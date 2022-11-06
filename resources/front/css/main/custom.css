@@ -1,0 +1,99 @@
+.sidebar-wrapper .sidebar-header img {
+    height: 2.2rem !important;
+}
+
+body.theme-light .logo-white {
+    display: none !important;
+}
+
+body.theme-dark .logo-black {
+    display: none !important;
+}
+
+.activity-feed {
+    padding: 15px;
+    list-style:none;
+    /*margin-top: 30px !important;*/
+    margin-bottom: 0 !important;
+    padding-left: 15px !important;
+    padding-bottom: 0 !important;
+}
+
+.activity-feed .feed-item {
+    position: relative;
+    padding-bottom: 20px;
+    padding-left: 30px;
+    border-left:2px solid #e4e8eb;
+    text-align: left !important;
+}
+
+.activity-feed .feed-item:last-child {
+    border-color:transparent;
+    padding-bottom: 0 !important;
+}
+
+.activity-feed .feed-item::after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: -7px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background:#177dff;
+}
+
+.feed-item-default::after {
+    background:#1a2035 !important;
+}
+
+.feed-item-primary::after {
+    background:#1572e8 !important;
+}
+
+.feed-item-secondary::after {
+    background:#6861ce !important;
+}
+
+.feed-item-success::after {
+    background:#31ce36 !important;
+}
+
+.feed-item-danger::after {
+    background:#f25961 !important;
+}
+
+.feed-item-info::after {
+    background:#48abf7 !important;
+}
+
+.feed-item-warning::after {
+    background:#ffad46 !important;
+}
+
+.activity-feed .feed-item .date {
+    display: block;
+    position: relative;
+    top: -5px;
+    color: #8c96a3;
+    text-transform: uppercase;
+    font-size:13px;
+    text-align: left;
+}
+
+.activity-feed .feed-item .text {
+    position: relative;
+    top:-3px;
+    text-align: left;
+}
+
+.form-group label {
+    margin-bottom: 10px;
+}
+.form-group {
+    margin-bottom: 1.3rem !important;
+}
+.form-group:last-child {
+    margin-bottom: 0 !important;
+}

@@ -14,6 +14,10 @@
 @section('content')
     <div class="row">
 
+        @if($clients->isEmpty())
+            <h5 class="text-gray-500">К сожалению, клиентов не найдено 😢</h5>
+        @else
+
         @foreach($clients as $client)
             <div class="col-md-4">
                 <div class="card">
@@ -85,12 +89,19 @@
                             <a href="#" class="btn icon btn-success me-2 mb-2"><i class="bi bi-people-fill"></i> Добавить ЛПР</a>
                             <a href="#" class="btn icon btn-success me-2 mb-2"><i class="bi bi-file-binary-fill"></i> Заполнить реквизиты</a>
                             <a href="#" class="btn icon btn-primary me-2 mb-2"><i class="bi bi-pencil"></i> Редактироввать</a>
-                            <a href="#" class="btn icon btn-danger me-2 mb-2"><i class="bi bi-trash-fill"></i> Удалить</a>
+                            <form action="{{route('clients.destroy', ['client' => $client->id])}}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn icon btn-danger me-2 mb-2"><i class="bi bi-trash-fill"></i> Удалить</button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         @endforeach
+
+        @endif
+
     </div>
 
     {{ $clients->links() }}

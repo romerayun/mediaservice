@@ -21,6 +21,8 @@ mix.styles([
 mix.js([
     'resources/front/js/bootstrap.js',
     'resources/front/js/app.js',
+    'resources/front/js/imask.js',
+    'resources/front/js/main.js',
 ], 'public/js/all.js');
 
 

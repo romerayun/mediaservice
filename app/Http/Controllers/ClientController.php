@@ -79,8 +79,8 @@ class ClientController extends Controller
             $rc->client_id = $idClient;
             $rc->save();
             DB::commit();
-            $request->session()->flash('success', 'Данные успешно добавлены 👍');
-            return back();
+                $request->session()->flash('success', 'Данные успешно добавлены 👍');
+                return back();
         } catch (\Exception $exception) {
             DB::rollback();
 
@@ -148,4 +148,6 @@ class ClientController extends Controller
         $client->delete();
         return redirect()->route('clients.index')->with('success', 'Данные успешно удалены 👍');
     }
+
+
 }

@@ -10,6 +10,23 @@ class RequisiteClient extends Model
     use HasFactory;
     protected $table = 'requisites_clients';
 
+    protected $fillable = [
+        'fullName',
+        'legalForm',
+        'INN',
+        'OGRN',
+        'lawAddress',
+        'checkingAccount',
+        'correspondentAccount',
+        'BIC',
+        'nameBank',
+        'KPP',
+        'KBK',
+        'buhName',
+        'phone',
+        'client_id',
+    ];
+
     public function client()
     {
         return $this->belongsTo(Client::class);

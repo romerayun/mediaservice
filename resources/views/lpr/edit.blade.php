@@ -1,6 +1,6 @@
 @extends('layout.layout')
 @section('page-heading')
-    Управление ЛПР <a href="{{route('clients.index')}}" class="btn btn-sm btn-primary">Назад</a>
+    Управление ЛПР <a href="{{route('lpr.createLpr', ['client_id' => $lpr->client_id])}}" class="btn btn-sm btn-primary">Назад</a>
 @endsection
 
 
@@ -10,10 +10,10 @@
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
-
-                        <h4 class="card-title mb-4 ">Добавление ЛПР</h4>
-                        <form action="{{route('lpr.storeLpr', ['client_id' => $client_id])}}" method="POST">
+                        <h4 class="card-title mb-4 ">Редактирование ЛПР</h4>
+                        <form action="{{route('lpr.update', ['lpr' => $lpr->id])}}" method="POST">
                             @csrf
+                            @method('PUT')
                             <div class="form-body">
                                 <div class="row">
                                     <div class="col-md-4">
@@ -23,7 +23,7 @@
                                                    class="form-control @if($errors->has('surname')) is-invalid @endif"
                                                    name="surname"
                                                    placeholder="Введите фамилию..." required
-                                                   value="{{old('surname')}}">
+                                                   value="{{$lpr->surname}}">
                                             @if($errors->has('surname'))
                                                 <div class="invalid-feedback">
                                                     <i class="bx bx-radio-circle"></i>
@@ -41,7 +41,7 @@
                                                    class="form-control @if($errors->has('name')) is-invalid @endif"
                                                    name="name"
                                                    placeholder="Введите имя..." required
-                                                   value="{{old('name')}}">
+                                                   value="{{$lpr->name}}">
                                             @if($errors->has('name'))
                                                 <div class="invalid-feedback">
                                                     <i class="bx bx-radio-circle"></i>
@@ -59,7 +59,7 @@
                                                    class="form-control @if($errors->has('patron')) is-invalid @endif"
                                                    name="patron"
                                                    placeholder="Введите отчество..." required
-                                                   value="{{old('patron')}}">
+                                                   value="{{$lpr->patron}}">
                                             @if($errors->has('patron'))
                                                 <div class="invalid-feedback">
                                                     <i class="bx bx-radio-circle"></i>
@@ -79,7 +79,7 @@
                                                class="form-control @if($errors->has('post')) is-invalid @endif"
                                                name="post"
                                                placeholder="Введите должность..." required
-                                               value="{{old('post')}}">
+                                               value="{{$lpr->post}}">
                                         @if($errors->has('post'))
                                             <div class="invalid-feedback">
                                                 <i class="bx bx-radio-circle"></i>
@@ -99,7 +99,7 @@
                                                    class="form-control @if($errors->has('phone')) is-invalid @endif"
                                                    name="phone"
                                                    placeholder="Введите телефон..." required
-                                                   value="{{old('phone')}}">
+                                                   value="{{$lpr->phone}}">
                                             @if($errors->has('phone'))
                                                 <div class="invalid-feedback">
                                                     <i class="bx bx-radio-circle"></i>
@@ -117,7 +117,7 @@
                                                    class="form-control @if($errors->has('date_of_birth')) is-invalid @endif"
                                                    name="date_of_birth"
                                                    placeholder="Введите день рождения ЛПР..." required
-                                                   value="{{old('date_of_birth')}}">
+                                                   value="{{$lpr->getDateBirth($lpr->date_of_birth)}}">
                                             @if($errors->has('date_of_birth'))
                                                 <div class="invalid-feedback">
                                                     <i class="bx bx-radio-circle"></i>
@@ -133,7 +133,7 @@
                                 <div class="col-md-12 mt-3">
                                     <div class="form-group">
                                         <label>Дополнительные комменатрии: </label>
-                                        <textarea class="form-control @if($errors->has('comment')) is-invalid @endif" id="comment" name="comment" rows="3" placeholder="Введите дополнительные комментарии...">{{old('comment')}}</textarea>
+                                        <textarea class="form-control @if($errors->has('comment')) is-invalid @endif" id="comment" name="comment" rows="3" placeholder="Введите дополнительные комментарии...">{{$lpr->comment}}</textarea>
                                         @if($errors->has('comment'))
                                             <div class="invalid-feedback">
                                                 <i class="bx bx-radio-circle"></i>
@@ -156,42 +156,4 @@
         </div>
     </div>
 
-
-    @if($lprs->count() == 0)
-        <h5 class="text-gray-500">К сожалению, ЛПР не найдено 😢</h5>
-    @else
-        <h5 class="text-gray-500">Список ЛПР</h5>
-        <table class="table table-lg table-hover">
-            <thead>
-            <tr>
-                <th>#</th>
-                <th>ФИО</th>
-                <th>Должность</th>
-                <th>Дата рождения</th>
-                <th>Комментарий</th>
-                <th class="text-center">Действие</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach($lprs as $key => $item)
-                <tr>
-                    <td>{{$key+1}}</td>
-                    <td>{{$item->surname}} {{$item->name}} {{$item->patron}}</td>
-                    <td>{{$item->post}}</td>
-                    <td>{{$item->getDateBirth($item->date_of_birth)}}</td>
-                    <td>{{$item->getComment($item->comment)}}</td>
-                    <td class="text-center">
-                        <a href="{{route('lpr.edit', ['lpr' => $item->id])}}" class="text-primary"><i class="bi bi-pen-fill"></i></a>
-                        <form action="{{route('lpr.destroy', ['lpr' => $item->id])}}" method="POST" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <a href="#" class="text-danger ms-2 delete"><i class="bi bi-trash-fill"></i></a>
-                        </form>
-                    </td>
-                </tr>
-
-            @endforeach
-            </tbody>
-        </table>
-    @endif
 @endsection

@@ -34,17 +34,6 @@ if (document.getElementById('date_of_birth')) {
                     to: 9999,
                 }
             },
-            format: function (date) {
-                var day = date.getDate();
-                var month = date.getMonth() + 1;
-                var year = date.getFullYear();
-
-                if (day < 10) day = "0" + day;
-                if (month < 10) month = "0" + month;
-
-                console.log([year, month, day].join('-'));
-                return [year, month, day].join('-');
-            },
         });
 }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreLpr;
 use App\Models\LprClient;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -31,18 +32,21 @@ class LprController extends Controller
 
     public function createLpr($client_id) {
 
-        return view('lpr.create', compact('client_id'));
+        $lprs = LprClient::where('client_id', $client_id)->get();
+        return view('lpr.create', compact('client_id', 'lprs'));
     }
 
     public function storeLpr($client_id, StoreLpr $request) {
 
         DB::beginTransaction();
         try {
+
+            $date = Carbon::createFromFormat('d.m.Y', $request->date_of_birth)->format('Y-m-d');
+            $request->merge(['date_of_birth' => $date, 'client_id' => $client_id]);
             $lpr = LprClient::create($request->all());
             DB::commit();
-            $lpr->client_id = $client_id;
-            $lpr->save();
-            DB::commit();
+            $request->session()->flash('success', 'Данные успешно добавлены 👍');
+            return back();
         } catch (\Exception $exception) {
             DB::rollback();
 
@@ -83,7 +87,8 @@ class LprController extends Controller
      */
     public function edit($id)
     {
-        //
+        $lpr = LprClient::firstWhere('id', $id);
+        return view('lpr.edit', compact('lpr'));
     }
 
     /**
@@ -95,7 +100,11 @@ class LprController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $lpr = LprClient::firstWhere('id', $id);
+        $date = Carbon::createFromFormat('d.m.Y', $request->date_of_birth)->format('Y-m-d');
+        $request->merge(['date_of_birth' => $date]);
+        $lpr->update($request->all());
+        return redirect()->back()->with('success', 'Данные успешно обновлены 👍');
     }
 
     /**
@@ -106,6 +115,8 @@ class LprController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $lpr = LprClient::find($id);
+        $lpr->delete();
+        return redirect()->back()->with('success', 'Данные успешно удалены 👍');
     }
 }

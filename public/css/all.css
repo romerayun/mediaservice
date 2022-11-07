@@ -115,3 +115,7 @@ body.theme-dark .logo-black {
 .form-group:last-child {
     margin-bottom: 0 !important;
 }
+
+.swal2-styled {
+    margin: .3125em !important;
+}

@@ -86,13 +86,13 @@
                         </div>
                         <div class="d-inline-block">
                             <a href="#" class="btn icon btn-primary me-2 mb-2"><i class="bi bi-eye-fill"></i> Открыть</a>
-                            <a href="#" class="btn icon btn-success me-2 mb-2"><i class="bi bi-people-fill"></i> Добавить ЛПР</a>
+                            <a href="{{route('lpr.createLpr', ['client_id' => $client->id])}}" class="btn icon btn-success me-2 mb-2"><i class="bi bi-people-fill"></i> Добавить ЛПР</a>
                             <a href="#" class="btn icon btn-success me-2 mb-2"><i class="bi bi-file-binary-fill"></i> Заполнить реквизиты</a>
                             <a href="#" class="btn icon btn-primary me-2 mb-2"><i class="bi bi-pencil"></i> Редактироввать</a>
                             <form action="{{route('clients.destroy', ['client' => $client->id])}}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn icon btn-danger me-2 mb-2"><i class="bi bi-trash-fill"></i> Удалить</button>
+                                <button type="submit" class="btn icon btn-danger me-2 mb-2 delete"><i class="bi bi-trash-fill"></i> Удалить</button>
                             </form>
                         </div>
                     </div>

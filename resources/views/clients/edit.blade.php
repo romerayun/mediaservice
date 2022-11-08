@@ -1,6 +1,6 @@
 @extends('layout.layout')
 @section('page-heading')
-    Добавление клиента <a href="{{route('clients.index')}}" class="btn btn-sm btn-primary">Назад</a>
+    Управление клиентом &laquo;{{$client->name}}&raquo; <a href="{{route('clients.index')}}" class="btn btn-sm btn-primary">Назад</a>
 @endsection
 
 
@@ -19,9 +19,10 @@
                             </div>
                         @endif
 
-                        <h4 class="card-title mb-4 ">Информация о клиенте</h4>
-                        <form action="{{route('clients.storeFast')}}" method="POST" enctype="multipart/form-data">
+                        <h4 class="card-title mb-4 ">Редактирование информации о клиенте</h4>
+                        <form action="{{route('clients.update', ['client'=>$client->id])}}" method="POST" enctype="multipart/form-data">
                             @csrf
+                            @method('PUT')
                             <div class="form-body">
                                 <div class="row">
                                     <div class="col-md-12">
@@ -29,7 +30,7 @@
                                             <label>ИНН организации: </label>
                                             <input type="text" id="inn" class="form-control @if($errors->has('inn')) is-invalid @endif" name="inn"
                                                    placeholder="Введите ИНН..." required
-                                                   value="{{old('inn')}}">
+                                                   value="{{$client->requisite->INN}}">
                                             @if($errors->has('inn'))
                                                 <div class="invalid-feedback">
                                                     <i class="bx bx-radio-circle"></i>
@@ -40,10 +41,17 @@
                                             @endif
                                         </div>
                                         <div class="form-group">
+
+
                                             <label>Логотип организации: </label>
-                                            <input type="file" id="logo" class="form-control @if($errors->has('logo')) is-invalid @endif" name="logo"
-                                                   required
-                                                   value="{{old('logo')}}">
+                                            @if(!empty($client->logo))
+                                                <div class="avatar avatar-xl d-block text-start mb-3">
+                                                    <img src="{{asset('storage').'/'.$client->logo}}" alt="Логотип организации">
+                                                </div>
+                                            @else
+                                                <p class="text-danger">Фото не загружено 🥺</p>
+                                            @endif
+                                            <input type="file" id="logo" class="form-control @if($errors->has('logo')) is-invalid @endif" name="logo">
                                             @if($errors->has('logo'))
                                                 <div class="invalid-feedback">
                                                     <i class="bx bx-radio-circle"></i>
@@ -57,7 +65,7 @@
                                             <label>Наименование организации: </label>
                                             <input type="text" id="name" class="form-control @if($errors->has('name')) is-invalid @endif" name="name"
                                                    placeholder="Введите наименование..." required
-                                                   value="{{old('name')}}">
+                                                   value="{{$client->name}}">
                                             @if($errors->has('name'))
                                                 <div class="invalid-feedback">
                                                     <i class="bx bx-radio-circle"></i>
@@ -71,7 +79,7 @@
                                             <label>Телефон: </label>
                                             <input type="tel" id="phone" class="form-control @if($errors->has('phone')) is-invalid @endif" name="phone"
                                                    placeholder="Введите телефон..." required
-                                                   value="{{old('phone')}}">
+                                                   value="{{$client->phone}}">
                                             @if($errors->has('phone'))
                                                 <div class="invalid-feedback">
                                                     <i class="bx bx-radio-circle"></i>
@@ -85,7 +93,7 @@
                                             <label>Адрес организации: </label>
                                             <input type="text" id="address" class="form-control @if($errors->has('address')) is-invalid @endif" name="address"
                                                    placeholder="Введите адрес..." required
-                                                   value="{{old('address')}}">
+                                                   value="{{$client->address}}">
                                             @if($errors->has('address'))
                                                 <div class="invalid-feedback">
                                                     <i class="bx bx-radio-circle"></i>
@@ -99,7 +107,7 @@
                                             <label>E-mail: </label>
                                             <input type="email" id="email" class="form-control @if($errors->has('email')) is-invalid @endif" name="email"
                                                    placeholder="Введите e-mail..." required
-                                                   value="{{old('email')}}">
+                                                   value="{{$client->email}}">
                                             @if($errors->has('email'))
                                                 <div class="invalid-feedback">
                                                     <i class="bx bx-radio-circle"></i>
@@ -115,7 +123,7 @@
                                                 <i>https://namesite.com</i>)</small>
                                             <input type="text" id="website" class="form-control @if($errors->has('website')) is-invalid @endif" name="website"
                                                    placeholder="Введите адрес сайта..." required
-                                                   value="{{old('website')}}">
+                                                   value="{{$client->website}}">
                                             @if($errors->has('website'))
                                                 <div class="invalid-feedback">
                                                     <i class="bx bx-radio-circle"></i>
@@ -130,7 +138,7 @@
                                             <input type="text" id="date_of_birth" class="form-control @if($errors->has('date_of_birth')) is-invalid @endif"
                                                    name="date_of_birth"
                                                    placeholder="Выберите дату рождения компании" required
-                                                   value="{{old('date_of_birth')}}">
+                                                   value="{{$client->getDateBirth($client->date_of_birth)}}">
                                             @if($errors->has('date_of_birth'))
                                                 <div class="invalid-feedback">
                                                     <i class="bx bx-radio-circle"></i>

@@ -53,7 +53,6 @@ class LprController extends Controller
             $request->session()->flash('error', 'При добавлении данных произошла ошибка 😢'. $exception);
             return back();
         }
-        return true;
 //        return view('lpr.create');
     }
 

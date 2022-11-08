@@ -57,6 +57,16 @@
                         </a>
                     </li>
 
+                    <li class="sidebar-title">Внутреняя структура</li>
+
+                    <li
+                        class="sidebar-item  ">
+                        <a href="{{route('groups.index')}}" class='sidebar-link'>
+                            <i class="bi bi-person-workspace"></i>
+                            <span>Отделы</span>
+                        </a>
+                    </li>
+
 {{--                    <li--}}
 {{--                        class="sidebar-item has-sub">--}}
 {{--                        <a href="#" class='sidebar-link'>--}}

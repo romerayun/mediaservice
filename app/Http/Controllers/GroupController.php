@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreRequisitesClients;
-use App\Models\RequisiteClient;
+use App\Http\Requests\StoreGroups;
+use App\Models\Group;
 use Illuminate\Http\Request;
+use Illuminate\Session\Store;
+use Illuminate\Support\Facades\DB;
 
-class RequisitesClient extends Controller
+class GroupController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,7 +17,8 @@ class RequisitesClient extends Controller
      */
     public function index()
     {
-        //
+        $groups = Group::all();
+        return view('groups.index', compact('groups'));
     }
 
     /**
@@ -25,7 +28,7 @@ class RequisitesClient extends Controller
      */
     public function create()
     {
-        //
+        return view('groups.create');
     }
 
     /**
@@ -34,9 +37,20 @@ class RequisitesClient extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreGroups $request)
     {
-        //
+        DB::beginTransaction();
+        try {
+            Group::create($request->all());
+            DB::commit();
+            $request->session()->flash('success', 'Данные успешно добавлены 👍');
+            return back();
+        } catch (\Exception $exception) {
+            DB::rollback();
+
+            $request->session()->flash('error', 'При добавлении данных произошла ошибка 😢');
+            return back();
+        }
     }
 
     /**
@@ -58,8 +72,8 @@ class RequisitesClient extends Controller
      */
     public function edit($id)
     {
-        $requisites = RequisiteClient::firstWhere('id', $id);
-        return view('requisites.index', compact('requisites'));
+        $group = Group::firstWhere('id', $id);
+        return view('groups.edit', compact('group'));
     }
 
     /**
@@ -69,21 +83,10 @@ class RequisitesClient extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(StoreRequisitesClients $request, $id)
+    public function update(StoreGroups $request, $id)
     {
-        $inn = $request->input('INN');
-
-        $resultInn = RequisiteClient::where('INN', $inn)->first();
-
-        if ($resultInn != null) {
-            if ($resultInn->id != $id) {
-                $request->session()->flash('infoClient', $resultInn->client);
-                return back();
-            }
-        }
-
-        $requisites = RequisiteClient::firstWhere('id', $id);
-        $requisites->update($request->all());
+        $group = Group::firstWhere('id', $id);
+        $group->update($request->all());
         return redirect()->back()->with('success', 'Данные успешно обновлены 👍');
     }
 
@@ -95,6 +98,8 @@ class RequisitesClient extends Controller
      */
     public function destroy($id)
     {
-        //
+        $group = Group::find($id);
+        $group->delete();
+        return redirect()->back()->with('success', 'Данные успешно удалены 👍');
     }
 }

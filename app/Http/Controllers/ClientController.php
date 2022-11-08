@@ -8,6 +8,7 @@ use App\Models\LprClient;
 use App\Models\RequisiteClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ClientController extends Controller
 {
@@ -31,7 +32,7 @@ class ClientController extends Controller
      */
     public function create()
     {
-        return view('clients.create');
+
     }
 
     public function createFast()
@@ -45,17 +46,19 @@ class ClientController extends Controller
 
         $validatedData = $request->validate(
             [
-                'inn' => 'required|integer',
+                'inn' => 'required|regex:/^[0-9]+$/|min:10|max:12',
             ],
             [
                 'inn.required' => 'Поле ИНН не может быть пустым',
-                'inn.integer' => 'Поле ИНН может состоять только из цифр',
+                'inn.regex' => 'Поле ИНН может состоять только из цифр',
+                'INN.min' => 'Поле ИНН не может быть меньше 10 символов',
+                'INN.max' => 'Поле ИНН не может быть больше 12 символов',
             ]
         );
 
         $inn = $request->input('inn');
 
-        $resultInn = RequisiteClient::where('inn', $inn)->first();
+        $resultInn = RequisiteClient::where('INN', $inn)->first();
         if ($resultInn != null) {
             $request->session()->flash('infoClient', $resultInn->client);
             return back();
@@ -84,7 +87,7 @@ class ClientController extends Controller
         } catch (\Exception $exception) {
             DB::rollback();
 
-            $request->session()->flash('error', 'При добавлении данных произошла ошибка 😢'. $exception);
+            $request->session()->flash('error', 'При добавлении данных произошла ошибка 😢');
             return back();
         }
 
@@ -110,7 +113,8 @@ class ClientController extends Controller
      */
     public function show($id)
     {
-        //
+        $client = Client::firstWhere('id', $id);
+        return view('clients.show', compact('client'));
     }
 
     /**
@@ -121,7 +125,8 @@ class ClientController extends Controller
      */
     public function edit($id)
     {
-        //
+        $client = Client::firstWhere('id', $id);
+        return view('clients.edit', compact('client'));
     }
 
     /**
@@ -131,9 +136,49 @@ class ClientController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(StoreClients $request, $id)
     {
-        //
+        $inn = $request->input('inn');
+
+        $resultInn = RequisiteClient::where('INN', $inn)->first();
+
+        if ($resultInn != null) {
+            if ($resultInn->client_id != $id) {
+                $request->session()->flash('infoClient', $resultInn->client);
+                return back();
+            }
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $client = Client::firstWhere('id', $id);
+
+            $client->update($request->all());
+            DB::commit();
+
+            $data = [];
+            if ($request->hasFile('logo')) {
+                Storage::delete($client->logo);
+                $folder = date("Y-m-d");
+                $data['logo'] = $request->file('logo')->store("images/{$folder}");
+                $client->logo = $data['logo'];
+                $client->save();
+                DB::commit();
+            }
+
+
+            $client->requisite->INN = $inn;
+            $client->save();
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Данные успешно обновлены 👍');
+        } catch (\Exception $exception) {
+            DB::rollback();
+
+            $request->session()->flash('error', 'При добавлении данных произошла ошибка 😢');
+            return back();
+        }
     }
 
     /**

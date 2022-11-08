@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -30,5 +31,11 @@ class Client extends Model
     public function requisite()
     {
         return $this->hasOne(RequisiteClient::class, 'client_id');
+    }
+
+    // Carbon
+
+    public function getDateBirth($date): string {
+        return Carbon::parse($date)->format('d.m.Y');
     }
 }

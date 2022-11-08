@@ -60,7 +60,7 @@
                             @else
                                 <p class="mb-1"><b>Полное наименование: </b>@if($client->requisite->fullName){{$client->requisite->fullName}} @else <span class="text-danger">Не заполнено</span> @endif</p>
                                 <p class="mb-1"><b>ИНН: </b>{{$client->requisite->INN}} </p>
-                                <p class="mb-1"><b>ОГРН(ОРГНИП): </b>@if($client->requisite->ORGN){{$client->requisite->ORGN}} @else <span class="text-danger">Не заполнено</span> @endif </p>
+                                <p class="mb-1"><b>ОГРН(ОРГНИП): </b>@if($client->requisite->OGRN){{$client->requisite->OGRN}} @else <span class="text-danger">Не заполнено</span> @endif </p>
                             @endif
 
 
@@ -85,14 +85,14 @@
 
                         </div>
                         <div class="d-inline-block">
-                            <a href="#" class="btn icon btn-primary me-2 mb-2"><i class="bi bi-eye-fill"></i> Открыть</a>
-                            <a href="{{route('lpr.createLpr', ['client_id' => $client->id])}}" class="btn icon btn-success me-2 mb-2"><i class="bi bi-people-fill"></i> Управление ЛПР</a>
-                            <a href="#" class="btn icon btn-success me-2 mb-2"><i class="bi bi-file-binary-fill"></i> Управление реквизитами</a>
-                            <a href="#" class="btn icon btn-primary me-2 mb-2"><i class="bi bi-pencil"></i> Редактироввать</a>
+                            <a href="{{route('clients.show', ['client' => $client->id])}}" class="btn btn-sm icon btn-primary me-2 mb-2"><i class="bi bi-eye-fill"></i> Открыть</a>
+                            <a href="{{route('lpr.createLpr', ['client_id' => $client->id])}}" class="btn btn-sm icon btn-success me-2 mb-2"><i class="bi bi-people-fill"></i> Управление ЛПР</a>
+                            <a href="{{route('requisites.edit', ['requisite' => $client->requisite->id])}}" class="btn btn-sm icon btn-success me-2 mb-2"><i class="bi bi-file-binary-fill"></i> Управление реквизитами</a>
+                            <a href="{{route('clients.edit', ['client' => $client->id])}}" class="btn btn-sm icon btn-primary me-2 mb-2"><i class="bi bi-pencil"></i> Редактировать</a>
                             <form action="{{route('clients.destroy', ['client' => $client->id])}}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn icon btn-danger me-2 mb-2 delete"><i class="bi bi-trash-fill"></i> Удалить</button>
+                                <button type="submit" class="btn icon btn-danger me-2 mb-2 delete btn-sm"><i class="bi bi-trash-fill"></i> Удалить</button>
                             </form>
                         </div>
                     </div>

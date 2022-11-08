@@ -25,7 +25,7 @@ class StoreClients extends FormRequest
     {
         return [
             'name' => 'required',
-            'logo' => 'required|image',
+            'logo' => 'nullable|image',
             'phone' => 'required|regex:/^(\+7)(\()[0-9]{3}(\))[0-9]{3}(\-)[0-9]{2}(\-)[0-9]{2}$/',
             'email' => 'required|email',
             'address' => 'required',
@@ -46,7 +46,7 @@ class StoreClients extends FormRequest
             'address.required' => 'Поле адрес не может быть пустым',
             'website.required' => 'Поле сайт не может быть пустым',
             'phone.required' => 'Поле номер телефона не может быть пустым',
-            'date_of_birth.required' => 'Поле номер телефона не может быть пустым',
+            'date_of_birth.required' => 'Поле день рождения компании не может быть пустым',
             'phone.regex' => 'Поле номер телефона должен быть в формате +7(999)999-99-99',
         ];
     }

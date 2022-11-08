@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\GroupController;
 use App\Http\Controllers\LprController;
+use App\Http\Controllers\RequisitesClient;
+use App\Models\RequisiteClient;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,4 +29,8 @@ Route::resource('clients', ClientController::class);
 Route::get('clients/create-lpr/{client_id}', [LprController::class, 'createLpr'])->name('lpr.createLpr');
 Route::post('clients/create-lpr/{client_id}', [LprController::class, 'storeLpr'])->name('lpr.storeLpr');
 Route::resource('lpr', LprController::class);
+
+Route::resource('requisites', RequisitesClient::class);
+
+Route::resource('groups', GroupController::class);
 

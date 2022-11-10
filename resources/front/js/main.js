@@ -1,5 +1,6 @@
 const Swal = require('sweetalert2');
 global.$ = global.jQuery = require('jquery');
+require('select2');
 
 if (document.getElementById('phone')) {
     var elPhone = document.getElementById('phone');
@@ -56,3 +57,5 @@ $('.delete').click(function(event) {
         }
     })
 });
+
+$('.js-example-basic-single').select2();

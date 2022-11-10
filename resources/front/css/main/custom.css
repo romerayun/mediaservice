@@ -101,3 +101,114 @@ body.theme-dark .logo-black {
 .swal2-styled {
     margin: .3125em !important;
 }
+
+.select2 {
+    width: 100% !important;
+}
+
+body.theme-dark .select2-container--default .select2-selection--single {
+    background-color: #1b1b29 !important;
+    border: 1px solid #35354f !important;
+}
+body.theme-dark .select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #c2c2d9;
+}
+
+body.theme-dark .select2-dropdown {
+    background-color: #1b1b29 !important;
+    border-color: #35354f !important;
+}
+
+body.theme-dark .select2-container--default .select2-search--dropdown .select2-search__field {
+    background: transparent !important;
+    border-color: #35354f !important;
+}
+
+body.theme-dark .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+    background-color: #435ebe;
+}
+
+body.theme-dark .select2-container--default .select2-results__option--selected {
+    background-color: #35354f !important;
+}
+
+body.theme-dark .select2-container--default .select2-results__option--selected:hover {
+    background-color: #435ebe !important;
+}
+
+
+body.theme-light .select2-container--default .select2-selection--single {
+    background-color: #fff !important;
+    border: 1px solid #dce7f1 !important;
+}
+body.theme-light .select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #607080;
+}
+
+body.theme-light .select2-dropdown {
+    /*background-color: #1b1b29 !important;*/
+    border-color: #dce7f1 !important;
+}
+
+body.theme-light .select2-container--default .select2-search--dropdown .select2-search__field {
+    background: transparent !important;
+    border-color: #dce7f1 !important;
+}
+
+body.theme-light .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+    background-color: #435ebe;
+}
+
+
+body.theme-light .select2-container--default .select2-results__option--selected {
+    background-color: #dce7f1 !important;
+}
+
+body.theme-light .select2-container--default .select2-results__option--selected:hover {
+    background-color: #435ebe !important;
+}
+
+body .is-invalid .select2-container--default .select2-selection--single {
+    border-color: #dc3545 !important;
+}
+
+body .is-invalid .select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #dc3545 !important;
+}
+
+body .is-invalid .select2-container--default .select2-selection--single .select2-selection__arrow b {
+    border-color: #dc3545 transparent transparent transparent !important;
+}
+
+
+body.theme-dark .is-invalid label {
+    color: #c2c2d9 !important;
+}
+body.theme-light .is-invalid label {
+    color: rgb(96, 112, 128) !important;
+}
+
+/*#607080*/
+
+
+.select2-container .select2-selection--single {
+    height: 38px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 38px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    top: 5px !important;
+    right: 6px !important;
+}
+
+.select2-results__options {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered {
+    padding-left: 12px !important;
+}

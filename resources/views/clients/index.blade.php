@@ -19,7 +19,7 @@
         @else
 
         @foreach($clients as $client)
-            <div class="col-md-4">
+            <div class="col-md-4 col-sm-12">
                 <div class="card">
                     <div class="card-header">
                         <div class="avatar avatar-lg me-3 align-items-center">

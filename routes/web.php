@@ -4,6 +4,8 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\LprController;
 use App\Http\Controllers\RequisitesClient;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 use App\Models\RequisiteClient;
 use Illuminate\Support\Facades\Route;
 
@@ -33,4 +35,6 @@ Route::resource('lpr', LprController::class);
 Route::resource('requisites', RequisitesClient::class);
 
 Route::resource('groups', GroupController::class);
+Route::resource('roles', RoleController::class);
+Route::resource('users', UserController::class);
 

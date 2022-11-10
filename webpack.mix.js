@@ -15,12 +15,12 @@ mix.styles([
     'resources/front/css/main/app.css',
     'resources/front/css/main/app-dark.css',
     'resources/front/css/shared/iconly.css',
+    'resources/front/css/main/select2.min.css',
     'resources/front/css/main/custom.css',
 ], 'public/css/all.css');
 
 
 mix.js([
-    'resources/front/js/jquery.min.js',
     'resources/front/js/bootstrap.js',
     'resources/front/js/app.js',
     'resources/front/js/imask.js',

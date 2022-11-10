@@ -66,6 +66,20 @@
                             <span>Отделы</span>
                         </a>
                     </li>
+                    <li
+                        class="sidebar-item  ">
+                        <a href="{{route('roles.index')}}" class='sidebar-link'>
+                            <i class="bi bi-briefcase-fill"></i>
+                            <span>Должности</span>
+                        </a>
+                    </li>
+                    <li
+                        class="sidebar-item  ">
+                        <a href="{{route('users.index')}}" class='sidebar-link'>
+                            <i class="bi bi-person-fill"></i>
+                            <span>Пользователи</span>
+                        </a>
+                    </li>
 
 {{--                    <li--}}
 {{--                        class="sidebar-item has-sub">--}}

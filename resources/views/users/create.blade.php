@@ -18,11 +18,29 @@
                 <div class="card-content">
                     <div class="card-body">
                         <h4 class="card-title mb-4 ">Добавление пользователя <sup class="text-danger">*</sup></h4>
-
-                        <form action="{{route('roles.store')}}" method="POST">
+                        <form action="{{route('users.store')}}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="form-body">
                                 <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>Фотография пользователя: </label>
+                                            <input type="file" id="photo" class="form-control @if($errors->has('photo')) is-invalid @endif"
+                                                   name="photo"
+                                                   accept="image/*"
+                                                   value="{{old('photo')}}">
+                                            @if($errors->has('photo'))
+                                                <div class="invalid-feedback">
+                                                    <i class="bx bx-radio-circle"></i>
+                                                    @foreach($errors->get('photo') as $message)
+                                                        {{$message}}<br>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
                                     <div class="col-md-4 col-sm-12">
                                         <div class="form-group">
                                             <label>Фамилия: </label>
@@ -83,7 +101,7 @@
                                     <div class="col-md-6 col-sm-12">
                                         <div class="form-group">
                                             <label>E-Mail: <span class="text-info text-opacity-75">(Данная почта будет использоваться для входа в CRM-систему)</span></label>
-                                            <input type="text" id="email"
+                                            <input type="email" id="email"
                                                    class="form-control @if($errors->has('email')) is-invalid @endif"
                                                    name="email"
                                                    placeholder="Введите e-mail..." required
@@ -101,7 +119,7 @@
                                     <div class="col-md-6 col-sm-12">
                                         <div class="form-group">
                                             <label>Телефон: </label>
-                                            <input type="text" id="phone"
+                                            <input type="tel" id="phone"
                                                    class="form-control @if($errors->has('phone')) is-invalid @endif"
                                                    name="phone"
                                                    placeholder="Введите имя..." required
@@ -121,17 +139,17 @@
 
                                 <div class="row mt-3">
                                     <div class="col-md-12">
-                                        <div class="form-group @if($errors->has('group_id')) is-invalid @endif">
+                                        <div class="form-group @if($errors->has('role_id')) is-invalid @endif">
                                             <label>Выберите должность: </label>
-                                            <select class="js-example-basic-single is-invalid" name="group_id" id="group_id">
+                                            <select class="js-example-basic-single is-invalid" name="role_id" id="role_id">
                                                 @foreach($roles as $role)
                                                     <option value="{{$role->id}}">{{$role->name}}</option>
                                                 @endforeach
                                             </select>
-                                            @if($errors->has('group_id'))
+                                            @if($errors->has('role_id'))
                                                 <div class="invalid-feedback">
                                                     <i class="bx bx-radio-circle"></i>
-                                                    @foreach($errors->get('group_id') as $message)
+                                                    @foreach($errors->get('role_id') as $message)
                                                         {{$message}}<br>
                                                     @endforeach
                                                 </div>

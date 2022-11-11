@@ -12,6 +12,22 @@ class UserM extends Model
     protected $table = 'users';
 
     protected $fillable = [
-
+        'name',
+        'email',
+        'password',
+        'surname',
+        'patron',
+        'phone',
+        'photo',
+        'role_id',
     ];
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function getFullName() {
+        return $this->surname . " " . $this->name . " " . $this->patron;
+    }
 }

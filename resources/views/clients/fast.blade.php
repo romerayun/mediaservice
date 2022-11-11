@@ -42,7 +42,7 @@
                                         <div class="form-group">
                                             <label>Логотип организации: </label>
                                             <input type="file" id="logo" class="form-control @if($errors->has('logo')) is-invalid @endif" name="logo"
-                                                   required
+                                                   required  accept="image/*"
                                                    value="{{old('logo')}}">
                                             @if($errors->has('logo'))
                                                 <div class="invalid-feedback">

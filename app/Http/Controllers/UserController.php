@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUser;
 use App\Models\Role;
 use App\Models\UserM;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -36,9 +40,30 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreUser $request)
     {
-        //
+        DB::beginTransaction();
+        $data = [];
+        try {
+            $password = Str::random(8);
+            $request->merge(['password' => Hash::make($password)]);
+
+            $user = UserM::create($request->all());
+            DB::commit();
+            $folder = date("Y-m-d");
+            $data['photo'] = $request->file('photo')->store("images/{$folder}");
+            $user->photo = $data['photo'];
+            $user->save();
+            DB::commit();
+
+            $request->session()->flash('success', 'Данные успешно добавлены 👍');
+            return back();
+        } catch (\Exception $exception) {
+            DB::rollback();
+
+            $request->session()->flash('error', 'При добавлении данных произошла ошибка 😢' . $exception);
+            return back();
+        }
     }
 
     /**

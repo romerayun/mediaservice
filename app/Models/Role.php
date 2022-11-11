@@ -22,4 +22,9 @@ class Role extends Model
         return $this->belongsTo(Group::class);
     }
 
+    public function users()
+    {
+        return $this->hasMany(UserM::class);
+    }
+
 }

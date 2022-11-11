@@ -14,10 +14,9 @@
 @section('content')
     <div class="row">
         <div class="col-md-12">
-            <div class="card">
-                <div class="card-content">
-                    <div class="card-body">
-                        <h4 class="card-title mb-4 ">Список пользователей</h4>
+
+
+{{--                        <h4 class="card-title mb-4 ">Список пользователей</h4>--}}
 
                         @if($users->isEmpty())
                             <h5 class="text-gray-500">К сожалению, пользователей не найдено 😢</h5>
@@ -33,14 +32,14 @@
                                                     <img src="{{asset('storage').'/'.$user->photo}}" alt="Фотография организации">
 
                                                 @endif
-                                                <h4 class="ms-lg-3 mb-0">{{$user->name}}</h4>
+                                                <h4 class="ms-lg-3 mb-0">{{$user->getFullName()}}</h4>
                                             </div>
                                         </div>
                                         <div class="card-body">
-                                            <div class="divider divider-left">
+                                            <div class="divider divider-left mt-0">
                                                 <div class="divider-text">Дополнительная информация</div>
                                             </div>
-                                            <p class="mb-1"><b>Должность: </b>{{$user->surname}}</p>
+                                            <p class="mb-1"><b>Должность: </b>{{$user->role->name}}</p>
                                             <p class="mb-1"><b>Телефон: </b><a href="tel:{{$user->phone}}">{{$user->phone}}</a></p>
                                             <p class="mb-1"><b>E-Mail: </b><a href="mailto:{{$user->email}}">{{$user->email}}</a></p>
 
@@ -50,17 +49,15 @@
                                                 <div class="divider-text">Действия</div>
 
                                             </div>
-{{--                                            <div class="d-inline-block">--}}
-{{--                                                <a href="{{route('clients.show', ['client' => $client->id])}}" class="btn btn-sm icon btn-primary me-2 mb-2"><i class="bi bi-eye-fill"></i> Открыть</a>--}}
-{{--                                                <a href="{{route('lpr.createLpr', ['client_id' => $client->id])}}" class="btn btn-sm icon btn-success me-2 mb-2"><i class="bi bi-people-fill"></i> Управление ЛПР</a>--}}
-{{--                                                <a href="{{route('requisites.edit', ['requisite' => $client->requisite->id])}}" class="btn btn-sm icon btn-success me-2 mb-2"><i class="bi bi-file-binary-fill"></i> Управление реквизитами</a>--}}
-{{--                                                <a href="{{route('clients.edit', ['client' => $client->id])}}" class="btn btn-sm icon btn-primary me-2 mb-2"><i class="bi bi-pencil"></i> Редактировать</a>--}}
-{{--                                                <form action="{{route('clients.destroy', ['client' => $client->id])}}" method="POST">--}}
-{{--                                                    @csrf--}}
-{{--                                                    @method('DELETE')--}}
-{{--                                                    <button type="submit" class="btn icon btn-danger me-2 mb-2 delete btn-sm"><i class="bi bi-trash-fill"></i> Удалить</button>--}}
-{{--                                                </form>--}}
-{{--                                            </div>--}}
+                                            <div class="d-inline-block">
+                                                <a href="{{route('users.show', ['user' => $user->id])}}" class="btn btn-sm icon btn-primary me-2 mb-2"><i class="bi bi-eye-fill"></i> Открыть</a>
+                                                <a href="{{route('users.edit', ['user' => $user->id])}}" class="btn btn-sm icon btn-primary me-2 mb-2"><i class="bi bi-pencil"></i> Редактировать</a>
+                                                <form action="{{route('users.destroy', ['user' => $user->id])}}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn icon btn-danger me-2 mb-2 delete btn-sm"><i class="bi bi-trash-fill"></i> Удалить</button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -68,9 +65,8 @@
                         @endif
 
                     </div>
-                </div>
-            </div>
-        </div>
+
+
     </div>
 
 @endsection

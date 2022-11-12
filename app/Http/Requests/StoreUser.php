@@ -25,7 +25,7 @@ class StoreUser extends FormRequest
     {
         return [
             'name' => 'required',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:App\Models\UserM,email',
             'surname' => 'required',
             'patron' => 'required',
             'phone' => 'required|regex:/^(\+7)(\()[0-9]{3}(\))[0-9]{3}(\-)[0-9]{2}(\-)[0-9]{2}$/',
@@ -44,7 +44,8 @@ class StoreUser extends FormRequest
             'phone.required' => 'Поле телефон должно быть заполнено',
             'phone.regex' => 'Поле номер телефона должен быть в формате +7(999)999-99-99',
             'photo.image' => 'Загружаемый файл должен быть в формате (jpeg, png, bmp, gif, svg, webp)',
-            'email.email' => 'Поле email должно быть в формате info@example.ru',
+            'email.email' => 'Поле E-mail должно быть в формате info@example.ru',
+            'email.unique' => 'Пользователь с таким E-mail уже существует',
             'role_id.required' => 'Поле отдел не может быть пустым',
             'role_id.integer' => 'Поле отдел должно быть в числовом формате',
         ];

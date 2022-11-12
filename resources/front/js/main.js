@@ -59,3 +59,8 @@ $('.delete').click(function(event) {
 });
 
 $('.js-example-basic-single').select2();
+
+
+$("form").submit(function( event ) {
+    alert( "Handler for .submit() called." );
+});

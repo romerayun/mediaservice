@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUser;
+use App\Mail\TestMail;
+use App\Mail\UserRegistration;
 use App\Models\Role;
 use App\Models\UserM;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class UserController extends Controller
@@ -50,11 +53,16 @@ class UserController extends Controller
 
             $user = UserM::create($request->all());
             DB::commit();
-            $folder = date("Y-m-d");
-            $data['photo'] = $request->file('photo')->store("images/{$folder}");
-            $user->photo = $data['photo'];
-            $user->save();
-            DB::commit();
+
+            if ($request->hasFile('photo')) {
+                $folder = date("Y-m-d");
+                $data['photo'] = $request->file('photo')->store("images/{$folder}");
+                $user->photo = $data['photo'];
+                $user->save();
+                DB::commit();
+            }
+
+            Mail::to('romerayun@gmail.com')->send(new UserRegistration($password));
 
             $request->session()->flash('success', 'Данные успешно добавлены 👍');
             return back();

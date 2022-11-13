@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class UserRegistration extends Mailable
+class Feedback extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -30,6 +30,6 @@ class UserRegistration extends Mailable
      */
     public function build()
     {
-        return $this->subject("Регистрационные данные")->markdown('mail.feedback')->with($this->params);
+        return $this->markdown('mail.feedback')->with($this->params);
     }
 }

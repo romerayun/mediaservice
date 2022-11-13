@@ -7,6 +7,7 @@ use App\Http\Controllers\MailController;
 use App\Http\Controllers\RequisitesClient;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Mail\Feedback;
 use App\Models\RequisiteClient;
 use Illuminate\Support\Facades\Route;
 
@@ -42,4 +43,11 @@ Route::resource('users', UserController::class);
 
 // Mail Controller
 //Route::get('/send-mail', [MailController::class, 'sendMail'])->name('mail.send');
-
+//Route::get('/mail-preview', function(){
+//    $params = [
+//        'email' => 'romerayun@gmail.com',
+//        'password' => 'qwerty123',
+//    ];
+//
+//    return new Feedback($params);
+//});

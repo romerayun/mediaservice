@@ -48,7 +48,12 @@ class UserController extends Controller
         DB::beginTransaction();
         $data = [];
         try {
+            $email = $request->email;
             $password = Str::random(8);
+            $params = [
+                'email' => $email,
+                'password' => $password,
+            ];
             $request->merge(['password' => Hash::make($password)]);
 
             $user = UserM::create($request->all());
@@ -62,7 +67,7 @@ class UserController extends Controller
                 DB::commit();
             }
 
-            Mail::to('romerayun@gmail.com')->send(new UserRegistration($password));
+            Mail::to($email)->send(new UserRegistration($params));
 
             $request->session()->flash('success', 'Данные успешно добавлены 👍');
             return back();

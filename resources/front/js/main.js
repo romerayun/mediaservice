@@ -2,6 +2,25 @@ const Swal = require('sweetalert2');
 global.$ = global.jQuery = require('jquery');
 require('select2');
 
+
+let selector = '.sidebar-menu ul.menu .sidebar-item';
+let fullUrl = window.location.href;
+var url = new URL(fullUrl);
+
+if (url.pathname.split('/')[1] === '') {
+    url = url.origin;
+} else {
+    url = url.origin + '/' + url.pathname.split('/')[1];
+}
+
+$(selector).each(function(){
+    if ($(this).find('a').attr('href') === url){
+        $(selector).removeClass('active');
+        $(this).removeClass('active').addClass('active');
+    }
+});
+
+
 if (document.getElementById('phone')) {
     var elPhone = document.getElementById('phone');
     var maskOptions = {
@@ -62,5 +81,5 @@ $('.js-example-basic-single').select2();
 
 
 $("form").submit(function( event ) {
-    alert( "Handler for .submit() called." );
+    // alert( "Handler for .submit() called." );
 });

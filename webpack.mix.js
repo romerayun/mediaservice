@@ -19,6 +19,10 @@ mix.styles([
     'resources/front/css/main/custom.css',
 ], 'public/css/all.css');
 
+mix.styles([
+    'resources/front/css/pages/auth.css',
+], 'public/css/auth.css')
+
 
 mix.js([
     'resources/front/js/bootstrap.js',

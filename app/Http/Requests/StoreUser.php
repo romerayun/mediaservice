@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\App;
+use Illuminate\Validation\Rule;
 
 class StoreUser extends FormRequest
 {
@@ -23,9 +25,10 @@ class StoreUser extends FormRequest
      */
     public function rules()
     {
+
         return [
             'name' => 'required',
-            'email' => 'required|email|unique:App\Models\UserM,email',
+            'email' => 'required|email|unique:App\Models\UserM,email,'.$this->user,
             'surname' => 'required',
             'patron' => 'required',
             'phone' => 'required|regex:/^(\+7)(\()[0-9]{3}(\))[0-9]{3}(\-)[0-9]{2}(\-)[0-9]{2}$/',

@@ -42,7 +42,7 @@
                 <ul class="menu">
 
                     <li
-                        class="sidebar-item active ">
+                        class="sidebar-item">
                         <a href="{{route('home')}}" class='sidebar-link'>
                             <i class="bi bi-house-fill"></i>
                             <span>Главная</span>
@@ -78,6 +78,15 @@
                         <a href="{{route('users.index')}}" class='sidebar-link'>
                             <i class="bi bi-person-fill"></i>
                             <span>Пользователи</span>
+                        </a>
+                    </li>
+
+
+                    <li
+                        class="sidebar-item  ">
+                        <a href="{{route('users.logout')}}" class='sidebar-link'>
+                            <i class="bi bi-door-open-fill"></i>
+                            <span>Выйти</span>
                         </a>
                     </li>
 

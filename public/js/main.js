@@ -21118,6 +21118,20 @@ var __webpack_exports__ = {};
 var Swal = __webpack_require__(/*! sweetalert2 */ "./node_modules/sweetalert2/dist/sweetalert2.all.js");
 __webpack_require__.g.$ = __webpack_require__.g.jQuery = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 __webpack_require__(/*! select2 */ "./node_modules/select2/dist/js/select2.js");
+var selector = '.sidebar-menu ul.menu .sidebar-item';
+var fullUrl = window.location.href;
+var url = new URL(fullUrl);
+if (url.pathname.split('/')[1] === '') {
+  url = url.origin;
+} else {
+  url = url.origin + '/' + url.pathname.split('/')[1];
+}
+$(selector).each(function () {
+  if ($(this).find('a').attr('href') === url) {
+    $(selector).removeClass('active');
+    $(this).removeClass('active').addClass('active');
+  }
+});
 if (document.getElementById('phone')) {
   var elPhone = document.getElementById('phone');
   var maskOptions = {
@@ -21169,6 +21183,9 @@ $('.delete').click(function (event) {
   });
 });
 $('.js-example-basic-single').select2();
+$("form").submit(function (event) {
+  // alert( "Handler for .submit() called." );
+});
 })();
 
 /******/ })()

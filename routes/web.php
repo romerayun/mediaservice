@@ -9,6 +9,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Mail\Feedback;
 use App\Models\RequisiteClient;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,22 +24,43 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('home');
+    if (Auth::check()) {
+        return view('home');
+    } else {
+        return view('users.login');
+    }
 })->name('home');
 
-Route::get('clients/fast-add', [ClientController::class, 'createFast'])->name('clients.createFast');
-Route::post('clients/fast-add', [ClientController::class, 'storeFast'])->name('clients.storeFast');
-Route::resource('clients', ClientController::class);
 
-Route::get('clients/create-lpr/{client_id}', [LprController::class, 'createLpr'])->name('lpr.createLpr');
-Route::post('clients/create-lpr/{client_id}', [LprController::class, 'storeLpr'])->name('lpr.storeLpr');
-Route::resource('lpr', LprController::class);
 
-Route::resource('requisites', RequisitesClient::class);
+//Route::get('/', function () {
+//    return view('home');
+//})->name('home');
+//Route::group(['middleware' => 'admin'], function () {
+    Route::get('clients/fast-add', [ClientController::class, 'createFast'])->name('clients.createFast');
+    Route::post('clients/fast-add', [ClientController::class, 'storeFast'])->name('clients.storeFast');
+    Route::resource('clients', ClientController::class);
 
-Route::resource('groups', GroupController::class);
-Route::resource('roles', RoleController::class);
-Route::resource('users', UserController::class);
+    Route::get('clients/create-lpr/{client_id}', [LprController::class, 'createLpr'])->name('lpr.createLpr');
+    Route::post('clients/create-lpr/{client_id}', [LprController::class, 'storeLpr'])->name('lpr.storeLpr');
+    Route::resource('lpr', LprController::class);
+
+    Route::resource('requisites', RequisitesClient::class);
+
+    Route::resource('groups', GroupController::class);
+    Route::resource('roles', RoleController::class);
+
+
+    Route::resource('users', UserController::class);
+//});
+
+Route::group(['middleware' => 'guest'], function () {
+    Route::get('/login', [UserController::class, 'login'])->name('users.login');
+    Route::post('/login', [UserController::class, 'auth'])->name('users.auth');
+
+});
+
+Route::get('/logout', [UserController::class, 'logout'])->name('users.logout');
 
 
 // Mail Controller

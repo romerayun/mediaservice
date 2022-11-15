@@ -6,110 +6,149 @@
 
 @section('content')
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
+
+                        @if(session()->has('infoClient'))
+                            <div class="alert alert-danger alert-dismissible show fade mt-3">
+                                Добавление невозможно, такой клиент уже существует. <br>
+                                <b>Найден клиент - </b><a href="#">{{session('infoClient')['name']}}</a>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+
                         <h4 class="card-title mb-4 ">Информация о клиенте</h4>
-                        <div class="form-body">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label>Наименование организации: </label>
-                                        <input type="text" id="name" class="form-control" name="name"
-                                               placeholder="Введите наименование..." required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Телефон: </label>
-                                        <input type="tel" id="phone" class="form-control" name="phone"
-                                               placeholder="Введите телефон..." required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Адрес организации: </label>
-                                        <input type="text" id="address" class="form-control" name="address"
-                                               placeholder="Введите адрес..." required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>E-mail: </label>
-                                        <input type="email" id="email" class="form-control" name="email"
-                                               placeholder="Введите e-mail..." required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Официальный сайт: </label>
-                                        <small class="text-info text-opacity-75">(Например. <i>https://namesite.com</i>)</small>
-                                        <input type="text" id="website" class="form-control" name="website"
-                                               placeholder="Введите адрес сайта..." required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>День рождения компании: </label>
-                                        <input type="date" id="date_of_birth" class="form-control" name="date_of_birth"
-                                               placeholder="Выберите дату рождения компании" required>
+                        <form action="{{route('clients.store')}}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="form-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>ИНН организации: </label>
+                                            <input type="text" id="inn" class="form-control @if($errors->has('inn')) is-invalid @endif" name="inn"
+                                                   placeholder="Введите ИНН..." required
+                                                   value="{{old('inn')}}">
+                                            @if($errors->has('inn'))
+                                                <div class="invalid-feedback">
+                                                    <i class="bx bx-radio-circle"></i>
+                                                    @foreach($errors->get('inn') as $message)
+                                                        {{$message}}<br>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Логотип организации: </label>
+                                            <input type="file" id="logo" class="form-control @if($errors->has('logo')) is-invalid @endif" name="logo"
+                                                   accept="image/*"
+                                                   value="{{old('logo')}}">
+                                            @if($errors->has('logo'))
+                                                <div class="invalid-feedback">
+                                                    <i class="bx bx-radio-circle"></i>
+                                                    @foreach($errors->get('logo') as $message)
+                                                        {{$message}}<br>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Наименование организации: </label>
+                                            <input type="text" id="name" class="form-control @if($errors->has('name')) is-invalid @endif" name="name"
+                                                   placeholder="Введите наименование..." required
+                                                   value="{{old('name')}}">
+                                            @if($errors->has('name'))
+                                                <div class="invalid-feedback">
+                                                    <i class="bx bx-radio-circle"></i>
+                                                    @foreach($errors->get('name') as $message)
+                                                        {{$message}}<br>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Телефон: </label>
+                                            <input type="tel" id="phone" class="form-control @if($errors->has('phone')) is-invalid @endif" name="phone"
+                                                   placeholder="Введите телефон..." required
+                                                   value="{{old('phone')}}">
+                                            @if($errors->has('phone'))
+                                                <div class="invalid-feedback">
+                                                    <i class="bx bx-radio-circle"></i>
+                                                    @foreach($errors->get('phone') as $message)
+                                                        {{$message}}<br>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Адрес организации: </label>
+                                            <input type="text" id="address" class="form-control @if($errors->has('address')) is-invalid @endif" name="address"
+                                                   placeholder="Введите адрес..." required
+                                                   value="{{old('address')}}">
+                                            @if($errors->has('address'))
+                                                <div class="invalid-feedback">
+                                                    <i class="bx bx-radio-circle"></i>
+                                                    @foreach($errors->get('address') as $message)
+                                                        {{$message}}<br>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="form-group">
+                                            <label>E-mail: </label>
+                                            <input type="email" id="email" class="form-control @if($errors->has('email')) is-invalid @endif" name="email"
+                                                   placeholder="Введите e-mail..." required
+                                                   value="{{old('email')}}">
+                                            @if($errors->has('email'))
+                                                <div class="invalid-feedback">
+                                                    <i class="bx bx-radio-circle"></i>
+                                                    @foreach($errors->get('email') as $message)
+                                                        {{$message}}<br>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Официальный сайт: </label>
+                                            <small class="text-info text-opacity-75">(Например.
+                                                <i>https://namesite.com</i>)</small>
+                                            <input type="text" id="website" class="form-control @if($errors->has('website')) is-invalid @endif" name="website"
+                                                   placeholder="Введите адрес сайта..." required
+                                                   value="{{old('website')}}">
+                                            @if($errors->has('website'))
+                                                <div class="invalid-feedback">
+                                                    <i class="bx bx-radio-circle"></i>
+                                                    @foreach($errors->get('website') as $message)
+                                                        {{$message}}<br>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="form-group">
+                                            <label>День рождения компании: </label>
+                                            <input type="text" id="date_of_birth" class="form-control @if($errors->has('date_of_birth')) is-invalid @endif"
+                                                   name="date_of_birth"
+                                                   placeholder="Выберите дату рождения компании" required
+                                                   value="{{old('date_of_birth')}}">
+                                            @if($errors->has('date_of_birth'))
+                                                <div class="invalid-feedback">
+                                                    <i class="bx bx-radio-circle"></i>
+                                                    @foreach($errors->get('date_of_birth') as $message)
+                                                        {{$message}}<br>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <button type="submit" class="btn btn-success">Сохранить</button>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-content">
-                    <div class="card-body">
-                        <h4 class="card-title mb-4 ">Информация о ЛПР</h4>
-                        <div class="form-body">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>Фамилия: </label>
-                                                <input type="text" id="surname" class="form-control" name="name"
-                                                       placeholder="Введите фамилию..." required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>Имя: </label>
-                                                <input type="tel" id="name" class="form-control" name="name"
-                                                       placeholder="Введите имя..." required>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Отчество: </label>
-                                        <input type="text" id="address" class="form-control" name="address"
-                                               placeholder="Введите отчество..." required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Должность: </label>
-                                        <input type="text" id="post" class="form-control" name="post"
-                                               placeholder="Введите должность..." required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Телефон: </label>
-                                        <input type="tel" id="phone" class="form-control" name="phone"
-                                               placeholder="Введите телефон..." required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>День рождения ЛПР: </label>
-                                        <input type="date" id="date_of_birth" class="form-control" name="date_of_birth"
-                                               placeholder="Выберите дату рождения ЛПР" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Дополнительная информация: </label>
-                                        <textarea class="form-control" id="comment" name="comment" rows="2"></textarea>
-                                    </div>
-
-{{--                                    <a href="#" class="btn btn-success">Добавить еще</a>--}}
-                                </div>
-                            </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 @endsection

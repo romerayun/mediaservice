@@ -41,6 +41,7 @@ Route::get('/', function () {
     Route::post('clients/fast-add', [ClientController::class, 'storeFast'])->name('clients.storeFast');
     Route::resource('clients', ClientController::class);
 
+    Route::get('/all-clients', [ClientController::class, 'showAll'])->name('clients.showAll');
     Route::get('clients/create-lpr/{client_id}', [LprController::class, 'createLpr'])->name('lpr.createLpr');
     Route::post('clients/create-lpr/{client_id}', [LprController::class, 'storeLpr'])->name('lpr.storeLpr');
     Route::resource('lpr', LprController::class);

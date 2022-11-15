@@ -161,7 +161,7 @@
         <h5 class="text-gray-500">К сожалению, ЛПР не найдено 😢</h5>
     @else
         <h5 class="text-gray-500">Список ЛПР</h5>
-        <table class="table table-lg table-hover">
+        <table class="table table-lg table-hover" id="datatables">
             <thead>
             <tr>
                 <th>#</th>

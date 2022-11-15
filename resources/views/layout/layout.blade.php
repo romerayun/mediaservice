@@ -6,9 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRM MediaService</title>
 
+
     <link rel="stylesheet" href="{{@asset('css/all.css')}}">
+    <link rel="stylesheet" href="{{@asset('css/datatables.css')}}">
     <link rel="shortcut icon" href="{{asset('images/logo/favicon.svg')}}" type="image/x-icon">
     <link rel="shortcut icon" href="{{asset('images/logo/favicon.png')}}" type="image/png">
+
+
 
 
 </head>
@@ -51,9 +55,17 @@
 
                     <li
                         class="sidebar-item  ">
+                        <a href="{{route('clients.showAll')}}" class='sidebar-link'>
+                            <i class="bi bi-person-lines-fill"></i>
+                            <span>Все клиенты</span>
+                        </a>
+                    </li>
+
+                    <li
+                        class="sidebar-item  ">
                         <a href="{{route('clients.index')}}" class='sidebar-link'>
                             <i class="bi bi-people-fill"></i>
-                            <span>Клиенты</span>
+                            <span>Мои клиенты</span>
                         </a>
                     </li>
 
@@ -155,6 +167,7 @@
 </div>
 
     <script src="{{asset('js/all.js')}}"></script>
+    <script src="{{asset('js/datatables.js')}}"></script>
     <script src="{{asset('js/main.js')}}"></script>
 
 

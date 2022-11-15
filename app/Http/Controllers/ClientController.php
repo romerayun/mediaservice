@@ -6,6 +6,7 @@ use App\Http\Requests\StoreClients;
 use App\Models\Client;
 use App\Models\LprClient;
 use App\Models\RequisiteClient;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -32,7 +33,7 @@ class ClientController extends Controller
      */
     public function create()
     {
-
+        return view('clients.create');
     }
 
     public function createFast()
@@ -41,7 +42,7 @@ class ClientController extends Controller
         return view('clients.fast');
     }
 
-    public function storeFast(StoreClients $request)
+    public function store(StoreClients $request)
     {
 
         $validatedData = $request->validate(
@@ -51,8 +52,8 @@ class ClientController extends Controller
             [
                 'inn.required' => 'Поле ИНН не может быть пустым',
                 'inn.regex' => 'Поле ИНН может состоять только из цифр',
-                'INN.min' => 'Поле ИНН не может быть меньше 10 символов',
-                'INN.max' => 'Поле ИНН не может быть больше 12 символов',
+                'inn.min' => 'Поле ИНН не может быть меньше 10 символов',
+                'inn.max' => 'Поле ИНН не может быть больше 12 символов',
             ]
         );
 
@@ -68,13 +69,19 @@ class ClientController extends Controller
 
         $data = [];
         try {
+
+            $date = Carbon::createFromFormat('d.m.Y', $request->date_of_birth)->format('Y-m-d');
+            $request->merge(['date_of_birth' => $date]);
+
             $client = Client::create($request->all());
             DB::commit();
-            $folder = date("Y-m-d");
-            $data['logo'] = $request->file('logo')->store("images/{$folder}");
-            $client->logo = $data['logo'];
-            $client->save();
-            DB::commit();
+            if ($request->hasFile('logo')) {
+                $folder = date("Y-m-d");
+                $data['logo'] = $request->file('logo')->store("images/{$folder}");
+                $client->logo = $data['logo'];
+                $client->save();
+                DB::commit();
+            }
             $idClient = $client->id;
 
             $rc = new RequisiteClient;
@@ -82,8 +89,8 @@ class ClientController extends Controller
             $rc->client_id = $idClient;
             $rc->save();
             DB::commit();
-                $request->session()->flash('success', 'Данные успешно добавлены 👍');
-                return back();
+            $request->session()->flash('success', 'Данные успешно добавлены 👍');
+            return back();
         } catch (\Exception $exception) {
             DB::rollback();
 
@@ -100,9 +107,38 @@ class ClientController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function storeFast(Request $request)
     {
-        //
+        $validatedData = $request->validate(
+            [
+                'name' => 'required',
+                'phone' => 'required|regex:/^(\+7)(\()[0-9]{3}(\))[0-9]{3}(\-)[0-9]{2}(\-)[0-9]{2}$/',
+            ],
+            [
+                'name.required' => 'Поле наименование не может быть пустым',
+                'phone.required' => 'Поле номер телефона не может быть пустым',
+                'phone.regex' => 'Поле номер телефона должен быть в формате +7(999)999-99-99',
+            ]
+        );
+
+        DB::beginTransaction();
+
+        try {
+            $client = Client::create($request->all());
+            DB::commit();
+            $idClient = $client->id;
+            $rc = new RequisiteClient;
+            $rc->client_id = $idClient;
+            $rc->save();
+            DB::commit();
+
+            $request->session()->flash('success', 'Данные успешно добавлены 👍');
+            return back();
+        } catch (\Exception $exception) {
+            DB::rollback();
+            $request->session()->flash('error', 'При добавлении данных произошла ошибка 😢' . $exception);
+            return back();
+        }
     }
 
     /**
@@ -192,6 +228,12 @@ class ClientController extends Controller
         $client = Client::find($id);
         $client->delete();
         return redirect()->route('clients.index')->with('success', 'Данные успешно удалены 👍');
+    }
+
+
+    public function showAll() {
+        $clients = Client::paginate(9);
+        return view('clients.all', compact('clients'));
     }
 
 

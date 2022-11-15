@@ -5,8 +5,8 @@
             <h3>Клиенты</h3>
         </div>
         <div class="col-12 col-md-6 text-end">
-            <a href="{{route('clients.createFast')}}" class="btn btn-sm btn-success">Добавление</a>
-{{--            <a href="{{route('clients.create')}}" class="btn btn-sm btn-secondary">Полное добавление</a>--}}
+            <a href="{{route('clients.createFast')}}" class="btn btn-sm btn-success">Быстрое добавление</a>
+            <a href="{{route('clients.create')}}" class="btn btn-sm btn-primary">Добавление</a>
         </div>
     </div>
 @endsection
@@ -36,10 +36,10 @@
                         <div class="divider divider-left">
                             <div class="divider-text">О компании</div>
                         </div>
-                        <p class="mb-1"><b>Адрес: </b>{{$client->address}}</p>
+                        <p class="mb-1"><b>Адрес: </b>@if($client->address){{$client->address}} @else <span class="text-danger">Не заполнено</span> @endif</p>
                         <p class="mb-1"><b>Телефон: </b><a href="tel:{{$client->phone}}">{{$client->phone}}</a></p>
-                        <p class="mb-1"><b>E-Mail: </b><a href="mailto:{{$client->email}}">{{$client->email}}</a></p>
-                        <p class="mb-1"><b>Сайт: </b><a target="_blank" href="{{$client->website}}">{{$client->website}}</a></p>
+                        <p class="mb-1"><b>E-Mail: </b>@if($client->address)<a href="mailto:{{$client->email}}">{{$client->email}}</a> @else <span class="text-danger">Не заполнено</span> @endif</p>
+                        <p class="mb-1"><b>Сайт: </b>@if($client->address)<a target="_blank" href="{{$client->website}}">{{$client->website}}</a>@else <span class="text-danger">Не заполнено</span> @endif</p>
 
                         <div class="divider divider-left">
                             <div class="divider-text">Инфомация о ЛПР</div>
@@ -59,7 +59,7 @@
                                 Информации не найдено 😢
                             @else
                                 <p class="mb-1"><b>Полное наименование: </b>@if($client->requisite->fullName){{$client->requisite->fullName}} @else <span class="text-danger">Не заполнено</span> @endif</p>
-                                <p class="mb-1"><b>ИНН: </b>{{$client->requisite->INN}} </p>
+                                <p class="mb-1"><b>ИНН: </b>@if($client->requisite->INN){{$client->requisite->INN}} @else <span class="text-danger">Не заполнено</span> @endif</p>
                                 <p class="mb-1"><b>ОГРН(ОРГНИП): </b>@if($client->requisite->OGRN){{$client->requisite->OGRN}} @else <span class="text-danger">Не заполнено</span> @endif </p>
                             @endif
 

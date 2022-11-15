@@ -22,7 +22,7 @@
                         @if($roles->isEmpty())
                             <h5 class="text-gray-500">К сожалению, должностей не найдено 😢</h5>
                         @else
-                            <table class="table table-lg table-hover">
+                            <table class="table table-lg table-hover" id="datatables">
                                 <thead>
                                 <tr>
                                     <th>#</th>

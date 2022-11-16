@@ -4,25 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Group extends Model
+class Category extends Model
 {
     use HasFactory;
-
-    protected $table = 'groups';
+    use SoftDeletes;
 
     protected $fillable = [
         'name',
     ];
 
-
-    public function roles()
-    {
-        return $this->hasMany(Role::class);
-    }
-
     public function services()
     {
         return $this->hasMany(Service::class);
     }
+
 }

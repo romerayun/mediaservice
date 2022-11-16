@@ -223,3 +223,8 @@ body.theme-light .is-invalid label {
 #auth #auth-left {
     padding: 2rem 8rem 5rem !important;
 }
+
+body.theme-dark .dropdown .avatar {
+    margin-right: 0rem !important;
+    margin-left: .6rem !important;
+}

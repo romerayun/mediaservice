@@ -69,7 +69,7 @@
                         </a>
                     </li>
 
-                    <li class="sidebar-title">Внутреняя структура</li>
+                    <li class="sidebar-title">Cтруктура</li>
 
                     <li
                         class="sidebar-item  ">
@@ -93,6 +93,23 @@
                         </a>
                     </li>
 
+                    <li class="sidebar-title">Управление услугами</li>
+
+                    <li
+                        class="sidebar-item  ">
+                        <a href="{{route('category.index')}}" class='sidebar-link'>
+                            <i class="bi bi-folder-fill"></i>
+                            <span>Категории услуг</span>
+                        </a>
+                    </li>
+
+                    <li
+                        class="sidebar-item  ">
+                        <a href="{{route('services.index')}}" class='sidebar-link'>
+                            <i class="bi bi-card-list"></i>
+                            <span>Услуги</span>
+                        </a>
+                    </li>
 
                     <li
                         class="sidebar-item  ">
@@ -127,12 +144,49 @@
     </div>
     <div id="main">
         <header class="mb-3">
-            <a href="#" class="burger-btn d-block d-xl-none">
-                <i class="bi bi-justify fs-3"></i>
-            </a>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-6">
+                        <a href="#" class="burger-btn d-block d-xl-none">
+                            <i class="bi bi-justify fs-3"></i>
+                        </a>
+                    </div>
+                    <div class="col-6 d-flex justify-content-end">
+                        <div class="header-top-right text-end">
+
+                            <div class="dropdown">
+                                <a href="#" id="topbarUserDropdown" class="user-dropdown d-flex align-items-center dropend dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="text">
+                                        <h6 class="user-dropdown-name">{{auth()->user()->surname}} {{\Illuminate\Support\Str::substr(auth()->user()->name, 0, 1)}}.
+                                            {{\Illuminate\Support\Str::substr(auth()->user()->patron, 0, 1)}}.</h6>
+                                        <p class="user-dropdown-status text-sm text-muted">{{auth()->user()->role->name}}</p>
+                                    </div>
+                                    <div class="avatar avatar-md2">
+                                        <img src="
+                                             @if(isset(auth()->user()->photo) && !empty(auth()->user()->photo))
+                                        {{asset("/storage")."/".auth()->user()->photo}}
+                                        @else
+                                        {{asset('images/faces/1.jpg')}}
+                                        @endif"
+                                             alt="Avatar">
+                                    </div>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="topbarUserDropdown" style="">
+                                    <li><a class="dropdown-item" href="#">Настройки</a></li>
+                                    <li><a class="dropdown-item" href="{{route('users.logout')}}">Выход</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </header>
 
+        <hr class="mb-4 mt-4">
         <div class="page-heading">
+
+
+
             <h3>@yield('page-heading')</h3>
             @if(session()->has('success'))
                 <div class="alert alert-success alert-dismissible show fade mt-3">

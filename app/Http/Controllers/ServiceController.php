@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreService;
 use App\Models\Category;
 use App\Models\Group;
 use App\Models\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ServiceController extends Controller
 {
@@ -29,7 +31,9 @@ class ServiceController extends Controller
      */
     public function create()
     {
-        //
+        $categories = Category::all();
+        $groups = Group::all();
+        return view('services.create', compact('groups', 'categories'));
     }
 
     /**
@@ -38,9 +42,20 @@ class ServiceController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreService $request)
     {
-        //
+        DB::beginTransaction();
+        try {
+            Service::create($request->all());
+            DB::commit();
+            $request->session()->flash('success', 'Данные успешно добавлены 👍');
+            return back();
+        } catch (\Exception $exception) {
+            DB::rollback();
+
+            $request->session()->flash('error', 'При добавлении данных произошла ошибка 😢');
+            return back();
+        }
     }
 
     /**
@@ -62,7 +77,10 @@ class ServiceController extends Controller
      */
     public function edit($id)
     {
-        //
+        $service = Service::firstWhere('id', $id);
+        $categories = Category::all();
+        $groups = Group::all();
+        return view('services.edit', compact('service', 'categories', 'groups'));
     }
 
     /**
@@ -72,9 +90,11 @@ class ServiceController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(StoreService $request, $id)
     {
-        //
+        $service = Service::firstWhere('id', $id);
+        $service->update($request->all());
+        return redirect()->back()->with('success', 'Данные успешно обновлены 👍');
     }
 
     /**
@@ -85,6 +105,8 @@ class ServiceController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $service = Service::find($id);
+        $service->delete();
+        return redirect()->back()->with('success', 'Данные успешно удалены 👍');
     }
 }

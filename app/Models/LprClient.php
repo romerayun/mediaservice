@@ -26,6 +26,27 @@ class LprClient extends Model
         return Carbon::parse($date)->format('d.m.Y');
     }
 
+    public function getFullName() {
+        return $this->surname . " " . $this->name . " " . $this->patron;
+    }
+
+    public function getUntilBirthday()
+    {
+        $date = Carbon::make($this->date_of_birth);
+
+        $date->setYear(now()->year);
+
+        if ($date->isPast()) {
+            $date->addYear();
+        }
+
+        if (($date->day == now()->day) && ($date->month == now()->month)){
+            return 'Сегодня 🥳';
+        }
+
+        return $date->diffForHumans();
+    }
+
     public function getComment($comment): string
     {
         if (empty($comment)) return '-';

@@ -27,7 +27,6 @@
                                 <img src="{{asset('images/faces/2.jpg')}}" alt="Логотип отсутствует" srcset="">
                             @else
                                 <img src="{{asset('storage').'/'.$client->logo}}" alt="Логотип организации">
-
                             @endif
                             <h4 class="ms-lg-3 mb-0">{{$client->name}}</h4>
                         </div>
@@ -39,7 +38,7 @@
                         <p class="mb-1"><b>Адрес: </b>@if($client->address){{$client->address}} @else <span class="text-danger">Не заполнено</span> @endif</p>
                         <p class="mb-1"><b>Телефон: </b><a href="tel:{{$client->phone}}">{{$client->phone}}</a></p>
                         <p class="mb-1"><b>E-Mail: </b>@if($client->address)<a href="mailto:{{$client->email}}">{{$client->email}}</a> @else <span class="text-danger">Не заполнено</span> @endif</p>
-                        <p class="mb-1"><b>Сайт: </b>@if($client->address)<a target="_blank" href="{{$client->website}}">{{$client->website}}</a>@else <span class="text-danger">Не заполнено</span> @endif</p>
+                        <p class="mb-1"><b>Сайт: </b>@if($client->website)<a target="_blank" href="{{$client->website}}">{{$client->website}}</a>@else <span class="text-danger">Не заполнено</span> @endif</p>
 
                         <div class="divider divider-left">
                             <div class="divider-text">Инфомация о ЛПР</div>

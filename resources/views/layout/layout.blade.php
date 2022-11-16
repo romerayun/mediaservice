@@ -111,6 +111,9 @@
                         </a>
                     </li>
 
+
+                    <li class="sidebar-title">Профиль</li>
+
                     <li
                         class="sidebar-item  ">
                         <a href="{{route('users.logout')}}" class='sidebar-link'>

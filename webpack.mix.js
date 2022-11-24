@@ -30,7 +30,7 @@ mix.styles([
 ], 'public/css/auth.css')
 
 
-mix.js([
+mix.combine([
     'resources/front/js/bootstrap.js',
     'resources/front/js/app.js',
     'resources/front/js/imask.js',

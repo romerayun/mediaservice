@@ -1,6 +1,18 @@
+import AirDatepicker from 'air-datepicker';
+import 'air-datepicker/air-datepicker.css';
 const Swal = require('sweetalert2');
 global.$ = global.jQuery = require('jquery');
 require('select2');
+
+
+new AirDatepicker('.datepicker', {
+    isMobile: true,
+    autoClose: true,
+    timepicker: true,
+    minDate: $.now(),
+    altFieldDateFormat: 'yyyy-MM-dd HH:mm:00',
+    altField: '#deadline'
+});
 
 
 let selector = '.sidebar-menu ul.menu .sidebar-item';
@@ -127,3 +139,15 @@ $("input[type=checkbox]").change(function () {
     $('input[name=' + nameCheckbox + ']').val(currentVal);
 
 });
+
+$("#goal").change(function () {
+    let goalS = $('.goal-section');
+    if (goalS.hasClass('show')) {
+        goalS.removeClass('show');
+    } else {
+        goalS.addClass('show');
+    }
+});
+
+
+

@@ -16,7 +16,7 @@ class StatusC extends Controller
      */
     public function index()
     {
-        $StatusClients = StatusClient::all();
+        $StatusClients = StatusClient::where('isVisible', 1)->get();
         return view('statusesC.index', compact('StatusClients'));
     }
 

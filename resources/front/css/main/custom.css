@@ -398,3 +398,47 @@ body .square-color-warning {
     background-color:#ffad46 !important;
     border-color:#ffad46 !important;
 }
+
+
+body .custom-bg-secondary {
+    background-color:#6861ce !important;
+    border-color: #6861ce !important;
+}
+
+body .custom-bg-default {
+    background-color:#1a2035 !important;
+    border-color:#1a2035 !important;
+}
+
+body .custom-bg-primary {
+    background-color:#1572e8 !important;
+    border-color:#1572e8 !important;
+}
+
+
+body .custom-bg-success {
+    background-color:#31ce36 !important;
+    border-color:#31ce36 !important;
+}
+
+body .custom-bg-danger {
+    background-color:#f25961 !important;
+    border-color:#f25961 !important;
+}
+
+body .custom-bg-info {
+    background-color:#48abf7 !important;
+    border-color:#48abf7 !important;
+}
+
+body .custom-bg-warning {
+    background-color:#ffad46 !important;
+    border-color:#ffad46 !important;
+}
+
+.goal-section {
+    display: none;
+}
+.goal-section.show {
+    display: block;
+}

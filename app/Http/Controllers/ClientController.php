@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreClients;
 use App\Models\Client;
+use App\Models\HistoryClient;
 use App\Models\LprClient;
 use App\Models\RequisiteClient;
 use App\Models\StatusClient;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -90,6 +93,15 @@ class ClientController extends Controller
             $rc->client_id = $idClient;
             $rc->save();
             DB::commit();
+
+            $history = new HistoryClient;
+            $history->status_id = StatusClient::where('name', 'Создан клиент');
+            $history->client_id = $idClient;
+            $history->comment = 'Создан новый клиент';
+            $history->user_id = Auth::user()->id;
+            $history->save();
+            DB::commit();
+
             $request->session()->flash('success', 'Данные успешно добавлены 👍');
             return back();
         } catch (\Exception $exception) {
@@ -133,6 +145,14 @@ class ClientController extends Controller
             $rc->save();
             DB::commit();
 
+            $history = new HistoryClient;
+            $history->status_id = StatusClient::where('name', 'Создан клиент')->get()->first()->id;
+            $history->client_id = $idClient;
+            $history->comment = 'Создан новый клиент';
+            $history->user_id = Auth::user()->id;
+            $history->save();
+            DB::commit();
+
             $request->session()->flash('success', 'Данные успешно добавлены 👍');
             return back();
         } catch (\Exception $exception) {
@@ -151,8 +171,11 @@ class ClientController extends Controller
     public function show($id)
     {
         $client = Client::firstWhere('id', $id);
-        $statusClient = StatusClient::all();
-        return view('clients.show', compact('client', 'statusClient'));
+        $statusClient = StatusClient::where('isVisible', 1)->get();
+
+        $listStatusesClient = HistoryClient::where('client_id', $id)->orderBy('id', 'desc')->get();
+
+        return view('clients.show', compact('client', 'statusClient', 'listStatusesClient'));
     }
 
     /**

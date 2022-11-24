@@ -2,7 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreHistory;
+use App\Models\Goal;
+use App\Models\HistoryClient;
+use App\Models\StatusClient;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class HistoryClientController extends Controller
 {
@@ -32,9 +39,33 @@ class HistoryClientController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreHistory $request)
     {
-        //
+        $user_id = Auth::user()->id;
+        $request->merge(['user_id' => $user_id]);
+        DB::beginTransaction();
+        try {
+            HistoryClient::create($request->all());
+
+            if ($request->goal) {
+                $goal = new Goal;
+                $goal->exposed = $user_id;
+                $goal->user_id = $user_id;
+                $goal->client_id = $request->client_id;
+                $goal->text = $request->text;
+                $goal->deadline = $request->deadline;
+                $goal->save();
+            }
+            DB::commit();
+
+            $request->session()->flash('success', 'Данные успешно добавлены 👍');
+            return back();
+        } catch (\Exception $exception) {
+            DB::rollback();
+
+            $request->session()->flash('error', 'При добавлении данных произошла ошибка 😢' . $exception);
+            return back();
+        }
     }
 
     /**

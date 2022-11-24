@@ -6,17 +6,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class StatusClient extends Model
+class Goal extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'name',
-        'color',
+        'text',
+        'deadline',
+        'exposed',
+        'user_id',
+        'client_id',
     ];
 
-    public function histories()
-    {
-        return $this->hasMany(HistoryClient::class);
-    }
+
+
 }

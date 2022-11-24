@@ -3,7 +3,7 @@
     <div class="row align-items-center">
         <div class="col-12 col-md-6">
             <h3>Клиент №{{$client->id}} - {{$client->name}}</h3>
-            <span class="badge bg-warning fs-6"><b>Текущий статус клиента</b> - Ведутся переговоры</span>
+            <span class="badge custom-bg-{{$listStatusesClient->first()->status->color}} fs-6"><b>Текущий статус клиента</b> - {{$listStatusesClient->first()->status->name}}</span>
         </div>
         <div class="col-12 col-md-6 text-end">
             <a href="{{route('clients.index')}}" class="btn btn-sm btn-primary">Вернуться назад</a>
@@ -36,8 +36,7 @@
                     <p class="mb-1"><b>E-Mail: </b>@if($client->address)<a
                             href="mailto:{{$client->email}}">{{$client->email}}</a> @else <span class="text-danger">Не заполнено</span> @endif
                     </p>
-                    <p class="mb-1"><b>Сайт: </b>@if($client->website)<a target="_blank"
-                                                                         href="{{$client->website}}">{{$client->website}}</a>@else
+                    <p class="mb-1"><b>Сайт: </b>@if($client->website)<a target="_blank" href="{{$client->website}}">{{$client->website}}</a>@else
                             <span class="text-danger">Не заполнено</span> @endif</p>
                     <p class="mb-1"><b>День рождения
                             компании: </b>@if($client->date_of_birth){{$client->getUntilBirthday()}} @else <span
@@ -141,12 +140,15 @@
                                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                                     <li class="nav-item" role="presentation">
                                         <a class="nav-link active" id="request-tab" data-bs-toggle="tab" href="#request"
-                                           role="tab" aria-controls="request" aria-selected="false" tabindex="-1">Текущий
-                                            статус</a>
+                                           role="tab" aria-controls="request" aria-selected="false" tabindex="-1">Добавление
+                                            статуса</a>
+                                    </li>
                                     <li class="nav-item" role="presentation">
-                                        <a class="nav-link" id="history-tab" data-bs-toggle="tab" href="#history"
-                                           role="tab" aria-controls="history" aria-selected="false" tabindex="-1">История
+                                        <a class="nav-link" id="historyClient-tab" data-bs-toggle="tab"
+                                           href="#historyClient"
+                                           role="tab" aria-controls="historyClient" aria-selected="false" tabindex="-1">История
                                             взаимодействия с клиентом</a>
+                                    </li>
                                     <li class="nav-item" role="presentation">
                                         <a class="nav-link" id="create-request-tab" data-bs-toggle="tab"
                                            href="#create-request" role="tab" aria-controls="create-request"
@@ -156,18 +158,7 @@
                                         <a class="nav-link" id="history-tab" data-bs-toggle="tab" href="#history"
                                            role="tab" aria-controls="history" aria-selected="false" tabindex="-1">История
                                             заявок</a>
-
-                                    {{--                                    </li><li class="nav-item" role="presentation">--}}
-                                    {{--                                        <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false" tabindex="-1">История заявок</a>--}}
-                                    {{--                                    </li><li class="nav-item" role="presentation">--}}
-                                    {{--                                        <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false" tabindex="-1">История заявок</a>--}}
-                                    {{--                                    </li><li class="nav-item" role="presentation">--}}
-                                    {{--                                        <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false" tabindex="-1">История заявок</a>--}}
-                                    {{--                                    </li><li class="nav-item" role="presentation">--}}
-                                    {{--                                        <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false" tabindex="-1">История заявок</a>--}}
-                                    {{--                                    </li><li class="nav-item" role="presentation">--}}
-                                    {{--                                        <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false" tabindex="-1">История заявок</a>--}}
-                                    {{--                                    </li>--}}
+                                    </li>
                                 </ul>
                             </div>
                             <div class="tab-content mt-4">
@@ -175,22 +166,43 @@
                                      aria-labelledby="request-tab">
                                     <h5 class="text-primary">Изменение статуса клиента</h5>
 
-                                    <form action="{{route('category.store')}}" method="POST" class="mt-3">
+                                    <form action="{{route('history-client.store')}}" method="POST" class="mt-3">
                                         @csrf
                                         <div class="form-body">
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <div class="form-group">
-                                                        <label>Новый статус: </label>
-                                                        <input type="text" id="name"
-                                                               class="form-control @if($errors->has('name')) is-invalid @endif"
-                                                               name="name"
-                                                               placeholder="Введите наименование категории..." required
-                                                               value="{{old('name')}}">
-                                                        @if($errors->has('name'))
+                                                    <div
+                                                        class="form-group @if($errors->has('status_id')) is-invalid @endif">
+                                                        <label>Выберите новый статус клиента: </label>
+                                                        <select class="js-example-basic-single is-invalid"
+                                                                name="status_id" id="status_id">
+                                                            @foreach($statusClient as $status)
+                                                                <option
+                                                                    value="{{$status->id}}">{{$status->name}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        @if($errors->has('status_id'))
                                                             <div class="invalid-feedback">
                                                                 <i class="bx bx-radio-circle"></i>
-                                                                @foreach($errors->get('name') as $message)
+                                                                @foreach($errors->get('status_id') as $message)
+                                                                    {{$message}}<br>
+                                                                @endforeach
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <input type="hidden" name="client_id" value="{{$client->id}}">
+                                                <div class="col-md-12 mt-3">
+                                                    <div class="form-group">
+                                                        <label>Комменатрий: </label>
+                                                        <textarea
+                                                            class="form-control @if($errors->has('comment')) is-invalid @endif"
+                                                            id="comment" name="comment" rows="3"
+                                                            placeholder="Введите дополнительные комментарии...">{{old('comment')}}</textarea>
+                                                        @if($errors->has('comment'))
+                                                            <div class="invalid-feedback">
+                                                                <i class="bx bx-radio-circle"></i>
+                                                                @foreach($errors->get('comment') as $message)
                                                                     {{$message}}<br>
                                                                 @endforeach
                                                             </div>
@@ -199,11 +211,76 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-12 mt-3">
+                                            <div class="col-12 mt-4">
+                                                <div class="form-check">
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="form-check-input form-check-primary form-check-glow" name="goalC" id="goal">
+                                                        <input type="hidden" name="goal" value="0">
+                                                        <label class="form-check-label" for="goal">Создать напоминание</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="goal-section">
+                                                <div class="col-12 mt-3">
+                                                    <div class="form-group">
+                                                        <label>Выберите дату выполнения: </label>
+                                                        <input type="hidden" name="deadline" id="deadline">
+                                                        <input type="text" id="deadline-datepicker"
+                                                               class="form-control datepicker @if($errors->has('deadline')) is-invalid @endif"
+                                                               name="deadline-datepicker"
+                                                               placeholder="Выберите дату выполнения задачи..." required
+                                                               value="{{old('deadline')}}">
+                                                        @if($errors->has('deadline'))
+                                                            <div class="invalid-feedback">
+                                                                <i class="bx bx-radio-circle"></i>
+                                                                @foreach($errors->get('deadline') as $message)
+                                                                    {{$message}}<br>
+                                                                @endforeach
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 mt-3">
+                                                    <div class="form-group">
+                                                        <label>Введите описание задачи: </label>
+                                                        <textarea
+                                                            class="form-control @if($errors->has('text')) is-invalid @endif"
+                                                            id="text" name="text" rows="3"
+                                                            placeholder="Введите описание задачи...">{{old('text')}}</textarea>
+                                                        @if($errors->has('text'))
+                                                            <div class="invalid-feedback">
+                                                                <i class="bx bx-radio-circle"></i>
+                                                                @foreach($errors->get('text') as $message)
+                                                                    {{$message}}<br>
+                                                                @endforeach
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12 mt-4">
                                                 <button type="submit" class="btn btn-success">Сохранить</button>
                                             </div>
                                         </div>
                                     </form>
+                                </div>
+
+                                <div class="tab-pane fade" id="historyClient" role="tabpanel"
+                                     aria-labelledby="historyClient-tab">
+                                    <ol class="activity-feed">
+                                        @foreach($listStatusesClient as $currentStatus)
+                                            <li class="feed-item feed-item-{{$currentStatus->status->color}}">
+
+                                                <time class="date" datetime="9-25">{{$currentStatus->getDate()}}</time>
+                                                <p class="fs-6"><b>Статус: </b> {{$currentStatus->status->name}}</p>
+                                                <span class="text"><b>Комментарий: </b> {{$currentStatus->comment}}</span>
+                                                <p class="text mt-3"><b>Менеджер: </b>{{$currentStatus->user->getFullName()}}</p>
+                                            </li>
+                                        @endforeach
+
+                                    </ol>
                                 </div>
 
                                 <div class="tab-pane fade show" id="create-request" role="tabpanel"
@@ -223,7 +300,8 @@
                                         <ol class="activity-feed">
                                             <li class="feed-item feed-item-success">
                                                 <time class="date" datetime="9-25">14 октября</time>
-                                                <span class="text">Счет выставлен - <a href="#"><i class="bi bi-file-pdf"></i> Счет</a></span>
+                                                <span class="text">Счет выставлен - <a href="#"><i
+                                                            class="bi bi-file-pdf"></i> Счет</a></span>
 
                                             </li>
                                             <li class="feed-item feed-item-secondary">

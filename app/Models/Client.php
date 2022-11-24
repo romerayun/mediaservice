@@ -35,6 +35,11 @@ class Client extends Model
         return $this->hasOne(RequisiteClient::class, 'client_id');
     }
 
+    public function histories()
+    {
+        return $this->hasMany(HistoryClient::class);
+    }
+
     // Carbon
 
     public function getDateBirth($date): string {

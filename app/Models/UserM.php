@@ -37,6 +37,11 @@ class UserM extends Authenticatable
         return $this->hasMany(Service::class);
     }
 
+    public function histories()
+    {
+        return $this->hasMany(HistoryClient::class);
+    }
+
     public function getFullName() {
         return $this->surname . " " . $this->name . " " . $this->patron;
     }

@@ -1,7 +1,7 @@
 if (document.getElementById('datatables')) {
     let dataTable = new simpleDatatables.DataTable("#datatables", {
         searchable: true,
-        fixedHeight: true,
+        fixedHeight: false,
         labels: {
             placeholder: "Поиск...",
             perPage: "{select} записей на странице",
@@ -10,13 +10,14 @@ if (document.getElementById('datatables')) {
         }
     });
 
-    function adaptPageDropdown() {
+
+    function adaptPageDropdown(dataTable) {
         const selector = dataTable.wrapper.querySelector(".dataTable-selector")
         selector.parentNode.parentNode.insertBefore(selector, selector.parentNode)
         selector.classList.add("form-select")
     }
 
-    function adaptPagination() {
+    function adaptPagination(dataTable) {
         const paginations = dataTable.wrapper.querySelectorAll(
             "ul.dataTable-pagination-list"
         )
@@ -43,8 +44,8 @@ if (document.getElementById('datatables')) {
     }
 
     dataTable.on("datatable.init", function () {
-        adaptPageDropdown()
-        adaptPagination()
+        adaptPageDropdown(dataTable)
+        adaptPagination(dataTable)
     })
 
     dataTable.on("datatable.page", adaptPagination)

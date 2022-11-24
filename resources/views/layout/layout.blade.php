@@ -18,6 +18,14 @@
 </head>
 
 <body>
+
+<div class="overlay-spinner">
+    <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+        <span class="visually-hidden">Сохраняем данные, пожалуйста подождите...</span>
+    </div>
+    <p class="text-white fw-bold">Сохраняем данные, пожалуйста подождите...</p>
+</div>
+
 <div id="app">
     <div id="sidebar" class="active">
         <div class="sidebar-wrapper active">
@@ -69,6 +77,14 @@
                         </a>
                     </li>
 
+                    <li
+                        class="sidebar-item  ">
+                        <a href="{{route('status-client.index')}}" class='sidebar-link'>
+                            <i class="bi bi-info-circle-fill"></i>
+                            <span>Статус клиента</span>
+                        </a>
+                    </li>
+
                     <li class="sidebar-title">Cтруктура</li>
 
                     <li
@@ -108,6 +124,22 @@
                         <a href="{{route('services.index')}}" class='sidebar-link'>
                             <i class="bi bi-card-list"></i>
                             <span>Услуги</span>
+                        </a>
+                    </li>
+
+                    <li
+                        class="sidebar-item  ">
+                        <a href="{{route('status-material.index')}}" class='sidebar-link'>
+                            <i class="bi bi-info-circle-fill"></i>
+                            <span>Статус материалов</span>
+                        </a>
+                    </li>
+
+                    <li
+                        class="sidebar-item  ">
+                        <a href="{{route('packages.index')}}" class='sidebar-link'>
+                            <i class="bi bi-box-seam-fill"></i>
+                            <span>Пакеты услуг</span>
                         </a>
                     </li>
 

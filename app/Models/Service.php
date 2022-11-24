@@ -12,9 +12,14 @@ class Service extends Model
 
     protected $fillable = [
         'name',
-        'price',
         'category_id',
         'group_id',
+        'isRequiredMaterial',
+        'isPackage',
+        'isPeriod',
+        'isBrif',
+        'isOutput',
+        'user_id',
     ];
 
     public function category()
@@ -25,5 +30,15 @@ class Service extends Model
     public function group()
     {
         return $this->belongsTo(Group::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(UserM::class);
+    }
+
+    public function packages()
+    {
+        return $this->hasMany(Package::class);
     }
 }

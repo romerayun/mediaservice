@@ -25,23 +25,21 @@ class StoreService extends FormRequest
     {
         return [
             'name' => 'required',
-            'price' => 'required|numeric',
             'category_id' => 'required|integer',
             'group_id' => 'required|integer',
+            'user_id' => 'nullable|integer',
         ];
     }
 
     public function messages()
     {
         return [
-            'name|required' => 'Поле наименование не может быть путсым',
-            'price|required' => 'Поле цена не может быть путсым',
-            'price|numeric' => 'Поле цена должно быть числом',
-            'category_id|required' => 'Поле категория не может быть путсым',
-            'category_id|integer' => 'Поле категория не может быть путсым',
-            'group_id|required' => 'Поле отдел не может быть путсым',
-            'group_id|integer' => 'Поле отдел не может быть путсым',
-
+            'name.required' => 'Поле наименование не может быть пустым',
+            'category_id.required' => 'Поле категория не может быть пустым',
+            'category_id.integer' => 'Выберите значение из списка',
+            'group_id.required' => 'Поле отдел не может быть пустым',
+            'group_id.integer' => 'Выберите значение из списка',
+            'user_id.integer' => 'Выберите значение из списка',
         ];
     }
 }

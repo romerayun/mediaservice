@@ -6,6 +6,7 @@ use App\Http\Requests\StoreClients;
 use App\Models\Client;
 use App\Models\LprClient;
 use App\Models\RequisiteClient;
+use App\Models\StatusClient;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -150,7 +151,8 @@ class ClientController extends Controller
     public function show($id)
     {
         $client = Client::firstWhere('id', $id);
-        return view('clients.show', compact('client'));
+        $statusClient = StatusClient::all();
+        return view('clients.show', compact('client', 'statusClient'));
     }
 
     /**

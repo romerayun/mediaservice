@@ -7,19 +7,22 @@ let selector = '.sidebar-menu ul.menu .sidebar-item';
 let fullUrl = window.location.href;
 var url = new URL(fullUrl);
 
+let currentUrl = url.pathname.split('/');
+
+
 if (url.pathname.split('/')[1] === '') {
     url = url.origin;
 } else {
     url = url.origin + '/' + url.pathname.split('/')[1];
 }
 
-$(selector).each(function(){
-    if ($(this).find('a').attr('href') === url){
+
+$(selector).each(function () {
+    if ($(this).find('a').attr('href') === url) {
         $(selector).removeClass('active');
         $(this).removeClass('active').addClass('active');
     }
 });
-
 
 
 if (document.getElementById('phone')) {
@@ -59,8 +62,8 @@ if (document.getElementById('date_of_birth')) {
 }
 
 
-$('.delete').click(function(event) {
-    var form =  $(this).closest("form");
+$('.delete').click(function (event) {
+    var form = $(this).closest("form");
     event.preventDefault();
     Swal.fire({
         title: 'Вы действительно хотите удалить запись? 🥺',
@@ -80,7 +83,47 @@ $('.delete').click(function(event) {
 
 $('.js-example-basic-single').select2();
 
+if (!currentUrl.includes('services') && !currentUrl.includes('edit')) {
+    $("#user_id").select2({
+        'disabled' : true,
+    });
+}
 
-$("form").submit(function( event ) {
-    // alert( "Handler for .submit() called." );
+
+$("form").submit(function (event) {
+    $(".overlay-spinner").addClass('show');
+});
+
+$("#group_id").change(function () {
+    if ($(this).find(':selected').val() !== '') {
+        let value = $(this).find(':selected').val();
+        let _token = $('input[name="_token"]').val();
+
+        $.ajax({
+            url: "/get-users-by-group",
+            method: "POST",
+            data: {
+                'value': value,
+                '_token': _token,
+            },
+            success: function (result) {
+                $("#user_id").html(result);
+                $("#user_id").removeAttr('disabled');
+                $('#user_id').select2()
+            },
+
+        });
+    }
+
+});
+
+
+$("input[type=checkbox]").change(function () {
+
+    let nameCheckbox = $(this).attr('name');
+    nameCheckbox = nameCheckbox.slice(0, -1);
+    let currentVal = +$(this).prop('checked');
+
+    $('input[name=' + nameCheckbox + ']').val(currentVal);
+
 });

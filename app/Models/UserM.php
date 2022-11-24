@@ -32,6 +32,11 @@ class UserM extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
+    public function services()
+    {
+        return $this->hasMany(Service::class);
+    }
+
     public function getFullName() {
         return $this->surname . " " . $this->name . " " . $this->patron;
     }

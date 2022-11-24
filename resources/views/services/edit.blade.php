@@ -49,14 +49,14 @@
                                 </div>
 
                                 <div class="row mt-3">
-                                    <div class="col-lg-6 col-md-12">
+                                    <div class="col-lg-12 col-md-12">
                                         <div class="form-group">
                                             <label>Наименование услуги: </label>
                                             <input type="text" id="name"
                                                    class="form-control @if($errors->has('name')) is-invalid @endif"
                                                    name="name"
                                                    placeholder="Введите наименование услуги..." required
-                                                   value="{{$service->name}}">
+                                                   value="{{$service->name }}">
                                             @if($errors->has('name'))
                                                 <div class="invalid-feedback">
                                                     <i class="bx bx-radio-circle"></i>
@@ -67,34 +67,16 @@
                                             @endif
                                         </div>
                                     </div>
+                                </div>
+                                <div class="row mt-3">
 
                                     <div class="col-lg-6 col-md-12">
-                                        <div class="form-group">
-                                            <label>Цена услуги: </label>
-                                            <input type="number" step="0.1" id="price"
-                                                   class="form-control @if($errors->has('price')) is-invalid @endif"
-                                                   name="price"
-                                                   placeholder="Введите цену услуги..." required
-                                                   value="{{$service->price}}">
-                                            @if($errors->has('price'))
-                                                <div class="invalid-feedback">
-                                                    <i class="bx bx-radio-circle"></i>
-                                                    @foreach($errors->get('price') as $message)
-                                                        {{$message}}<br>
-                                                    @endforeach
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row mt-3">
-                                    <div class="col-md-12">
                                         <div class="form-group @if($errors->has('group_id')) is-invalid @endif">
                                             <label>Выберите отдел: </label>
                                             <select class="js-example-basic-single is-invalid" name="group_id" id="group_id">
+                                                <option value="">Не выбрано</option>
                                                 @foreach($groups as $group)
-                                                    @if($service->group->id == $group->id)
+                                                    @if($service->group_id == $group->id)
                                                         <option value="{{$group->id}}" selected>{{$group->name}}</option>
                                                     @else
                                                         <option value="{{$group->id}}">{{$group->name}}</option>
@@ -111,7 +93,75 @@
                                             @endif
                                         </div>
                                     </div>
+
+                                    <div class="col-lg-6 col-md-12">
+                                        <div class="form-group @if($errors->has('user_id')) is-invalid @endif">
+                                            <label>Выберите ответственного за распределение заявок: </label>
+                                            <select class="js-example-basic-single is-invalid" name="user_id" id="user_id">
+                                                @if(!$users)
+                                                    <option value="0">Не выбрано</option>
+                                                @else
+                                                    <option value="0">Не выбрано</option>
+
+
+                                                    @if (!$users->roles->isEmpty())
+                                                        @foreach ($users->roles as $role)
+
+                                                            @if (!$role->users->isEmpty())
+                                                                @foreach ($role->users as $user)
+                                                                    @if($service->user_id == $user->id)
+                                                                        <option value="{{$user->id}}" selected>{{$user->surname}} {{$user->name}} {{$user->patron}} ({{$user->role->name}})</option>
+                                                                    @else
+                                                                        <option value="{{$user->id}}">{{$user->surname}} {{$user->name}} {{$user->patron}} ({{$user->role->name}})</option>
+                                                                    @endif
+                                                                @endforeach
+                                                            @endif
+                                                        @endforeach
+                                                    @endif
+
+                                                @endif
+                                            </select>
+                                            @if($errors->has('user_id'))
+                                                <div class="invalid-feedback">
+                                                    <i class="bx bx-radio-circle"></i>
+                                                    @foreach($errors->get('user_id') as $message)
+                                                        {{$message}}<br>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
                                 </div>
+
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <ul class="list-group">
+                                            <li class="list-group-item">
+                                                <input class="form-check-input me-1" name="isRequiredMaterialC" type="checkbox" value="" @if($service->isRequiredMaterial) checked @endif> Обязательные материалы
+                                                <input type="hidden" name="isRequiredMaterial" value="{{$service->isRequiredMaterial}}">
+                                            </li>
+                                            <li class="list-group-item">
+                                                <input class="form-check-input me-1" name="isPackageC" type="checkbox" value="" @if($service->isPackage) checked @endif> Пакеты услуг
+                                                <input type="hidden" name="isPackage" value="{{$service->isPackage}}">
+                                            </li>
+                                            <li class="list-group-item">
+                                                <input class="form-check-input me-1" name="isPeriodC" type="checkbox" value="" @if($service->isPeriod) checked @endif> Срок размещения
+                                                <input type="hidden" name="isPeriod" value="{{$service->isPeriod}}">
+                                            </li>
+                                            <li class="list-group-item">
+                                                <input class="form-check-input me-1" name="isBrifC" type="checkbox" value="" @if($service->isBrif) checked @endif> Бриф
+                                                <input type="hidden" name="isBrif" value="{{$service->isBrif}}">
+                                            </li>
+                                            <li class="list-group-item">
+                                                <input class="form-check-input me-1" name="isOutputC" type="checkbox" value="" @if($service->isOutput) checked @endif> Количество выходов
+                                                <input type="hidden" name="isOutput" value="{{$service->isOutput}}">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+
 
                                 <div class="col-12 mt-3">
                                     <button type="submit" class="btn btn-success">Сохранить</button>

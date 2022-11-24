@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreServ;
 use App\Http\Requests\StoreService;
 use App\Models\Category;
 use App\Models\Group;
 use App\Models\Service;
+use App\Models\UserM;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -39,13 +41,19 @@ class ServiceController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\StoreService  $request
      * @return \Illuminate\Http\Response
      */
     public function store(StoreService $request)
     {
+
         DB::beginTransaction();
         try {
+
+            if(!$request->user_id) {
+                $request->merge(['user_id' => null]);
+            }
+
             Service::create($request->all());
             DB::commit();
             $request->session()->flash('success', 'Данные успешно добавлены 👍');
@@ -80,7 +88,9 @@ class ServiceController extends Controller
         $service = Service::firstWhere('id', $id);
         $categories = Category::all();
         $groups = Group::all();
-        return view('services.edit', compact('service', 'categories', 'groups'));
+        if (!$service->user_id) $users = false;
+        else $users = Group::with('roles.users')->find($service->group_id);
+        return view('services.edit', compact('service', 'categories', 'groups', 'users'));
     }
 
     /**
@@ -93,6 +103,10 @@ class ServiceController extends Controller
     public function update(StoreService $request, $id)
     {
         $service = Service::firstWhere('id', $id);
+        if(!$request->user_id) {
+            $request->merge(['user_id' => null]);
+        }
+
         $service->update($request->all());
         return redirect()->back()->with('success', 'Данные успешно обновлены 👍');
     }
@@ -109,4 +123,36 @@ class ServiceController extends Controller
         $service->delete();
         return redirect()->back()->with('success', 'Данные успешно удалены 👍');
     }
+
+    public function usersByGroup(Request $request) {
+
+        if ($request->value > 0) {
+
+            $users = Group::with('roles.users')->find($request->value);
+
+            $htmlRes = '<option value="0">Не выбрано</option>';
+            if (!$users) {
+                echo $htmlRes;
+                return;
+            }
+
+            if (!$users->roles->isEmpty()) {
+                foreach ($users->roles as $role) {
+                    $nameRole = $role->name;
+                    if (!$role->users->isEmpty()) {
+                        foreach ($role->users as $user) {
+                            $htmlRes .= "<option value='$user->id'>$user->surname $user->name $user->patron ($nameRole)</option>";
+                        }
+                    }
+
+                }
+            }
+
+            echo $htmlRes;
+            return;
+
+        }
+        return 0;
+    }
+
 }

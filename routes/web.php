@@ -3,11 +3,15 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\HistoryClientController;
 use App\Http\Controllers\LprController;
 use App\Http\Controllers\MailController;
+use App\Http\Controllers\PackageController;
 use App\Http\Controllers\RequisitesClient;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\StatusC;
+use App\Http\Controllers\StatusMaterialController;
 use App\Http\Controllers\UserController;
 use App\Mail\Feedback;
 use App\Models\RequisiteClient;
@@ -49,6 +53,14 @@ Route::resource('roles', RoleController::class);
 Route::resource('users', UserController::class);
 Route::resource('category', CategoryController::class);
 Route::resource('services', ServiceController::class);
+Route::resource('status-material', StatusMaterialController::class);
+Route::resource('packages', PackageController::class);
+Route::resource('status-client', StatusC::class);
+Route::resource('history-client', HistoryClientController::class);
+
+
+Route::post('/get-users-by-group', [ServiceController::class, 'usersByGroup'])->name('services.usersByGroup');
+
 
 Route::group(['middleware' => 'guest'], function () {
     Route::get('/login', [UserController::class, 'login'])->name('users.login');

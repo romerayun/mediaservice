@@ -21121,6 +21121,7 @@ __webpack_require__(/*! select2 */ "./node_modules/select2/dist/js/select2.js");
 var selector = '.sidebar-menu ul.menu .sidebar-item';
 var fullUrl = window.location.href;
 var url = new URL(fullUrl);
+var currentUrl = url.pathname.split('/');
 if (url.pathname.split('/')[1] === '') {
   url = url.origin;
 } else {
@@ -21183,8 +21184,38 @@ $('.delete').click(function (event) {
   });
 });
 $('.js-example-basic-single').select2();
+if (!currentUrl.includes('services') && !currentUrl.includes('edit')) {
+  $("#user_id").select2({
+    'disabled': true
+  });
+}
 $("form").submit(function (event) {
-  // alert( "Handler for .submit() called." );
+  $(".overlay-spinner").addClass('show');
+});
+$("#group_id").change(function () {
+  if ($(this).find(':selected').val() !== '') {
+    var value = $(this).find(':selected').val();
+    var _token = $('input[name="_token"]').val();
+    $.ajax({
+      url: "/get-users-by-group",
+      method: "POST",
+      data: {
+        'value': value,
+        '_token': _token
+      },
+      success: function success(result) {
+        $("#user_id").html(result);
+        $("#user_id").removeAttr('disabled');
+        $('#user_id').select2();
+      }
+    });
+  }
+});
+$("input[type=checkbox]").change(function () {
+  var nameCheckbox = $(this).attr('name');
+  nameCheckbox = nameCheckbox.slice(0, -1);
+  var currentVal = +$(this).prop('checked');
+  $('input[name=' + nameCheckbox + ']').val(currentVal);
 });
 })();
 

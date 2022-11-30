@@ -37,7 +37,12 @@ class Client extends Model
 
     public function histories()
     {
-        return $this->hasMany(HistoryClient::class);
+        return $this->hasMany(HistoryClient::class)->orderBy('id', 'desc');
+    }
+
+    public function goals()
+    {
+        return $this->hasMany(Goal::class);
     }
 
     // Carbon

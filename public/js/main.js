@@ -21721,6 +21721,25 @@ $("#goal").change(function () {
     goalS.addClass('show');
   }
 });
+$("#isMySelfC").change(function () {
+  var goalS = $('.user-form');
+  if (goalS.hasClass('show')) {
+    goalS.removeClass('show');
+  } else {
+    goalS.addClass('show');
+  }
+});
+$(".btn-collapse").click(function () {
+  var btn = $(this);
+  var icon = btn.find('i');
+  if (icon.hasClass('bi-caret-down-fill')) {
+    icon.removeClass('bi-caret-down-fill');
+    icon.addClass('bi-caret-up-fill');
+  } else {
+    icon.removeClass('bi-caret-up-fill');
+    icon.addClass('bi-caret-down-fill');
+  }
+});
 })();
 
 /******/ })()

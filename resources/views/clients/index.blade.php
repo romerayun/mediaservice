@@ -68,14 +68,17 @@
                             <div class="divider-text">Последнее взаимодействие</div>
                         </div>
                         <ol class="activity-feed">
-                            <li class="feed-item feed-item-success">
-                                <time class="date" datetime="9-25">14 октября</time>
-                                <span class="text">Таргетированая реклама в ВК</span>
-                            </li>
-                            <li class="feed-item feed-item-secondary">
-                                <time class="date" datetime="9-25">12 октября</time>
-                                <span class="text">Новость на Серебрянном дожде</span>
-                            </li>
+                            @foreach($client->histories as $currentStatus)
+                                @if ($loop->index == 2) @break @endif
+                               <li class="feed-item feed-item-{{$currentStatus->status->color}}">
+
+                                   <time class="date" datetime="9-25">{{$currentStatus->getDate()}}</time>
+                                   <p class="fs-6"><b>Статус: </b> {{$currentStatus->status->name}}</p>
+                                   <span class="text"><b>Комментарий: </b> {{$currentStatus->comment}}</span>
+                                   <p class="text mt-3"><b>Ответственный: </b>{{$currentStatus->user->getFullName()}}</p>
+                               </li>
+
+                            @endforeach
                         </ol>
 
 

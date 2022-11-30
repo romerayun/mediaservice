@@ -149,5 +149,30 @@ $("#goal").change(function () {
     }
 });
 
+$("#isMySelfC").change(function () {
+    let goalS = $('.user-form');
+    if (goalS.hasClass('show')) {
+        goalS.removeClass('show');
+    } else {
+        goalS.addClass('show');
+    }
+});
+
+$(".btn-collapse").click(function () {
+
+    let btn = $(this);
+    let icon = btn.find('i');
+
+    if(icon.hasClass('bi-caret-down-fill')) {
+        icon.removeClass('bi-caret-down-fill');
+        icon.addClass('bi-caret-up-fill');
+    } else {
+        icon.removeClass('bi-caret-up-fill');
+        icon.addClass('bi-caret-down-fill');
+    }
+
+
+});
+
 
 

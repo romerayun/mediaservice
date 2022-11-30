@@ -442,3 +442,14 @@ body .custom-bg-warning {
 .goal-section.show {
     display: block;
 }
+
+.user-form {
+    display: none !important;
+}
+.user-form.show {
+    display: flex !important;
+}
+
+.border-radius-50 {
+    border-radius: 50% !important;
+}

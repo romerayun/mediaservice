@@ -79,9 +79,25 @@
 
                     <li
                         class="sidebar-item  ">
+                        <a href="{{route('goals.index')}}" class='sidebar-link'>
+                            <i class="bi bi-people-fill"></i>
+                            <span>Мои задачи <span class="badge bg-danger border-radius-50">{{getCountGoals()}}</span></span>
+                        </a>
+                    </li>
+
+                    <li
+                        class="sidebar-item  ">
                         <a href="{{route('status-client.index')}}" class='sidebar-link'>
                             <i class="bi bi-info-circle-fill"></i>
                             <span>Статус клиента</span>
+                        </a>
+                    </li>
+
+                    <li
+                        class="sidebar-item  ">
+                        <a href="{{route('status-claim.index')}}" class='sidebar-link'>
+                            <i class="bi bi-info-circle-fill"></i>
+                            <span>Статус заявок</span>
                         </a>
                     </li>
 

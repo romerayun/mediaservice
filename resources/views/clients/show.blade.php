@@ -276,7 +276,7 @@
                                                 <time class="date" datetime="9-25">{{$currentStatus->getDate()}}</time>
                                                 <p class="fs-6"><b>Статус: </b> {{$currentStatus->status->name}}</p>
                                                 <span class="text"><b>Комментарий: </b> {{$currentStatus->comment}}</span>
-                                                <p class="text mt-3"><b>Менеджер: </b>{{$currentStatus->user->getFullName()}}</p>
+                                                <p class="text mt-3"><b>Ответственный: </b>{{$currentStatus->user->getFullName()}}</p>
                                             </li>
                                         @endforeach
 

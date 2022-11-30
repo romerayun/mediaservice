@@ -15,7 +15,12 @@ class CreateHistoryClaimsTable extends Migration
     {
         Schema::create('history_claims', function (Blueprint $table) {
             $table->id();
+//            $table->foreignId('claim_id')->constrained('claims')->cascadeOnUpdate();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnUpdate();
+            $table->foreignId('status_id')->constrained('status_claims')->cascadeOnUpdate();
+            $table->text('comment');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

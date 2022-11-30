@@ -15,7 +15,13 @@ class CreateClaimsTable extends Migration
     {
         Schema::create('claims', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('service_id')->constrained('services')->cascadeOnUpdate();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnUpdate();
+            $table->foreignId('client_id')->constrained('clients')->cascadeOnUpdate();
+            $table->float('amount');
+            $table->dateTime('deadline');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

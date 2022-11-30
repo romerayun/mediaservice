@@ -286,7 +286,11 @@
                                 <div class="tab-pane fade show" id="create-request" role="tabpanel"
                                      aria-labelledby="create-request-tab">
                                     <h5 class="text-primary">Создание заявки</h5>
+                                    <form action="#" method="POST">
+                                        @csrf
 
+
+                                    </form>
                                 </div>
 
                                 <div class="tab-pane fade show" id="history" role="tabpanel"

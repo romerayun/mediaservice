@@ -453,3 +453,26 @@ body .custom-bg-warning {
 .border-radius-50 {
     border-radius: 50% !important;
 }
+
+.pagination .page-item.active a {
+    background: #435ebe !important;
+}
+
+body.theme-dark .pagination .page-item.active a {
+    color: #fff !important;
+}
+
+.list-group-item {
+    margin-bottom: 15px !important;
+}
+
+.list-group-item:last-child, .list-group-item:first-child {
+    border-bottom-left-radius: inherit !important;
+    border-bottom-right-radius: inherit !important;
+    border-top-left-radius: inherit !important;
+    border-top-right-radius: inherit !important;
+}
+
+.sidebar-item.active .sidebar-link .badge.bg-primary {
+    background-color: hsla(0,0%,100%,.25)!important;
+}

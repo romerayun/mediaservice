@@ -3,6 +3,7 @@
     <div class="row align-items-center">
         <div class="col-12 col-md-6">
             <h3>Просроченные задачи</h3>
+            <p class="text-subtitle text-muted fs-6" style="font-weight: 400">При повторе задачи, дата выполенения будет установлена на - сегодня + 1 день </p>
         </div>
         <div class="col-12 col-md-6 text-end">
             <a href="{{route('goals.index')}}" class="btn  btn-primary">Назад</a>
@@ -37,6 +38,7 @@
                                         <th>Создана</th>
                                         <th>Выполнить до</th>
                                         <th>Создал задачу</th>
+                                        <th class="text-center">Повторить</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -54,6 +56,16 @@
                                             <td><span class="badge bg-danger ">{{$item->getDeadline()}}</span></td>
                                             <td>
                                                 {{$item->exposed_user->getFullName()}}
+                                            </td>
+                                            <td class="text-center">
+                                                @if($item->isRepeat)
+                                                    <p class="text-danger m-0">Задача уже была повторена</p>
+                                                @else
+                                                    <form action='{{route('goals.repeatGoal', ['goal' => $item->id])}}' method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="btn icon btn-success"><i class="bi bi-arrow-repeat"></i></button>
+                                                    </form>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach

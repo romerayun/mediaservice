@@ -25,6 +25,8 @@ class UserM extends Authenticatable
         'phone',
         'photo',
         'role_id',
+        'userInvoice',
+        'userLeader',
     ];
 
     public function role()
@@ -42,9 +44,24 @@ class UserM extends Authenticatable
         return $this->hasMany(HistoryClient::class);
     }
 
+    public function historiesClaims()
+    {
+        return $this->hasMany(HistoryClaim::class);
+    }
+
     public function goals()
     {
         return $this->hasMany(Goal::class);
+    }
+
+    public function workClaim()
+    {
+        return $this->hasMany(Claim::class, 'user_id');
+    }
+
+    public function myClaims()
+    {
+        return $this->hasMany(Claim::class, 'creator');
     }
 
     public function getFullName() {

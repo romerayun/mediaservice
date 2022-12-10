@@ -14,4 +14,11 @@ class StatusClaim extends Model
         'name',
         'color',
     ];
+
+    public function histories()
+    {
+        return $this->hasMany(HistoryClaim::class);
+    }
+
+
 }

@@ -41,4 +41,9 @@ class Service extends Model
     {
         return $this->hasMany(Package::class);
     }
+
+    public function claims()
+    {
+        return $this->hasMany(Claim::class, 'service_id');
+    }
 }

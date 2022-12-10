@@ -18,6 +18,8 @@
     "dependencies": {
         "air-datepicker": "^3.3.1",
         "cross-env": "^7.0.3",
+        "filepond": "^4.30.4",
+        "filepond-plugin-image-preview": "^4.6.11",
         "jquery": "^3.6.1",
         "select2": "^4.1.0-rc.0",
         "sweetalert2": "^11.6.6"

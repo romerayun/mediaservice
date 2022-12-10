@@ -45,7 +45,12 @@
                                         <td>{{$item->category->name}}</td>
                                         <td>{{$item->name}}</td>
                                         <td>{{$item->group->name}}</td>
-                                        <td>{{$item->user_id}}</td>
+
+                                        @if($item->user_id)
+                                            <td>{{$item->user->getFullName()}}</td>
+                                        @else
+                                            <td><span class="text-danger">Ответственный не назначен</span></td>
+                                        @endif
 
                                         <td>
                                             @if($item->isRequiredMaterial)

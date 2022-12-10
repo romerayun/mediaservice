@@ -21,7 +21,17 @@
                         <form action="{{route('users.store')}}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="form-body">
-                                <div class="row">
+                                <div class="row mt-1">
+                                    <div class="col-lg-6 col-md-12">
+                                        <input class="form-check-input me-1" name="userInvoiceC" type="checkbox" value=""> Может ли пользователь выставлять счет?
+                                        <input type="hidden" name="userInvoice" value="0">
+                                    </div>
+                                    <div class="col-lg-6 col-md-12">
+                                        <input class="form-check-input me-1" name="userLeaderC" type="checkbox" value=""> Пользователь является руководителем отдела?
+                                        <input type="hidden" name="userLeader" value="0">
+                                    </div>
+                                </div>
+                                <div class="row mt-4">
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label>Фотография пользователя: </label>

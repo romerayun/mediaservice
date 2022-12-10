@@ -16,7 +16,7 @@ class StatusClaimController extends Controller
      */
     public function index()
     {
-        $statusClaim = StatusClaim::all();
+        $statusClaim = StatusClaim::where('isVisible', '=', 1)->get();
         return view('statusesClaim.index', compact('statusClaim'));
     }
 

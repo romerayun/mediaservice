@@ -3,6 +3,38 @@ import 'air-datepicker/air-datepicker.css';
 const Swal = require('sweetalert2');
 global.$ = global.jQuery = require('jquery');
 require('select2');
+import * as FilePond from 'filepond';
+import 'filepond/dist/filepond.min.css';
+import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
+import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
+FilePond.registerPlugin(FilePondPluginImagePreview);
+
+
+
+const inputElement = document.querySelector('#filepond');
+const pond = FilePond.create(inputElement, {
+    'labelIdle' : 'Перетащите свои файлы в эту область или <span class="filepond--label-action"> Нажмите сюда </span>',
+    credits : false,
+    server: {
+        url : '/upload-filepond',
+        headers: {
+            'X-CSRF-TOKEN' : $('input[name="_token"]').val()
+        }
+    }
+});
+
+let goalFile = document.querySelector('#goalFiles');
+const goalsFile = FilePond.create(goalFile, {
+    'labelIdle' : 'Перетащите свои файлы в эту область или <span class="filepond--label-action"> Нажмите сюда </span>',
+    credits : false,
+    server: {
+        url : '/upload-files-goal',
+        headers: {
+            'X-CSRF-TOKEN' : $('input[name="_token"]').val()
+        }
+    }
+});
+
 
 
 new AirDatepicker('.datepicker', {
@@ -13,6 +45,31 @@ new AirDatepicker('.datepicker', {
     altFieldDateFormat: 'yyyy-MM-dd HH:mm:00',
     altField: '#deadline'
 });
+
+if (document.getElementById('deadlineClaim-datepicker')) {
+    new AirDatepicker('.deadlineClaim', {
+        isMobile: true,
+        autoClose: true,
+        timepicker: true,
+        minDate: $.now(),
+        altFieldDateFormat: 'yyyy-MM-dd HH:mm:00',
+        altField: '#deadlineClaim'
+    });
+}
+
+if (document.getElementById('datepicker-range')) {
+    new AirDatepicker('.datepicker-range', {
+        isMobile: true,
+        autoClose: true,
+        range: true,
+        dynamicRange: true,
+        multipleDatesSeparator: ' | ',
+        minDate: $.now(),
+        altFieldDateFormat: 'yyyy-MM-dd',
+        altField: '#period-range'
+    });
+}
+
 
 
 let selector = '.sidebar-menu ul.menu .sidebar-item';
@@ -95,7 +152,7 @@ $('.delete').click(function (event) {
 
 $('.js-example-basic-single').select2();
 
-if (!currentUrl.includes('services') && !currentUrl.includes('edit')) {
+if (!currentUrl.includes('services') && !currentUrl.includes('edit') && !currentUrl.includes('distribution-claims')) {
     $("#user_id").select2({
         'disabled' : true,
     });
@@ -129,6 +186,97 @@ $("#group_id").change(function () {
 
 });
 
+$("#group_idS").change(function () {
+    if ($(this).find(':selected').val() !== '') {
+        let value = $(this).find(':selected').val();
+        let _token = $('input[name="_token"]').val();
+
+        $.ajax({
+            url: "/get-services-by-group",
+            method: "POST",
+            data: {
+                'value': value,
+                '_token': _token,
+            },
+            success: function (result) {
+                $(".service-group").html(result);
+                $(".service-group").removeAttr('disabled');
+                $('.service-group').select2();
+            },
+
+        });
+    }
+
+});
+
+function dNone(block) {
+    if ($(block).hasClass('d-none')) {
+        $(block).removeClass('d-none');
+    } else {
+        $(block).addClass('d-none');
+    }
+}
+
+function dNoneAll() {
+    if (!$('.package-block').hasClass('d-none')) {
+        $('.package-block').addClass('d-none');
+    }
+    if (!$('.period-block').hasClass('d-none')) {
+        $('.period-block').addClass('d-none');
+    }
+    if (!$('.brif-block').hasClass('d-none')) {
+        $('.brif-block').addClass('d-none');
+    }
+    if (!$('.output-block').hasClass('d-none')) {
+        $('.output-block').addClass('d-none');
+    }
+    if (!$('.material-block').hasClass('d-none')) {
+        $('.material-block').addClass('d-none');
+    }
+}
+
+$(".service-group").change(function () {
+    dNoneAll();
+    if ($(this).find(':selected').val() !== '') {
+        let value = $(this).find(':selected').val();
+        let _token = $('input[name="_token"]').val();
+
+        $.ajax({
+            url: "/get-package-by-service",
+            method: "POST",
+            data: {
+                'value': value,
+                '_token': _token,
+            },
+            success: function (result) {
+                result = JSON.parse(result);
+
+                if (result.service.isPeriod) {
+                    dNone('.period-block');
+                }
+                if (result.service.isPackage) {
+                    dNone('.package-block');
+                }
+                if (result.service.isBrif) {
+                    dNone('.brif-block');
+                }
+                if (result.service.isOutput) {
+                    dNone('.output-block');
+                }
+                if (result.service.isRequiredMaterial) {
+                    dNone('.material-block');
+                }
+
+                $(".service-package").html(result.html);
+                $(".service-package").removeAttr('disabled');
+                $('.service-package').select2();
+            },
+
+        });
+    }
+
+});
+
 
 $("input[type=checkbox]").change(function () {
 
@@ -155,6 +303,18 @@ $("#isMySelfC").change(function () {
         goalS.removeClass('show');
     } else {
         goalS.addClass('show');
+    }
+});
+
+
+$("#isInvoiceC").change(function () {
+    // invoice-block
+
+    let goalS = $('.invoice-block');
+    if (goalS.hasClass('d-none')) {
+        goalS.removeClass('d-none');
+    } else {
+        goalS.addClass('d-none');
     }
 });
 

@@ -34,6 +34,10 @@ class Goal extends Model
         return $this->belongsTo(Client::class);
     }
 
+    public function files()
+    {
+        return $this->hasMany(GoalFile::class);
+    }
 
     public function getDateCreate(): string {
         return Carbon::parse($this->created_at)->format('d.m.Y H:i:s');

@@ -13,8 +13,6 @@
     <link rel="shortcut icon" href="{{asset('images/logo/favicon.png')}}" type="image/png">
 
 
-
-
 </head>
 
 <body>
@@ -81,9 +79,47 @@
                         class="sidebar-item  ">
                         <a href="{{route('goals.index')}}" class='sidebar-link'>
                             <i class="bi bi-people-fill"></i>
-                            <span>Мои задачи <span class="badge bg-danger border-radius-50">{{getCountGoals()}}</span></span>
+                            <span>Мои задачи <span class="badge bg-primary">{{getCountGoals()}}</span></span>
                         </a>
                     </li>
+
+                    @if(getCountClaimsResponsible() != 0)
+                        <li
+                            class="sidebar-item  ">
+                            <a href="{{route('claim.distribution')}}" class='sidebar-link'>
+                                <i class="bi bi-clipboard-plus-fill"></i>
+                                <span>Распределение заявок <span class="badge bg-primary">{{getCountClaimsResponsibleIsNotRead()}}</span></span>
+                            </a>
+                        </li>
+                    @endif
+
+                    <li
+                        class="sidebar-item  ">
+                        <a href="{{route('claim.claimGroups')}}" class='sidebar-link'>
+                            <i class="bi bi-clipboard-fill"></i>
+                            <span>Заявки отдела <span class="badge bg-primary">{{getCountClaimsGroupIsNotRead()}}</span></span>
+                        </a>
+                    </li>
+
+
+                    <li
+                        class="sidebar-item  ">
+                        <a href="{{route('claim.claimsMy')}}" class='sidebar-link'>
+                            <i class="bi bi-clipboard-check-fill"></i>
+                            <span>Мои заявки <span class="badge bg-primary">{{myClaimsIsNotClosed()}}</span></span>
+                        </a>
+                    </li>
+
+
+                    @if(auth()->user()->userInvoice != 0)
+                        <li
+                            class="sidebar-item  ">
+                            <a href="{{route('claim.invoice')}}" class='sidebar-link'>
+                                <i class="bi bi-receipt"></i>
+                                <span>Счета <span class="badge bg-primary">{{getCountNotCompleteInvoice()}}</span></span>
+                            </a>
+                        </li>
+                    @endif
 
                     <li
                         class="sidebar-item  ">
@@ -273,6 +309,7 @@
 
     <script src="{{asset('js/all.js')}}"></script>
     <script src="{{asset('js/datatables.js')}}"></script>
+
     <script src="{{asset('js/main.js')}}"></script>
 
 

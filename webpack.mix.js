@@ -22,12 +22,12 @@ mix.styles([
 mix.styles([
     'resources/front/extensions/simple-datatables/style.css',
     'resources/front/css/pages/simple-datatables.css',
-], 'public/css/datatables.css')
+], 'public/css/datatables.css');
 
 
 mix.styles([
     'resources/front/css/pages/auth.css',
-], 'public/css/auth.css')
+], 'public/css/auth.css');
 
 
 mix.combine([
@@ -35,6 +35,7 @@ mix.combine([
     'resources/front/js/app.js',
     'resources/front/js/imask.js',
 ], 'public/js/all.js');
+
 
 
 mix.combine([

@@ -39,6 +39,7 @@
                                         <th>Создана</th>
                                         <th>Выполнить до</th>
                                         <th>Создал задачу</th>
+
                                         <th class="text-center">Действие</th>
                                     </tr>
                                     </thead>
@@ -195,6 +196,7 @@
                                         <th>Создана</th>
                                         <th>Выполнить до</th>
                                         <th>Создал задачу</th>
+                                        <th>Файлы</th>
                                         <th class="text-center">Действие</th>
                                     </tr>
                                     </thead>
@@ -220,6 +222,9 @@
                                             <td>
                                                 {{$item->exposed_user->getFullName()}}
                                             </td>
+                                            <td>
+                                                {{createZip($item->files)}}
+                                            </td>
                                             <td class="text-center">
                                                 <a href="{{route('category.edit', ['category' => $item->id])}}"
                                                    class="text-primary"><i
@@ -235,6 +240,68 @@
                                                     @csrf
                                                     <button type="submit" class="bg-transparent border-0 text-success"><i class="bi bi-check-lg fs-5"></i></button>
                                                 </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        @endif
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-body">
+                        <button class="btn btn-success btn-collapse w-100" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#completeGoals" aria-expanded="true" aria-controls="completeGoals">
+                            <span class="card-title fw-bold fs-6 mb-0">Выполненные задачи</span>
+                            <span class="badge bg-transparent">{{$completeGoals->count()}}</span>
+                            <i class="bi bi-caret-down-fill ms-1"></i>
+                        </button>
+
+                        @if($completeGoals->isEmpty())
+                            <h5 class="text-gray-500 mt-4 mb-0">Выполненных задач не найдено </h5>
+                        @else
+
+                            <div class="table-responsive">
+                                <table class="table table-hover collapse mt-3" id="completeGoals">
+                                    <thead>
+                                    <tr>
+                                        <th>Статус</th>
+                                        <th>Задача</th>
+                                        <th>Создана</th>
+                                        <th>Выполнить до</th>
+                                        <th>Создал задачу</th>
+
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach($completeGoals as $key => $item)
+
+                                        <tr @if(!$item->isRead) class="bg-light-primary" @endif>
+                                            <td>
+                                                @if(!$item->status)
+                                                    <span class="badge bg-danger ">
+                                                    Не выполнена
+                                                </span>
+                                                @else
+                                                    <span class="badge bg-success ">
+                                                    Выполнена
+                                                </span>
+                                                @endif
+                                            </td>
+                                            <td style="width: 30%">{{$item->text}}</td>
+                                            <td><span class="badge bg-success ">{{$item->getDateCreate()}}</span></td>
+                                            <td><span class="badge bg-danger ">{{$item->getDeadline()}}</span></td>
+
+                                            <td>
+                                                {{$item->exposed_user->getFullName()}}
                                             </td>
                                         </tr>
                                     @endforeach

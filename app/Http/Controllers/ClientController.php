@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreClients;
+use App\Models\Claim;
 use App\Models\Client;
+use App\Models\Group;
+use App\Models\HistoryClaim;
 use App\Models\HistoryClient;
 use App\Models\LprClient;
 use App\Models\RequisiteClient;
@@ -95,7 +98,7 @@ class ClientController extends Controller
             DB::commit();
 
             $history = new HistoryClient;
-            $history->status_id = StatusClient::where('name', 'Создан клиент');
+            $history->status_id = StatusClient::where('name', 'Создан клиент')->get()->first()->id;
             $history->client_id = $idClient;
             $history->comment = 'Создан новый клиент';
             $history->user_id = Auth::user()->id;
@@ -172,10 +175,14 @@ class ClientController extends Controller
     {
         $client = Client::firstWhere('id', $id);
         $statusClient = StatusClient::where('isVisible', 1)->get();
-
         $listStatusesClient = HistoryClient::where('client_id', $id)->orderBy('id', 'desc')->get();
+        $groups = Group::all();
+//        $claims = Claim::where('client_id', $id)->get();
+//        $listStatusesClaims = HistoryClaim::where('client_id', $id)->orderBy('id', 'desc')->get();
+        $claims = Claim::where('client_id', $id)->with('histories')->orderBy('created_at', 'desc')->get();
+//        $services =
 
-        return view('clients.show', compact('client', 'statusClient', 'listStatusesClient'));
+        return view('clients.show', compact('client', 'statusClient', 'listStatusesClient', 'groups', 'claims'));
     }
 
     /**

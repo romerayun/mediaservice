@@ -6,6 +6,7 @@ use App\Http\Requests\StoreServ;
 use App\Http\Requests\StoreService;
 use App\Models\Category;
 use App\Models\Group;
+use App\Models\Package;
 use App\Models\Service;
 use App\Models\UserM;
 use Illuminate\Http\Request;
@@ -153,6 +154,60 @@ class ServiceController extends Controller
 
         }
         return 0;
+    }
+
+    public function servicesByGroup(Request $request) {
+
+        if ($request->value > 0) {
+
+            $services = Service::where('group_id', $request->value)->get();
+
+            $htmlRes = '<option value="0">Не выбрано</option>';
+            if (!$services) {
+                echo $htmlRes;
+                return;
+            }
+
+            foreach ($services as $service) {
+                $htmlRes .= "<option value='$service->id'>$service->name</option>";
+            }
+
+
+            echo $htmlRes;
+            return;
+
+        }
+        return 0;
+    }
+
+    public function packageByService(Request $request) {
+
+        if ($request->value > 0) {
+
+            $services = Package::where('service_id', $request->value)->get();
+
+            $htmlRes = '<option value="0">Не выбрано</option>';
+            if (!$services) {
+                echo $htmlRes;
+                return;
+            }
+
+            foreach ($services as $service) {
+                $htmlRes .= "<option value='$service->id'>$service->name</option>";
+            }
+
+
+            $res = array(
+                'html' => $htmlRes,
+                'service' => Service::firstWhere('id', $request->value),
+            );
+
+            echo json_encode($res);
+            return;
+
+        }
+        return 0;
+
     }
 
 }

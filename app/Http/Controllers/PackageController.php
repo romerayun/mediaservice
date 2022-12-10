@@ -28,7 +28,7 @@ class PackageController extends Controller
      */
     public function create()
     {
-        $services = Service::all();
+        $services = Service::where('isPackage', '=', 1)->get();
         return view('packages.create', compact('services'));
     }
 
@@ -74,7 +74,7 @@ class PackageController extends Controller
     public function edit($id)
     {
         $package = Package::firstWhere('id', $id);
-        $services = Service::all();
+        $services = Service::where('isPackage', '=', 1)->get();
         return view('packages.edit', compact('package', 'services'));
     }
 

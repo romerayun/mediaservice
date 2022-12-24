@@ -39,7 +39,7 @@
                                         <th>Создана</th>
                                         <th>Выполнить до</th>
                                         <th>Создал задачу</th>
-
+                                        <th>Файлы</th>
                                         <th class="text-center">Действие</th>
                                     </tr>
                                     </thead>
@@ -64,6 +64,13 @@
                                             <td><span class="badge bg-danger ">{{$item->getDeadline()}}</span></td>
                                             <td>
                                                 {{$item->exposed_user->getFullName()}}
+                                            </td>
+                                            <td>
+                                                @if($item->files->count() == 0)
+                                                    <span class="text-warning">Файлы не были загружены</span>
+                                                @else
+                                                    <a class="btn btn-success download-zip" attr-id="{{$item->id}}">Скачать</a>
+                                                @endif
                                             </td>
                                             <td class="text-center">
                                                 <a href="{{route('category.edit', ['category' => $item->id])}}"
@@ -118,6 +125,7 @@
                                         <th>Создана</th>
                                         <th>Выполнить до</th>
                                         <th>Создал задачу</th>
+                                        <th>Файлы</th>
                                         <th class="text-center">Действие</th>
                                     </tr>
                                     </thead>
@@ -142,6 +150,13 @@
 
                                             <td>
                                                 {{$item->exposed_user->getFullName()}}
+                                            </td>
+                                            <td>
+                                                @if($item->files->count() == 0)
+                                                    <span class="text-warning">Файлы не были загружены</span>
+                                                @else
+                                                    <a class="btn btn-success download-zip" attr-id="{{$item->id}}">Скачать</a>
+                                                @endif
                                             </td>
                                             <td class="text-center">
                                                 <a href="{{route('category.edit', ['category' => $item->id])}}"
@@ -223,7 +238,11 @@
                                                 {{$item->exposed_user->getFullName()}}
                                             </td>
                                             <td>
-                                                {{createZip($item->files)}}
+                                                @if($item->files->count() == 0)
+                                                    <span class="text-warning">Файлы не были загружены</span>
+                                                @else
+                                                <a class="btn btn-success download-zip" attr-id="{{$item->id}}">Скачать</a>
+                                                @endif
                                             </td>
                                             <td class="text-center">
                                                 <a href="{{route('category.edit', ['category' => $item->id])}}"
@@ -278,6 +297,7 @@
                                         <th>Создана</th>
                                         <th>Выполнить до</th>
                                         <th>Создал задачу</th>
+                                        <th>Файлы</th>
 
                                     </tr>
                                     </thead>
@@ -302,6 +322,13 @@
 
                                             <td>
                                                 {{$item->exposed_user->getFullName()}}
+                                            </td>
+                                            <td>
+                                                @if($item->files->count() == 0)
+                                                    <span class="text-warning">Файлы не были загружены</span>
+                                                @else
+                                                    <a class="btn btn-success download-zip" attr-id="{{$item->id}}">Скачать</a>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach

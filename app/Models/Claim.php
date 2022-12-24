@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Claim extends Model
 {
@@ -27,8 +28,12 @@ class Claim extends Model
         'comment',
     ];
 
+    public function getDate() {
+        return Str::title(Carbon::parse($this->created_at)->translatedFormat('F')) . " " . Carbon::parse($this->created_at)->format('Y');
+    }
+
     public function getCreateDate() {
-        return Carbon::parse($this->deadline)->format('d.m.Y г.');
+        return Carbon::parse($this->created_at)->format('d.m.Y г.');
     }
 
     public function service()
@@ -56,6 +61,11 @@ class Claim extends Model
         return $this->hasMany(HistoryClaim::class)->orderBy('id', 'desc');
     }
 
+    public function historiesPayment()
+    {
+        return $this->hasMany(HistoryPayment::class)->orderBy('id', 'desc');
+    }
+
     public function files()
     {
         return $this->hasMany(ClaimFile::class);
@@ -69,4 +79,5 @@ class Claim extends Model
     public function getDeadline(): string {
         return Carbon::parse($this->deadline)->format('d.m.Y г.');
     }
+
 }

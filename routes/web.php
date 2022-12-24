@@ -9,14 +9,19 @@ use App\Http\Controllers\HistoryClientController;
 use App\Http\Controllers\LprController;
 use App\Http\Controllers\MailController;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RequisitesClient;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SalesPlanController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\StatusC;
 use App\Http\Controllers\StatusClaimController;
 use App\Http\Controllers\StatusMaterialController;
+use App\Http\Controllers\StatusPaymentController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ZipController;
+use App\Http\Controllers\CalendarController;
 use App\Mail\Feedback;
 use App\Models\RequisiteClient;
 use App\Models\StatusClaim;
@@ -55,6 +60,7 @@ Route::resource('lpr', LprController::class);
 Route::resource('requisites', RequisitesClient::class);
 Route::resource('groups', GroupController::class);
 Route::resource('roles', RoleController::class);
+Route::get('users/remoteData', [UserController::class, 'getClaimsPayment'])->name('user.remote');
 Route::resource('users', UserController::class);
 Route::resource('category', CategoryController::class);
 Route::resource('services', ServiceController::class);
@@ -62,7 +68,12 @@ Route::resource('status-material', StatusMaterialController::class);
 Route::resource('packages', PackageController::class);
 Route::resource('status-client', StatusC::class);
 Route::resource('status-claim', StatusClaimController::class);
+Route::resource('status-payment', StatusPaymentController::class);
 Route::resource('history-client', HistoryClientController::class);
+
+Route::get('plan/statistics', [SalesPlanController::class, 'statistics'])->name('plan.statistics');
+Route::get('plan/statistics/remoteData', [SalesPlanController::class, 'remoteData'])->name('plan.remote');
+Route::resource('plan', SalesPlanController::class);
 
 Route::get('goals/deadline', [GoalController::class, 'deadline'])->name('goals.deadline');
 Route::get('goals/send', [GoalController::class, 'send'])->name('goals.send');
@@ -72,6 +83,7 @@ Route::resource('goals', GoalController::class);
 
 
 Route::get('/distribution-claims', [ClaimController::class, 'claimDistribution'])->name('claim.distribution');
+Route::get('/distribution-claims/complete', [ClaimController::class, 'claimDistributionComplete'])->name('claim.distributionComplete');
 Route::post('/distribution-claims/{claim}', [ClaimController::class, 'claimUserUpdate'])->name('claim.userUpdate');
 
 Route::post('/groups-claims/{claim}', [ClaimController::class, 'claimAccept'])->name('claim.claimAccept');
@@ -81,6 +93,7 @@ Route::get('/my-claims', [ClaimController::class, 'claimsMy'])->name('claim.clai
 Route::get('/my-claims/closed', [ClaimController::class, 'getClaimsClosed'])->name('claim.getClaimsClosed');
 Route::post('/my-claims/{claim}/closed', [ClaimController::class, 'claimsClosed'])->name('claim.claimsClosed');
 
+Route::post('zip-download', [ZipController::class, 'downloadFiles'])->name('zip.downloadFiles');
 
 Route::get('invoice', [ClaimController::class, 'createInvoice'])->name('claim.invoice');
 Route::get('invoice/closed', [ClaimController::class, 'closedInvoice'])->name('claim.closedInvoice');
@@ -88,6 +101,17 @@ Route::post('invoice/{claim}', [ClaimController::class, 'storeInvoice'])->name('
 Route::post('invoice/closed/{claim}', [ClaimController::class, 'updateInvoice'])->name('claim.updateInvoice');
 Route::post('claims/{claim}/storeHistory', [ClaimController::class, 'storeHistory'])->name('claim.storeHistory');
 Route::resource('claims', ClaimController::class);
+
+Route::get('payments', [PaymentController::class, 'index'])->name('payment.index');
+Route::get('payments/paid', [PaymentController::class, 'paid'])->name('payment.paid');
+Route::post('payments', [PaymentController::class, 'storeStatus'])->name('payment.store');
+
+Route::get('calendar', [CalendarController::class, 'index'])->name('calendar.index');
+Route::get('calendar/getGoals', [CalendarController::class, 'getGoals'])->name('calendar.getGoals');
+Route::get('calendar/getGoal/{goal}', [CalendarController::class, 'getGoalById'])->name('calendar.getGoalById');
+Route::patch('calendar/goal-update/{goal}', [CalendarController::class, 'updateGoal'])->name('calendar.updateGoal');
+Route::delete('calendar/goal-delete/{goal}', [CalendarController::class, 'deleteGoal'])->name('calendar.deleteGoal');
+
 
 Route::post('/upload-filepond', [UploadController::class, 'store']);
 Route::post('/upload-files-goal', [UploadController::class, 'goalsStore']);

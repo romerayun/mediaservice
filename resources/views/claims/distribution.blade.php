@@ -4,6 +4,9 @@
         <div class="col-12 col-md-6">
             <h3>Распределение заявок</h3>
         </div>
+        <div class="col-12 col-md-6 text-end">
+            <a href="{{route('claim.distributionComplete')}}" class="btn btn-success">Распределенные заявки <span class="badge bg-transparent">{{getCountClaimsResponsibleComplete()}}</span></a>
+        </div>
     </div>
 @endsection
 

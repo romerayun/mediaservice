@@ -1,5 +1,6 @@
 import AirDatepicker from 'air-datepicker';
 import 'air-datepicker/air-datepicker.css';
+
 const Swal = require('sweetalert2');
 global.$ = global.jQuery = require('jquery');
 require('select2');
@@ -7,34 +8,62 @@ import * as FilePond from 'filepond';
 import 'filepond/dist/filepond.min.css';
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
+import {DataTable} from "../extensions/simple-datatables";
+
 FilePond.registerPlugin(FilePondPluginImagePreview);
 
+
+function getSum() {
+    let sum = 0;
+    let series = [];
+    let labels = [];
+    let labelsMonth = [];
+    let pie = [];
+    $('#plan-table tr td').each(function (index) {
+        if (index === 3) {
+            sum += +$(this).text().slice(0, -5);
+            series.push(+$(this).text().slice(0, -5));
+        } else if (index % 5 === 3) {
+            sum += +$(this).text().slice(0, -5);
+            series.push(+$(this).text().slice(0, -5));
+        }
+
+        if (index === 2) {
+            labels.push($(this).text());
+        } else if (index % 5 === 2) {
+            labels.push($(this).text());
+        }
+
+        if (index === 1) {
+            labelsMonth.push($(this).text());
+        } else if (index % 5 === 1) {
+            labelsMonth.push($(this).text());
+        }
+
+    });
+
+    pie.push(series);
+    pie.push(labels);
+    pie.push(sum);
+    pie.push(labelsMonth);
+
+
+    return pie;
+
+}
 
 
 const inputElement = document.querySelector('#filepond');
 const pond = FilePond.create(inputElement, {
-    'labelIdle' : 'Перетащите свои файлы в эту область или <span class="filepond--label-action"> Нажмите сюда </span>',
-    credits : false,
+    'labelIdle': 'Перетащите свои файлы в эту область или <span class="filepond--label-action"> Нажмите сюда </span>',
+    credits: false,
     server: {
-        url : '/upload-filepond',
+        url: '/upload-filepond',
         headers: {
-            'X-CSRF-TOKEN' : $('input[name="_token"]').val()
+            'X-CSRF-TOKEN': $('input[name="_token"]').val()
         }
     }
 });
-
-let goalFile = document.querySelector('#goalFiles');
-const goalsFile = FilePond.create(goalFile, {
-    'labelIdle' : 'Перетащите свои файлы в эту область или <span class="filepond--label-action"> Нажмите сюда </span>',
-    credits : false,
-    server: {
-        url : '/upload-files-goal',
-        headers: {
-            'X-CSRF-TOKEN' : $('input[name="_token"]').val()
-        }
-    }
-});
-
 
 
 new AirDatepicker('.datepicker', {
@@ -70,6 +99,17 @@ if (document.getElementById('datepicker-range')) {
     });
 }
 
+if (document.getElementById('month-datepicker')) {
+    let monthDatepicker = new AirDatepicker('.month-datepicker', {
+        isMobile: true,
+        autoClose: true,
+        view: 'months',
+        minView: 'months',
+        dateFormat: 'MMMM yyyy',
+        altFieldDateFormat: 'yyyy-MM-01',
+        altField: '#month'
+    });
+}
 
 
 let selector = '.sidebar-menu ul.menu .sidebar-item';
@@ -131,7 +171,7 @@ if (document.getElementById('date_of_birth')) {
 }
 
 
-$('.delete').click(function (event) {
+$(document).on("click", ".delete", function (event) {
     var form = $(this).closest("form");
     event.preventDefault();
     Swal.fire({
@@ -154,7 +194,7 @@ $('.js-example-basic-single').select2();
 
 if (!currentUrl.includes('services') && !currentUrl.includes('edit') && !currentUrl.includes('distribution-claims')) {
     $("#user_id").select2({
-        'disabled' : true,
+        'disabled': true,
     });
 }
 
@@ -323,7 +363,7 @@ $(".btn-collapse").click(function () {
     let btn = $(this);
     let icon = btn.find('i');
 
-    if(icon.hasClass('bi-caret-down-fill')) {
+    if (icon.hasClass('bi-caret-down-fill')) {
         icon.removeClass('bi-caret-down-fill');
         icon.addClass('bi-caret-up-fill');
     } else {
@@ -335,4 +375,289 @@ $(".btn-collapse").click(function () {
 });
 
 
+$(document).on("click", ".download-zip", function (e) {
+    let value = $(this).attr('attr-id');
+    let _token = $('input[name="_token"]').val();
+    $.ajax({
+        url: "/zip-download",
+        method: "POST",
+        data: {
+            'id': value,
+            '_token': _token,
+        },
+        success: function (result) {
+            e.preventDefault();
+            window.location.href = result;
+        },
+    });
+});
 
+
+if (document.getElementById('plan-table')) {
+
+    var options = {
+        series: getSum()[0],
+        chart: {
+            width: '100%',
+            type: 'pie',
+        },
+        legend: {
+            position: 'top',
+            horizontalAlign: 'center',
+        },
+        dataLabels: {
+            enabled: false
+        },
+        stroke: {
+            width: 1,
+            colors: ["#35354f"]
+        },
+        toolbar: {
+            show: true,
+        },
+        fill: {
+            type: 'gradient',
+        },
+        labels: getSum()[3],
+    };
+    var chart = new ApexCharts(document.querySelector("#bar"), options);
+    chart.render();
+
+    let planTable = new simpleDatatables.DataTable("#plan-table", {
+        searchable: true,
+        fixedHeight: false,
+        labels: {
+            placeholder: "Поиск...",
+            perPage: "{select} записей на странице",
+            noRows: "Ничего не найдено",
+            info: "Показано с {start} по {end} из {rows} записей",
+        },
+    });
+
+
+    planTable.on("datatable.init", function () {
+        adaptPageDropdown(planTable)
+        adaptPagination(planTable)
+    });
+
+    planTable.on("datatable.page", adaptPagination);
+
+
+    if (document.getElementById('filter-month')) {
+        let monthDatepicker = new AirDatepicker('.filter-month', {
+            isMobile: true,
+            autoClose: true,
+            view: 'months',
+            minView: 'months',
+            dateFormat: 'MMMM yyyy',
+            onSelect: function onSelect(fd, date, inst) {
+                planTable.search(fd.formattedDate);
+                planTable.draw;
+                $("#sum").text(getSum()[2]);
+
+                chart.updateOptions({
+                    series: getSum()[0],
+                    labels: getSum()[1],
+                });
+            }
+        });
+    }
+
+    $("#sum").text(getSum()[2]);
+
+
+}
+
+
+$(document).on("click", ".changeStatus", function (event) {
+    let id = $(this).attr('attr-id');
+    $('#claim_id').val(id);
+});
+
+
+// $(document).ready(function () {
+//
+//     let myTable = $('#myTable').DataTable({
+//         processing: true,
+//         serverSide: true,
+//         ajax: {
+//             url: '/plan/statisticsAjax',
+//             type: 'get',
+//         },
+//         columns: [
+//             {data: 'id'},
+//             {data: 'month'}
+//             // {data: 'phone', name: 'phone'},
+//             // {data: 'dob', name: 'dob'}
+//         ],
+//     });
+//
+//     myTable.on("datatable.init", function () {
+//         // adaptPageDropdown(myTable)
+//         // adaptPagination(myTable)
+//     });
+//
+//     myTable.on("datatable.page", adaptPagination);
+// });
+
+
+if (document.getElementById('plan-statistics')) {
+
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    let paramMonth = urlParams.get('month');
+
+    var options = {
+        chart: {
+            width: '100%',
+            type: 'pie',
+        },
+        series: [],
+        noData: {
+            text: 'Данные загружаются...',
+            style: {
+                color: '#FFC107',
+            }
+        },
+        legend: {
+            position: 'top',
+            horizontalAlign: 'center',
+        },
+        dataLabels: {
+            enabled: false
+        },
+        stroke: {
+            width: 1,
+            colors: ["#35354f"]
+        },
+        toolbar: {
+            show: true,
+        },
+        fill: {
+            type: 'gradient',
+        },
+        labels: [],
+    }
+
+    var chart = new ApexCharts(
+        document.querySelector("#plan-statistics"),
+        options
+    );
+
+    chart.render();
+
+    var url = '/plan/statistics/remoteData';
+
+    $.getJSON(url, {month: paramMonth}, function (response) {
+        if (response.data.length === 0) {
+            chart.updateOptions({
+                noData: {
+                    text: 'Данные о поступлениях не найдены!',
+                    style: {
+                        color: '#DC3545',
+                    }
+                },
+            });
+        } else {
+            chart.updateOptions({
+                series: response.data,
+                labels: response.labels
+            });
+        }
+
+
+    });
+}
+
+if (document.getElementById('month-f')) {
+    let monthDatepicker = new AirDatepicker('.month-f', {
+        isMobile: true,
+        autoClose: true,
+        view: 'months',
+        minView: 'months',
+        dateFormat: 'MMMM yyyy',
+        altFieldDateFormat: 'yyyy-MM',
+        altField: '#month',
+        onSelect: function onSelect(fd, date, inst) {
+            planTable.search(fd.formattedDate);
+            planTable.draw;
+            $("#sum").text(getSum()[2]);
+
+            chart.updateOptions({
+                series: getSum()[0],
+                labels: getSum()[1],
+            });
+        }
+    });
+}
+
+if (document.getElementById('plan-user')) {
+
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    let paramMonth = urlParams.get('month');
+    let id = $("#id_user").val();
+
+    var options = {
+        chart: {
+            width: '100%',
+            type: 'bar',
+        },
+        series: [],
+        noData: {
+            text: 'Данные загружаются...',
+            style: {
+                color: '#FFC107',
+            }
+        },
+        legend: {
+            position: 'bottom',
+            horizontalAlign: 'center',
+        },
+        dataLabels: {
+            enabled: false
+        },
+        stroke: {
+            width: 1,
+            colors: ["#35354f"]
+        },
+        toolbar: {
+            show: true,
+        },
+        fill: {
+            type: 'gradient',
+        },
+        labels: [],
+    }
+
+    var chart = new ApexCharts(
+        document.querySelector("#plan-user"),
+        options
+    );
+
+    chart.render();
+
+    var url = '/users/remoteData';
+
+    $.getJSON(url, {month: paramMonth, id: id}, function (response) {
+        chart.updateOptions({
+            series: [
+                {
+                    name: 'План',
+                    data: response.plan
+                },
+                {
+                    name: 'Заявки',
+                    data: response.claims
+                },
+                {
+                    name: 'Поступления',
+                    data: response.paid
+                }
+            ],
+            xaxis: {
+                categories: ["Статистика продаж"]
+            }
+        });
+    });
+}

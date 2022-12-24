@@ -13,7 +13,8 @@
 
 @section('content')
     <div class="row">
-        <div class="col-md-12">
+
+        <div class="col-lg-9 col-md-12">
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
@@ -87,11 +88,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-lg-9 col-md-12">
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
@@ -174,8 +171,53 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-12">
 
+        <div class="col-lg-3 col-md-12">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            История оплаты заявки
+                        </h4>
+
+                        @if(!$claim->historiesPayment->count())
+                            <h6 class="text-gray-500  mt-3">К сожалению, истории не найдено 😢</h6>
+                        @else
+                            <ol class="activity-feed mt-3">
+                                @foreach($claim->historiesPayment as $history)
+                                    <li class="feed-item feed-item-{{$history->status->color}}">
+                                        <time class="date" datetime="9-25">{{$history->getDate()}}</time>
+                                        <p class="fs-6"><b>Статус: </b> {{$history->status->name}}</p>
+                                        <span
+                                            class="text"><b>Комментарий: </b> {{$history->comment}}</span>
+                                        <p class="text mt-3">
+                                            <b>Ответственный: </b>{{$history->user->getFullName()}}</p>
+                                    </li>
+                                @endforeach
+                            </ol>
+                        @endif
+
+                    </div>
+                </div>
+            </div>
+            @if($claim->isInvoice)
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="card-body">
+                                <h4 class="card-title">Счет</h4>
+                                @if ($claim->invoice)
+                                    <a href=" {{asset("/storage")."/".$claim->invoice}}"
+                                       class="btn icon icon-left btn-primary me-2 mt-2" download="true">
+                                        <i class="bi bi-file-arrow-down-fill"></i> Скачать счет</a>
+                                @else
+                                    <p class="text-gray-500 m-0">Счет не готов 😢</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
             @if($claim->service->isRequiredMaterial)
                 <div class="col-12">
                     <div class="card">
@@ -266,27 +308,8 @@
                     </div>
                 </div>
             @endif
-            @if($claim->isInvoice)
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-content">
-                            <div class="card-body">
-                                <h4 class="card-title">Счет</h4>
-                                @if ($claim->invoice)
-                                    <a href=" {{asset("/storage")."/".$claim->invoice}}"
-                                       class="btn icon icon-left btn-primary me-2" download="true">
-                                        <i class="bi bi-file-arrow-down-fill"></i> Скачать счет</a>
-                                @else
-                                    <p class="text-gray-500 m-0">Счет не готов 😢</p>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endif
 
 
         </div>
-
     </div>
 @endsection

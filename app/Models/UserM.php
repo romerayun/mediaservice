@@ -49,9 +49,19 @@ class UserM extends Authenticatable
         return $this->hasMany(HistoryClaim::class);
     }
 
+    public function historiesPayment()
+    {
+        return $this->hasMany(HistoryPayment::class)->orderBy('id', 'desc');
+    }
+
     public function goals()
     {
         return $this->hasMany(Goal::class);
+    }
+
+    public function plans()
+    {
+        return $this->hasMany(SalesPlan::class);
     }
 
     public function workClaim()

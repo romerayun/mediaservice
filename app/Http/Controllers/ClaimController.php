@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Claim;
 use App\Models\ClaimFile;
 use App\Models\HistoryClaim;
+use App\Models\HistoryPayment;
 use App\Models\StatusClaim;
+use App\Models\StatusPayment;
 use App\Models\TemporaryFile;
 use App\Models\UserM;
 use Illuminate\Http\Request;
@@ -129,6 +131,24 @@ class ClaimController extends Controller
                 'claim_id' => $claimId,
             ]);
 
+            $statusPayment = StatusPayment::where('name', '=', 'Не оплачен')->get()->first()->id;
+            HistoryPayment::create([
+                'user_id' => Auth::user()->id,
+                'status_id' => $statusPayment,
+                'comment' => 'Заявка не оплачена',
+                'claim_id' => $claimId,
+            ]);
+
+            if ($request->isInvoice) {
+                $statusPayment = StatusPayment::where('name', '=', 'Счет не выставлен')->get()->first()->id;
+                HistoryPayment::create([
+                    'user_id' => Auth::user()->id,
+                    'status_id' => $statusPayment,
+                    'comment' => 'Счет не выставлен',
+                    'claim_id' => $claimId,
+                ]);
+            }
+
             DB::commit();
             $request->session()->flash('success', 'Заявка успешно создана 👍');
             return back();
@@ -151,7 +171,7 @@ class ClaimController extends Controller
     {
         $claim = Claim::find($id);
         $countAdds = claimsAdds($claim);
-        $statusesClaim = StatusClaim::all();
+        $statusesClaim = StatusClaim::where('isVisible', 1)->get();
         $users = UserM::all();
         return view('claims.show', compact('claim', 'countAdds', 'statusesClaim', 'users'));
     }
@@ -196,9 +216,8 @@ class ClaimController extends Controller
     }
 
     public function claimDistribution() {
-
-
-        $claims = Claim::with('service')
+        $claims = Claim::whereNull('user_id')
+            ->with('service')
             ->whereHas('service', function ($q) {
                 $q->where('user_id', \Illuminate\Support\Facades\Auth::user()->id);
             })
@@ -210,6 +229,20 @@ class ClaimController extends Controller
         $users = UserM::all();
 
         return view('claims.distribution', compact('claims', 'users'));
+    }
+
+    public function claimDistributionComplete() {
+        $claims = Claim::whereNotNull('user_id')
+            ->with('service')
+            ->whereHas('service', function ($q) {
+                $q->where('user_id', \Illuminate\Support\Facades\Auth::user()->id);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        $users = UserM::all();
+
+        return view('claims.distribution-complete', compact('claims', 'users'));
     }
 
     public function claimUserUpdate($cliam, Request $request) {
@@ -434,6 +467,15 @@ class ClaimController extends Controller
                 'comment' => "Выставлен счет",
                 'claim_id' => $claim->id,
             ]);
+
+            $statusPayment = StatusPayment::where('name', '=', 'Счет выставлен')->get()->first()->id;
+            HistoryPayment::create([
+                'user_id' => Auth::user()->id,
+                'status_id' => $statusPayment,
+                'comment' => 'Выставлен счет',
+                'claim_id' => $claim->id,
+            ]);
+
 
             DB::commit();
 

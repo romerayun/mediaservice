@@ -17,6 +17,10 @@ class Goal extends Model
         'exposed',
         'user_id',
         'client_id',
+        'start_date',
+        'color',
+        'allDay',
+        'rrule'
     ];
 
     public function exposed_user()
@@ -29,7 +33,7 @@ class Goal extends Model
         return $this->belongsTo(UserM::class);
     }
 
-    public function client_id()
+    public function client()
     {
         return $this->belongsTo(Client::class);
     }

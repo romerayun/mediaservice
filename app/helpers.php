@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\Claim;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 if (!function_exists('getAllGoals')) {
     function getAllGoals()
@@ -69,7 +71,18 @@ if (!function_exists('getCountClaimsResponsible')) {
 if (!function_exists('getCountClaimsResponsibleIsNotRead')) {
     function getCountClaimsResponsibleIsNotRead()
     {
-        return \App\Models\Claim::where('isRead', '=', 0)
+        return \App\Models\Claim::whereNull('user_id')
+            ->with('service')
+            ->whereHas('service', function ($q) {
+                $q->where('user_id', \Illuminate\Support\Facades\Auth::user()->id);
+            })->count();
+    }
+}
+
+if (!function_exists('getCountClaimsResponsibleComplete')) {
+    function getCountClaimsResponsibleComplete()
+    {
+        return \App\Models\Claim::whereNotNull('user_id')
             ->with('service')
             ->whereHas('service', function ($q) {
                 $q->where('user_id', \Illuminate\Support\Facades\Auth::user()->id);
@@ -178,29 +191,63 @@ if (!function_exists('getCountNotCompleteInvoice')) {
     }
 }
 
-
-if (!function_exists('createZip')) {
-    function createZip($files)
+if (!function_exists('getCountCompletePayment')) {
+    function getCountCompletePayment()
     {
-//        $zip = new \ZipArchive();
-//
-//        $fileName = 'files.zip';
-//        $res = $zip->open((storage_path() . $fileName), ZipArchive::CREATE | \ZipArchive::OVERWRITE);
-//        dd($res);
-//
-//        if ($res === TRUE)
-//        {
-//            foreach ($files as $key => $value) {
-//                $zip->addFile(storage_path($value->file), $value->file);
-//            }
-//
-//            $zip->close();
-//        }
-//
-//        return response()->download(public_path($fileName));
-
+        return Claim::with('historiesPayment.status')
+            ->whereHas('historiesPayment.status', function ($q) {
+                $q->where('name', "Оплачен");
+            })
+            ->count();
     }
 }
 
+if (!function_exists('convertMonth')) {
+    function convertMonth($month)
+    {
+        $month = $month.'-01';
+        return Str::title(Carbon::parse($month)->translatedFormat('F')) . " " . Carbon::parse($month)->format('Y');
+    }
+}
+
+if (!function_exists('getMonths')) {
+    function getMonths()
+    {
+        return array(
+            '1' => 'Январь',
+            '2' => 'Февраль',
+            '3' => 'Март',
+            '4' => 'Апрель',
+            '5' => 'Май',
+            '6' => 'Июнь',
+            '7' => 'Июль',
+            '8' => 'Август',
+            '9' => 'Сентябрь',
+            '10' => 'Октябрь',
+            '11' => 'Ноябрь',
+            '12' =>  'Декабрь',
+        );
+    }
+}
+
+if (!function_exists('getAbbrMonths')) {
+    function getAbbrMonths()
+    {
+        return array(
+            '1' => 'Янв',
+            '2' => 'Февр',
+            '3' => 'Март',
+            '4' => 'Апр.',
+            '5' => 'Май',
+            '6' => 'Июнь',
+            '7' => 'Июль',
+            '8' => 'Авг.',
+            '9' => 'Сент.',
+            '10' => 'Окт.',
+            '11' => 'Нояб.',
+            '12' =>  'Дек.',
+        );
+    }
+}
 
 

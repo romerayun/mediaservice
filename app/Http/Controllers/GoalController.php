@@ -71,71 +71,66 @@ class GoalController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreGoal $request)
+    public function store(Request $request)
     {
+        $request->validate(
+            [
+                'text' => 'required',
+                'user_id' => 'nullable|integer',
+            ],
+            [
+                'text.required' => 'Поле описание не может быть пустым',
+                'user_id.integer' => 'Выберите значение из списка',
+            ]
+        );
         $request->merge([
             'exposed' => Auth::user()->id,
         ]);
-
         if ($request->isMySelf == 1) {
             $request->merge([
                 'user_id' => Auth::user()->id,
             ]);
         }
 
+        if ($request->rrule == '') {
+            $request->merge([
+                'rrule' => null,
+            ]);
+        }
+
         DB::beginTransaction();
-
         try {
-
             $goal = Goal::create($request->all());
             $goal_id = $goal->id;
 
             if ($request->filepond) {
                 if (count($request->filepond) != 0) {
+                    $files = $request->file('filepond');
 
-                    $folder = uniqid() . '-' . now()->timestamp;
-                    Storage::disk('public')->makeDirectory('goals/' . $folder);
+                    foreach ($files as $file) {
 
-                    $oldFolders = array();
-                    foreach ($request->filepond as $file) {
+                        $filename = $file->getClientOriginalName();
+                        $folder = uniqid() . '-' . now()->timestamp;
+
+                        $file->storeAs('goals/' . $folder, $filename);
+
                         $goalFile = GoalFile::create([
                             'goal_id' => $goal_id,
+                            'file' => 'goals/' . $folder . '/' . $filename,
                         ]);
 
-                        $temporaryFile = TemporaryFile::where('folder', $file)->first();
-                        if ($temporaryFile) {
-
-                            $oldFile = 'goals/tmp/' . $file . '/' . $temporaryFile->filename;
-                            $newFile = 'goals/' . $folder . '/' . $temporaryFile->filename;
-                            Storage::copy($oldFile, $newFile);
-
-                            $goalFile->file = $newFile;
-                            $goalFile->save();
-                        }
-
-                        $temporaryFile->delete();
-
-                        $oldFolders[] = $file;
                     }
-
-                    foreach ($oldFolders as $folder) {
-                        Storage::deleteDirectory('goals/tmp/' . $folder);
-                    }
-
                 }
             }
 
-
             DB::commit();
-
-
-            $request->session()->flash('success', 'Данные успешно добавлены 👍');
-            return back();
+            return response()->json([
+                'goal' => $goal,
+                'user' => $goal->exposed_user->getFullName(),
+            ]);
         } catch (\Exception $exception) {
             DB::rollback();
-
-            $request->session()->flash('error', 'При добавлении данных произошла ошибка 😢');
-            return back();
+            return $exception;
         }
     }
 
@@ -196,22 +191,28 @@ class GoalController extends Controller
     public function complete($id)
     {
         $goal = Goal::firstWhere('id', $id);
+        if (!$goal) {
+            return response()->json([
+                'error' => 'Задача не найдена'
+            ], 404);
+        }
         $goal->status = 1;
         $goal->save();
-        return redirect()->back()->with('success', 'Данные успешно обновлены 👍');
+        return response()->json('Задача успешно обновлена');
     }
 
     public function send()
     {
         $goals = Goal::where('exposed', \Illuminate\Support\Facades\Auth::user()->id)
-            ->where('user_id', '<>' , \Illuminate\Support\Facades\Auth::user()->id)
+            ->where('user_id', '<>', \Illuminate\Support\Facades\Auth::user()->id)
             ->orderBy('id', 'desc')
             ->get();
 
         return view('goals.send', compact('goals'));
     }
 
-    public function repeatGoal($id, Request $request) {
+    public function repeatGoal($id, Request $request)
+    {
 
         $goal = Goal::where('id', $id)->get()->first();
         $goal->isRepeat = 1;

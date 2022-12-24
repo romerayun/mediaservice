@@ -25,7 +25,7 @@ class StoreGoal extends FormRequest
     {
         return [
             'text' => 'required',
-            'deadline' => 'required|date',
+            'deadline' => 'date',
             'user_id' => 'nullable|integer',
         ];
     }
@@ -34,7 +34,6 @@ class StoreGoal extends FormRequest
     {
         return [
             'text.required' => 'Поле описание не может быть пустым',
-            'deadline.required' => 'Поле срок выполнения не может быть пустым',
             'deadline.date' => 'Поле срок выполения должен быть в формате дата/время',
             'user_id.integer' => 'Выберите значение из списка',
         ];

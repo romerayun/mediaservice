@@ -1,4 +1,6 @@
-import * as FilePond from "filepond";
+import * as FilePond from 'filepond';
+import 'filepond/dist/filepond.min.css';
+
 import AirDatepicker from 'air-datepicker';
 import 'air-datepicker/air-datepicker.css';
 const Swal = require('sweetalert2');
@@ -10,8 +12,40 @@ const goalsFile = FilePond.create(goalFile, {
     credits: false,
     allowMultiple: true,
     instantUpload: false,
-    allowProcess: false,
+    allowProcess: true,
 });
+
+
+
+function resetCreateEvent() {
+    document.getElementById("newGoal").reset();
+    if (!$(".user-form").hasClass('show')) {
+        $(".user-form").addClass('show');
+    }
+    $("#group_id").select2();
+    $("#user_id").select2();
+    $("#user_id").attr('disabled', 'disabled');
+    goalsFile.removeFiles();
+    startDatePicker.update({
+        timepicker: true,
+    });
+    endDatePicker.update({
+        timepicker: true,
+    });
+    $("#remind-rules").css('display', 'none');
+    $("#remind-datepicker").attr('disabled', 'yes');
+    $("#remind-datepicker").val('');
+    $('#remind-date-hidden').val($("#tomorrow").val());
+    $("#recurring-rules").css('display', 'none');
+    $('span.freq-selection').text('день(я,ей)');
+    $('#monthday-select,#bymonth-select,#weekday-select').hide();
+    $('input[name="interval"]').val("1");
+    $('input[name="count"]').val("1");
+    $('select[name="freq"]').val('daily');
+    $('input[id="until-select"]').prop('checked', false);
+    $('input[id="end-no"]').prop('checked', true).change();
+
+}
 
 function showToast(text, color) {
     Toastify({
@@ -47,7 +81,7 @@ let endDatePicker = new AirDatepicker('#end-date-datepicker', {
 let endDatePickerModal = new AirDatepicker('#end-date', {
     isMobile: true,
     autoClose: true,
-    dateFormat: 'dd.MM.YYYY',
+    dateFormat: 'dd.MM.yyyy',
     onSelect: function onSelect(fd, date, inst) {
         let dateSelected = fd.date;
         let dtEndString = dateSelected.getFullYear() + ('0' + (dateSelected.getMonth()+1)).slice(-2) + ('0' + dateSelected.getDate()).slice(-2);
@@ -56,6 +90,22 @@ let endDatePickerModal = new AirDatepicker('#end-date', {
         $("#end-date-hidden").val(dtEndString + timeEndString);
     }
 });
+
+let today = new Date();
+today.setMinutes(0);
+
+let remindDate = new AirDatepicker('#remind-datepicker', {
+    isMobile: true,
+    autoClose: true,
+    timepicker: true,
+    minDate: today,
+    minutesStep: 30,
+    dateFormat: 'dd.MM.yyyy',
+    altFieldDateFormat: 'yyyy-MM-dd HH:mm:00',
+    altField: '#remind-date-hidden'
+});
+
+
 
 $("#repeatGoalC").change(function (event) {
 
@@ -69,7 +119,6 @@ $("#repeatGoalC").change(function (event) {
 
 document.addEventListener('DOMContentLoaded', function () {
 
-
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('input[name="_token"]').val()
@@ -81,11 +130,14 @@ document.addEventListener('DOMContentLoaded', function () {
     var calendar = new FullCalendar.Calendar(calendarEl, {
         locale: 'ru',
         firstDay: 1,
+
+        weekNumbers: true,
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
         },
+        initialView: 'timeGridWeek',
         eventDidMount: function(info) {
             var tooltip = new Tooltip(info.el, {
                 title: info.event.extendedProps.exposed,
@@ -93,6 +145,35 @@ document.addEventListener('DOMContentLoaded', function () {
                 trigger: 'hover',
                 container: '#calendar'
             });
+        },
+        eventContent: function(arg) {
+            let container = document.createElement('div')
+            container.className = 'm-1'
+
+            let time = document.createElement('p')
+            time.className = 'mb-0 font-bold'
+            let title = document.createElement('p')
+            title.className = 'mb-2'
+            let status = document.createElement('span')
+
+
+            time.innerHTML = arg.timeText;
+            container.appendChild(time)
+            title.innerHTML = arg.event.title;
+            container.appendChild(title)
+
+            if (arg.event.extendedProps.status == 0) {
+                status.innerHTML = 'Статус: Не выполнена';
+            } else if (arg.event.extendedProps.status == 1) {
+                status.innerHTML = 'Статус: Выполнена';
+            } else {
+                status.innerHTML = 'Статус: Просрочена';
+            }
+
+            container.appendChild(status)
+
+            let arrayOfDomNodes = [ container ]
+            return { domNodes: arrayOfDomNodes }
         },
         events: url,
         eventTimeFormat: {
@@ -106,16 +187,7 @@ document.addEventListener('DOMContentLoaded', function () {
         selectable: true,
         selectMirror: true,
         select: function (start) {
-            // const rruleSet = new RRuleSet();
-            // rruleSet.rrule(
-            //     new RRule({
-            //         freq: RRule.MONTHLY,
-            //         count: 5,
-            //         dtstart: datetime(2012, 2, 1, 10, 30),
-            //     })
-            // )
-            // console.log(rruleSet);
-            // return;
+
             $('#createGoal').modal('toggle');
 
             if (calendar.view.type === 'dayGridMonth') {
@@ -186,10 +258,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 let text = $("#text").val();
                 let fd = new FormData();
                 let pondFiles = goalsFile.getFiles();
+
                 if (pondFiles.length > 0) {
                     for (var i = 0; i < pondFiles.length; i++) {
                         fd.append('filepond[]', pondFiles[i].file);
                     }
+                }
+
+                if ($('input[name="remind-goal"]').prop("checked") == true) {
+                    fd.append('remind_at', $("#remind-date-hidden").val());
+                } else {
+                    fd.append('remind_at', '0');
                 }
 
                 fd.append('isMySelf', isMySelf);
@@ -209,28 +288,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     cache: false,
                     data: fd,
                     success: function (response) {
-                        console.log(response);
                         $('#createGoal').modal('toggle');
                         $('#newGoal').trigger('reset');
                         $('.user-form').addClass('show');
                         $("input[name='isMySelf']").val(0);
                         if (isMySelf == 1) {
-                            // calendar.addEvent({
-                            //     'id': response.goal.id,
-                            //     'title': response.goal.text,
-                            //     'start': response.goal.start_date,
-                            //     'end': response.goal.deadline,
-                            //     'exposed' : 'Создал задачу: ' + response.user,
-                            //     'backgroundColor': response.goal.color,
-                            //     'borderColor': response.goal.color,
-                            //     'display': 'block',
-                            //     'allDay': Boolean(+response.goal.allDay),
-                            //     'rrule' : response.goal.rrule,
-                            // });
-                            calendar.refetchEvents()
-                        } else {
-                            showToast("Задача успешно создана 👌", "linear-gradient(to right, #00B560, #00914D)");
+                            calendar.refetchEvents();
+                            resetCreateEvent();
                         }
+                        showToast("Задача успешно создана 👌", "linear-gradient(to right, #00B560, #00914D)");
                         calendar.unselect();
                     },
                     error: function (error) {
@@ -277,7 +343,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         },
         eventClick: function (info) {
-            // $('#viewGoal').modal('toggle');
+
             let id = info.event.id;
             $.ajax({
                 url: '/calendar/getGoal/' + id,
@@ -296,7 +362,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else {
                         $("#files").html("<a class='btn btn-success download-zip mt-2' attr-id='"+response.id+"'>Скачать</a>")
                     }
-                    if (response.status != 0) {
+                    if (response.status == 1) {
                         $("#status-goal").html("Выполнено");
                         if ($("#status-goal").hasClass('bg-danger')) {
                             $("#status-goal").removeClass('bg-danger');
@@ -304,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                         $("#completeGoal").attr('disabled', 'disabled');
                         $("#completeGoal").addClass('disabled');
-                    } else {
+                    } else if (response.status == 0) {
                         $("#status-goal").html("Не выполнено");
                         if ($("#status-goal").hasClass('bg-success')) {
                             $("#status-goal").removeClass('bg-success');
@@ -314,6 +380,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         if ($("#completeGoal").hasClass('disabled')) {
                             $("#completeGoal").removeClass('disabled');
                         }
+                    } else {
+                        $("#status-goal").html("Просрочена");
+                        if ($("#status-goal").hasClass('bg-success')) {
+                            $("#status-goal").removeClass('bg-success');
+                            $("#status-goal").addClass('bg-danger');
+                        }
+                        $("#completeGoal").attr('disabled', 'disabled');
+                        $("#completeGoal").addClass('disabled');
                     }
                     $(".action-goal").each(function(index) {
                         $(this).attr('attr-id', response.id);
@@ -370,6 +444,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                         $("#completeGoal").attr('disabled', 'disabled');
                         $("#completeGoal").addClass('disabled');
+                        calendar.refetchEvents();
                     },
                     error: function (error) {
                         showToast("При обновлении задачи, произошла ошибка 😢", "linear-gradient(to right, #ED213A, #93291E)");
@@ -403,6 +478,57 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    calendar.render();
+    calendar.render();console.log($('.fc-toolbar-chunk')[2]);
+    if ($(window).width() < 500) {
+        calendar.changeView('timeGridDay');
+        $(".fc-today-button").css('display', 'none');
+
+        $('.fc-toolbar-chunk').each(function (index) {
+
+            if (index == 2) $(this).css('display', 'none');
+        });
+        calendar.setOption('height', 800);
+    }
+
+
+    $("#createGoalWithoutCalendar").click(function () {
+        let currentDate = new Date();
+        calendar.select(currentDate);
+    });
+
+    $('input[name="remind-goal"]').change(function () {
+
+        if ($(this).prop('checked') == true) {
+            $('#remind-rules').slideDown();
+        } else {
+            $('#remind-rules').hide();
+        }
+
+    });
+
+    $('input[name="remind-rules"]').change(function () {
+
+        var selectedRadio = $(this).val();
+
+        $('input[name="remind-rules"]').each(function () {
+
+            if ($(this).val() === selectedRadio) {
+
+                $('#remind-date-hidden').val(selectedRadio);
+
+                if ($(this).val() === 'another') {
+                    $("#remind-datepicker").removeAttr('disabled');
+                } else {
+                    $("#remind-datepicker").attr('disabled', 'yes');
+                    $("#remind-datepicker").val('');
+                }
+            }
+        });
+    });
+
+
+
+
 });
+
 

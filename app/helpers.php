@@ -16,7 +16,7 @@ if (!function_exists('getAllGoals')) {
 if (!function_exists('getCountGoals')) {
     function getCountGoals()
     {
-        $goals = \App\Models\Goal::where('isRead', 0)->where('user_id', \Illuminate\Support\Facades\Auth::user()->id)->count();
+        $goals = \App\Models\Goal::where('status', 0)->where('user_id', \Illuminate\Support\Facades\Auth::user()->id)->count();
         return $goals;
     }
 }
@@ -250,4 +250,11 @@ if (!function_exists('getAbbrMonths')) {
     }
 }
 
+if (!function_exists('getCountClientIsNotAllow')) {
+    function getCountClientIsNotAllow()
+    {
+        $clients = \App\Models\Client::where('isAllow', 0)->count();
+        return $clients;
+    }
+}
 

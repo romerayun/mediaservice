@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class ClientController extends Controller
 {
@@ -25,9 +26,35 @@ class ClientController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $clients = Client::paginate(9);
+        $search = '%';
+        if ($request->input('search')) {
+            $request->merge(['search' => $request->input('search')]);
+            $validatedData = $request->validate(
+                [
+                    'search' => 'required|string|min:1',
+                ],
+                [
+                    'search.required' => 'Введите поисковый запрос',
+                    'search.min' => 'Введите поисковый запрос',
+                    'search.string' => 'Введите поисковый запрос',
+                ]
+            );
+
+            $search = '%' . $request->input('search') . '%';
+        }
+
+
+        $clients = Client::where('user_id', Auth::user()->id)
+            ->where(function ($q) use ($search) {
+                $q->where('name', 'like', $search);
+                $q->orWhere('phone', 'like', $search);
+                $q->orWhere('address', 'like', $search);
+                $q->orWhere('email', 'like', $search);
+            })
+            ->where('isAllow', 1)
+            ->paginate(9);
 
 
         return view('clients.index', compact('clients'));
@@ -76,7 +103,9 @@ class ClientController extends Controller
 
         $data = [];
         try {
-
+            if (Auth::user()->role->level == 1) {
+                $request->merge(['isAllow' => 1]);
+            }
             $date = Carbon::createFromFormat('d.m.Y', $request->date_of_birth)->format('Y-m-d');
             $request->merge(['date_of_birth' => $date]);
 
@@ -140,6 +169,9 @@ class ClientController extends Controller
         DB::beginTransaction();
 
         try {
+            if (Auth::user()->role->level == 1) {
+                $request->merge(['isAllow' => 1]);
+            }
             $client = Client::create($request->all());
             DB::commit();
             $idClient = $client->id;
@@ -262,11 +294,34 @@ class ClientController extends Controller
         return redirect()->route('clients.index')->with('success', 'Данные успешно удалены 👍');
     }
 
-
-    public function showAll() {
-        $clients = Client::paginate(9);
+    public function showAll()
+    {
+        $clients = Client::where('isAllow', 1)->get();
         return view('clients.all', compact('clients'));
     }
 
+    public function allow()
+    {
+        $clients = Client::where('isAllow', 0)->get();
+        return view('clients.allow', compact('clients'));
+    }
+
+    public function allowUpdate($id, Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $client = Client::firstWhere('id', $id);
+            $client->isAllow = 1;
+            $client->save();
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Данные успешно обновлены 👍');
+        } catch (\Exception $exception) {
+            DB::rollback();
+
+            $request->session()->flash('error', 'При обновлении данных произошла ошибка 😢');
+            return back();
+        }
+    }
 
 }

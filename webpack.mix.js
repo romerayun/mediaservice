@@ -16,8 +16,13 @@ mix.styles([
     'resources/front/css/main/app-dark.css',
     'resources/front/css/shared/iconly.css',
     'resources/front/css/main/select2.min.css',
-    'resources/front/css/main/custom.css',
 ], 'public/css/all.css');
+
+mix.styles([
+    'resources/front/css/main/custom.css',
+], 'public/css/main.css');
+
+
 
 mix.styles([
     'resources/front/extensions/simple-datatables/style.css',
@@ -56,6 +61,7 @@ mix.combine([
     'resources/front/extensions/calendar/moment.min.js',
     'resources/front/extensions/calendar/rrule/rrule.min.js',
     'resources/front/extensions/calendar/index.global.min.js',
+    'resources/front/extensions/calendar/ru.global.js',
     'resources/front/extensions/calendar/rrule/index.global.min.js',
 ], 'public/js/calendar.js');
 

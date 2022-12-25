@@ -74,6 +74,11 @@ class UserM extends Authenticatable
         return $this->hasMany(Claim::class, 'creator');
     }
 
+    public function clients()
+    {
+        return $this->hasMany(Client::class);
+    }
+
     public function getFullName() {
         return $this->surname . " " . $this->name . " " . $this->patron;
     }

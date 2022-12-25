@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" href="{{@asset('css/toastify.css')}}">
     <link rel="stylesheet" href="{{@asset('css/all.css')}}">
+    <link rel="stylesheet" href="{{@asset('css/main.css')}}">
     <link rel="stylesheet" href="{{@asset('css/datatables.css')}}">
 
     <link rel="shortcut icon" href="{{asset('images/logo/favicon.svg')}}" type="image/x-icon">
@@ -100,7 +101,7 @@
 
                     <li
                         class="sidebar-item  ">
-                        <a href="{{route('goals.index')}}" class='sidebar-link'>
+                        <a href="{{route('calendar.index')}}" class='sidebar-link'>
                             <i class="bi bi-people-fill"></i>
                             <span>Мои задачи <span class="badge bg-primary">{{getCountGoals()}}</span></span>
                         </a>
@@ -245,6 +246,14 @@
 
 
                     <li class="sidebar-title">Профиль</li>
+
+                    <li
+                        class="sidebar-item  ">
+                        <a href="{{route('users.show', ['user' => auth()->user()->id])}}" class='sidebar-link'>
+                            <i class="bi bi-piggy-bank-fill"></i>
+                            <span>Мои продажи</span>
+                        </a>
+                    </li>
 
                     <li
                         class="sidebar-item  ">

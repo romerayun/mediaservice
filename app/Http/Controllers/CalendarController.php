@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
 use App\Models\Goal;
 use App\Models\Group;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +15,6 @@ class CalendarController extends Controller
     public function index()
     {
         $groups = Group::all();
-
         return view('calendar.index', compact('groups'));
     }
 
@@ -46,6 +47,7 @@ class CalendarController extends Controller
                 'allDay' => $goal->allDay,
                 'duration' => ['milliseconds' => $duration],
                 'rrule' => $goal->rrule,
+                'status' => $goal->status,
                 'editable' => $editable,
             ];
         }
@@ -62,7 +64,7 @@ class CalendarController extends Controller
         if ($goal->client_id == null) {
             $client = "Клиент не найден";
         } else {
-            $client = $goal->client->name;
+            $client = "<a href='/clients/".$goal->client->id."' target='_blank'>".$goal->client->name."</a>";
         }
 
         $countFiles = $goal->files->count();

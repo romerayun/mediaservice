@@ -20,7 +20,8 @@ class Goal extends Model
         'start_date',
         'color',
         'allDay',
-        'rrule'
+        'rrule',
+        'remind_at',
     ];
 
     public function exposed_user()

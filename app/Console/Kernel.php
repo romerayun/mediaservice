@@ -15,9 +15,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-//         $schedule->call(function () {
-//            info('message');
-//         })->everyMinute();
+        $schedule->command('goal_reminder:send')->everyThirtyMinutes();
+        $schedule->command('goals:deadline')->daily()->runInBackground();
+        $schedule->command('client:birthday')->daily()->runInBackground();
+        $schedule->command('client:lprBirthday')->daily()->runInBackground();
     }
 
     /**

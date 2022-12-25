@@ -50,6 +50,11 @@ class Client extends Model
         return $this->hasMany(Claim::class);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(UserM::class);
+    }
+
     // Carbon
 
     public function getDateBirth($date): string {

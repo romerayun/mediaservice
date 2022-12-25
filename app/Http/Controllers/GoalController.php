@@ -23,35 +23,7 @@ class GoalController extends Controller
      */
     public function index()
     {
-        expiredGoal();
-
-        $startDate = date('Y-m-d H:i:s');
-        $currentDate = date('Y-m-d 23:59:59');
-
-        $todayGoals = Goal::where('user_id', Auth::user()->id)
-            ->whereBetween('deadline', [$startDate, $currentDate])
-            ->whereIn('status', array(0))
-            ->orderBy('deadline', 'asc')
-            ->get();
-
-        $tomorrowGoals = Goal::where('user_id', Auth::user()->id)
-            ->whereBetween('deadline', [date('Y-m-d 00:00:00', strtotime("+1 day")), date('Y-m-d 23:59:59', strtotime("+1 day"))])
-            ->whereIn('status', array(0))
-            ->orderBy('deadline', 'asc')
-            ->get();
-
-        $otherGoals = Goal::where('user_id', Auth::user()->id)
-            ->where('deadline', '>=', date('Y-m-d 00:00:00', strtotime("+2 day")))
-            ->whereIn('status', array(0))
-            ->orderBy('deadline', 'asc')
-            ->get();
-
-        $completeGoals = Goal::where('user_id', Auth::user()->id)
-            ->where('status', 1)
-            ->orderBy('deadline', 'asc')
-            ->get();
-
-        return view('goals.index', compact('todayGoals', 'tomorrowGoals', 'otherGoals', 'completeGoals'));
+        abort(404);
     }
 
     /**
@@ -61,6 +33,7 @@ class GoalController extends Controller
      */
     public function create()
     {
+        abort(404);
         $groups = Group::all();
         return view('goals.create', compact('groups'));
     }
@@ -95,6 +68,12 @@ class GoalController extends Controller
         if ($request->rrule == '') {
             $request->merge([
                 'rrule' => null,
+            ]);
+        }
+
+        if ($request->remind_at == '0') {
+            $request->merge([
+                'remind_at' => null,
             ]);
         }
 
@@ -142,7 +121,7 @@ class GoalController extends Controller
      */
     public function show($id)
     {
-        //
+        abort(404);
     }
 
     /**
@@ -153,7 +132,7 @@ class GoalController extends Controller
      */
     public function edit($id)
     {
-        //
+        abort(404);
     }
 
     /**
@@ -165,7 +144,7 @@ class GoalController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        abort(404);
     }
 
     /**
@@ -176,15 +155,31 @@ class GoalController extends Controller
      */
     public function destroy($id)
     {
-        //
+        abort(404);
     }
 
     public function deadline()
     {
-        $goals = Goal::where('deadline', '<', date('Y-m-d H:i:s'))
-            ->where('user_id', \Illuminate\Support\Facades\Auth::user()->id)
-            ->orderBy('id', 'desc')
-            ->get();
+//        dd(Auth::user());
+
+        if (Auth::user()->userLeader == 1 && Auth::user()->role->level != 1) {
+            $goals = Goal::where('status', 2)
+                ->whereHas('user.role', function ($q) {
+                    $q->where('group_id', Auth::user()->role->group_id);
+                })
+                ->orderBy('id', 'desc')
+                ->get();
+        } else if (Auth::user()->role->level == 1) {
+            $goals = Goal::where('status', 2)
+                ->orderBy('id', 'desc')
+                ->get();
+        } else {
+            $goals = Goal::where('status_id', 2)
+                ->where('user_id', \Illuminate\Support\Facades\Auth::user()->id)
+                ->orderBy('id', 'desc')
+                ->get();
+        }
+
         return view('goals.expired', compact('goals'));
     }
 
@@ -213,28 +208,35 @@ class GoalController extends Controller
 
     public function repeatGoal($id, Request $request)
     {
-
-        $goal = Goal::where('id', $id)->get()->first();
-        $goal->isRepeat = 1;
-        $goal->save();
-
         DB::beginTransaction();
-
         try {
+            $goal = Goal::where('id', $id)->get()->first();
+            if ($goal->rrule != null) {
+                $request->session()->flash('error', 'К сожалению, для данной задачи невозможно выполнить повтор 😢');
+                return back();
+            }
+            $newGoal = $goal->replicate();
+            $goal->isRepeat = 1;
+            $goal->save();
 
-            $newGoal = new Goal();
+            $startDate = Carbon::now()->addDay();
+            $oldDate = Carbon::parse($goal->start_date);
+            $startDate->hour = $oldDate->hour;
+            $startDate->minute = $oldDate->minute;
+            $startDate->second = 0;
+            $newGoal->start_date = $startDate;
 
+            $endDate = Carbon::now()->addDay();
+            $oldEndDate = Carbon::parse($goal->deadline);
+            $endDate->hour = $oldEndDate->hour;
+            $endDate->minute = $oldEndDate->minute;
+            $endDate->second = 0;
 
-            $newGoal->text = $goal->text;
-            $newGoal->exposed = $goal->exposed;
-            $newGoal->user_id = $goal->user_id;
-            $newGoal->client_id = $goal->client_id;
-            $newGoal->isRead = 0;
-            $newGoal->isReadExpired = 0;
+            $newGoal->deadline = $endDate;
+            $newGoal->created_at = Carbon::now();
             $newGoal->status = 0;
-            $newGoal->deadline = now()->addDay(1);
-
             $newGoal->save();
+
             DB::commit();
 
             $request->session()->flash('success', 'Задача создана повторно 👍');
@@ -242,7 +244,7 @@ class GoalController extends Controller
         } catch (\Exception $exception) {
             DB::rollback();
 
-            $request->session()->flash('error', 'При создании задачи произошла ошибка 😢');
+            $request->session()->flash('error', 'При повторе задачи произошла ошибка 😢');
             return back();
         }
 

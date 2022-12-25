@@ -7,6 +7,11 @@
         <div class="col-12 col-md-6 text-end">
             <a href="{{route('clients.createFast')}}" class="btn btn-sm btn-success">Быстрое добавление</a>
             <a href="{{route('clients.create')}}" class="btn btn-sm btn-primary">Добавление</a>
+            @if(auth()->user()->role->level == 1)
+                <a href="{{route('clients.allow')}}" class="btn btn-sm btn-primary">Подтверждение клиентов
+                    <span class="badge bg-transparent">{{getCountClientIsNotAllow()}}</span>
+                </a>
+            @endif
         </div>
     </div>
 @endsection
@@ -18,24 +23,6 @@
         @if($clients->isEmpty())
             <h5 class="text-gray-500">К сожалению, клиентов не найдено 😢</h5>
         @else
-{{--                <div class="col-md-4 col-sm-12">--}}
-{{--                    <div class="card">--}}
-{{--                        <div class="card-header">--}}
-{{--                            <div class="avatar avatar-lg me-3 align-items-center">--}}
-{{--                                @if(empty($client->logo))--}}
-{{--                                    <img src="{{asset('images/faces/2.jpg')}}" alt="Логотип отсутствует" srcset="">--}}
-{{--                                @else--}}
-{{--                                    <img src="{{asset('storage').'/'.$client->logo}}" alt="Логотип организации">--}}
-
-{{--                                @endif--}}
-{{--                                <h4 class="ms-lg-3 mb-0">{{$client->name}}</h4>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                        <div class="card-body">--}}
-{{--                            <p class="mb-1"><b>Закрепленный менеджер (МП): </b><a href="tel:{{$client->phone}}">{{$client->phone}}</a></p>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
                 <table class="table table-lg table-hover" id="datatables">
                     <thead>
                     <tr>
@@ -43,7 +30,7 @@
                         <th>Логотип</th>
                         <th>Клиент</th>
                         <th>Менеджер</th>
-                        <th>Статус</th>
+                        <th>Последнее взаимодействие</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -60,8 +47,21 @@
                                 </div>
                             </td>
                             <td>{{$item->name}}</td>
-                            <td></td>
-                            <td></td>
+                            <td>
+                                @if ($item->user)
+                                    {{$item->user->getFullName()}}
+                                @else
+                                    <span class="text-success">Свободный клиент</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if ($item->histories)
+                                    <p>{{$item->histories->first()->status->name}}</p>
+                                    <p><b>Ответственный: </b>{{$item->histories->first()->user->getFullName()}}</p>
+                                @else
+                                    <span class="text-danger">Взаимодействий не найдено</span>
+                                @endif
+                            </td>
                         </tr>
 
                     @endforeach
@@ -72,8 +72,6 @@
         @endif
 
     </div>
-
-    {{ $clients->links() }}
 
 
 @endsection

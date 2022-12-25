@@ -661,3 +661,19 @@ if (document.getElementById('plan-user')) {
         });
     });
 }
+
+$('input[name="active-adds"]').change(function () {
+    if ($(this).prop('checked') == true) {
+        $('.form-active-adds').slideDown();
+    } else {
+        $('.form-active-adds').slideUp();
+    }
+});
+
+$('input[name="close-claim"]').change(function () {
+    if ($(this).prop('checked') == true) {
+        $('.form-close-claim').slideDown();
+    } else {
+        $('.form-close-claim').slideUp();
+    }
+});

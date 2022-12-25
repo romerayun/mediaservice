@@ -6,7 +6,7 @@
             <input type="hidden" id="id_user" value="{{$user->id}}">
         </div>
         <div class="col-12 col-md-6 text-end">
-            <a href="{{route('users.index')}}" class="btn btn-primary">Назад</a>
+            <a href="{{back()->getTargetUrl()}}" class="btn btn-primary">Назад</a>
         </div>
     </div>
 @endsection

@@ -52,6 +52,8 @@ Route::get('clients/fast-add', [ClientController::class, 'createFast'])->name('c
 Route::post('clients/fast-add', [ClientController::class, 'storeFast'])->name('clients.storeFast');
 Route::resource('clients', ClientController::class);
 
+Route::patch('/allow/{client}', [ClientController::class, 'allowUpdate'])->name('clients.allowUpdate');
+Route::get('/allow', [ClientController::class, 'allow'])->name('clients.allow');
 Route::get('/all-clients', [ClientController::class, 'showAll'])->name('clients.showAll');
 Route::get('clients/create-lpr/{client_id}', [LprController::class, 'createLpr'])->name('lpr.createLpr');
 Route::post('clients/create-lpr/{client_id}', [LprController::class, 'storeLpr'])->name('lpr.storeLpr');

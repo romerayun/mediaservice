@@ -6,6 +6,7 @@ use App\Http\Requests\StoreHistory;
 use App\Models\Goal;
 use App\Models\HistoryClient;
 use App\Models\StatusClient;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -53,7 +54,8 @@ class HistoryClientController extends Controller
                 $goal->user_id = $user_id;
                 $goal->client_id = $request->client_id;
                 $goal->text = $request->text;
-                $goal->deadline = $request->deadline;
+                $goal->start_date = $request->deadline;
+                $goal->deadline = Carbon::parse($request->deadline)->addHour();
                 $goal->save();
             }
             DB::commit();

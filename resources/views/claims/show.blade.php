@@ -56,35 +56,71 @@
                             <p class="mt-1"><b class="text-primary">Комментарий:</b> {{$claim->comment}}</p>
                         @endif
 
+                        <hr>
+                        <div class="form-check form-switch">
+                            <label class="form-check-label" for="active-adds">Поставить рекламу на запуск</label>
+                            <input class="form-check-input" name="active-adds" type="checkbox">
+                        </div>
+
+                        <div class="form-active-adds mt-3" style="display: none">
+                            <h4 class="card-title mb-0">Поставить рекламу на запуск</h4>
+                            <p class="mb-3 text-warning text-opacity-75"><i>После постановки данной заявки на запуск, за неделю
+                                    автоматически сгенерируется задача о приближающемся окончании рекламной кампании
+                                </i></p>
+
+                            <form action="#" method="POST">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-12">
+                                        <label for="start-date-datepicker" class="mb-2">Выберите начало задачи:</label>
+                                        <div id="start-date-datepicker"></div>
+                                        <input type="hidden" name="start-date-hidden" id="start-date-hidden">
+                                    </div>
+                                    <div class="col-lg-6 col-md-12">
+                                        <label for="end-date-datepicker" class="mb-2">Выберите конец задачи:</label>
+                                        <div id="end-date-datepicker"></div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+
+
+
                         @if ($claim->isClose == 0)
                             <hr>
+                            <div class="form-check form-switch">
+                                <label class="form-check-label" for="close-claim">Закрыть задачу</label>
+                                <input class="form-check-input" name="close-claim" type="checkbox">
+                            </div>
 
-                            <h4 class="card-title mb-0">Закрыть заявку</h4>
-                            <p class="mb-3 text-warning text-opacity-75"><i>После закрытия заявки, изменение истории
-                                    будет
-                                    невозможно</i></p>
-                            <form action="{{route('claim.claimsClosed', ['claim' => $claim->id])}}" method="POST">
-                                @csrf
-                                <div class="form-group">
-                                    <label>Причина закрытия заявки: </label>
-                                    <textarea
-                                        class="form-control @if($errors->has('commentClose')) is-invalid @endif"
-                                        id="commentClose" name="commentClose" rows="3"
-                                        placeholder="Введите причину закрытия заявки...">{{old('commentClose')}}</textarea>
-                                    @if($errors->has('commentClose'))
-                                        <div class="invalid-feedback">
-                                            <i class="bx bx-radio-circle"></i>
-                                            @foreach($errors->get('commentClose') as $message)
-                                                {{$message}}<br>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                </div>
+                            <div class="form-close-claim mt-3" style="display: none">
+                                <h4 class="card-title mb-0">Закрыть заявку</h4>
+                                <p class="mb-3 text-warning text-opacity-75"><i>После закрытия заявки, изменение истории
+                                        будет
+                                        невозможно</i></p>
+                                <form action="{{route('claim.claimsClosed', ['claim' => $claim->id])}}" method="POST">
+                                    @csrf
+                                    <div class="form-group">
+                                        <label>Причина закрытия заявки: </label>
+                                        <textarea
+                                            class="form-control @if($errors->has('commentClose')) is-invalid @endif"
+                                            id="commentClose" name="commentClose" rows="3"
+                                            placeholder="Введите причину закрытия заявки...">{{old('commentClose')}}</textarea>
+                                        @if($errors->has('commentClose'))
+                                            <div class="invalid-feedback">
+                                                <i class="bx bx-radio-circle"></i>
+                                                @foreach($errors->get('commentClose') as $message)
+                                                    {{$message}}<br>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
 
-                                <button type="submit" class="btn btn-danger">Закрыть заявку</button>
-                            </form>
+                                    <button type="submit" class="btn btn-danger">Закрыть заявку</button>
+
+                                </form>
+                            </div>
                         @endif
-
                     </div>
                 </div>
             </div>

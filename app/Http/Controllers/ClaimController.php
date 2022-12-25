@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Claim;
 use App\Models\ClaimFile;
+use App\Models\Goal;
 use App\Models\HistoryClaim;
 use App\Models\HistoryPayment;
 use App\Models\StatusClaim;
 use App\Models\StatusPayment;
 use App\Models\TemporaryFile;
 use App\Models\UserM;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +28,7 @@ class ClaimController extends Controller
      */
     public function index()
     {
-        //
+        abort(404);
     }
 
     /**
@@ -35,7 +38,7 @@ class ClaimController extends Controller
      */
     public function create()
     {
-        //
+        abort(404);
     }
 
     /**
@@ -184,7 +187,7 @@ class ClaimController extends Controller
      */
     public function edit($id)
     {
-        //
+        abort(404);
     }
 
     /**
@@ -196,7 +199,7 @@ class ClaimController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        abort(404);
     }
 
     /**
@@ -207,12 +210,12 @@ class ClaimController extends Controller
      */
     public function destroy($id)
     {
-        //
+        abort(404);
     }
 
     public function claimInputs()
     {
-
+        abort(404);
     }
 
     public function claimDistribution() {
@@ -272,6 +275,23 @@ class ClaimController extends Controller
                 'claim_id' => $cliam->id,
             ]);
 
+            $oldGoal = Goal::where('claim_id', $cliam->id);
+            if ($oldGoal->count() != 0) {
+                $oldGoal->delete();
+            }
+
+            $goal = new Goal;
+            $goal->exposed = Auth::user()->id;
+            $goal->user_id = $request->user_id;
+            $goal->client_id = $cliam->client_id;
+            $goal->claim_id = $cliam->id;
+            $goal->text = "Заявка для выполенения - " . $cliam->service->name;
+            $goal->start_date = Carbon::parse($cliam->created_at)->format('Y-m-d 00:00:00');
+            $goal->deadline = Carbon::parse($cliam->deadline)->addDay()->format('Y-m-d 00:00:00');
+            $goal->allDay = 1;
+            $goal->save();
+
+
             DB::commit();
 
             return redirect()->back()->with('success', 'Данные успешно обновлены 👍');
@@ -299,6 +319,23 @@ class ClaimController extends Controller
                 'comment' => 'Принял для выполнения',
                 'claim_id' => $cliam->id,
             ]);
+
+            $oldGoal = Goal::where('claim_id', $cliam->id);
+            if ($oldGoal->count() != 0) {
+                $oldGoal->delete();
+            }
+
+            $goal = new Goal;
+            $goal->exposed = Auth::user()->id;
+            $goal->user_id = Auth::user()->id;
+            $goal->client_id = $cliam->client_id;
+            $goal->claim_id = $cliam->id;
+            $goal->text = "Заявка для выполенения - " . $cliam->service->name;
+            $goal->start_date = Carbon::parse($cliam->created_at)->format('Y-m-d 00:00:00');
+            $goal->deadline = Carbon::parse($cliam->deadline)->addDay()->format('Y-m-d 00:00:00');
+            $goal->allDay = 1;
+            $goal->save();
+
 
             DB::commit();
 

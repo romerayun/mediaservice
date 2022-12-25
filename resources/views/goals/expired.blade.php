@@ -6,7 +6,7 @@
             <p class="text-subtitle text-muted fs-6" style="font-weight: 400">При повторе задачи, дата выполенения будет установлена на - сегодня + 1 день </p>
         </div>
         <div class="col-12 col-md-6 text-end">
-            <a href="{{route('goals.index')}}" class="btn  btn-primary">Назад</a>
+            <a href="{{route('calendar.index')}}" class="btn  btn-primary">Назад</a>
         </div>
     </div>
 @endsection
@@ -18,19 +18,19 @@
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
-                        <button class="btn btn-danger btn-collapse w-100" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#goalsToday" aria-expanded="true" aria-controls="goalsToday">
-                            <span class="card-title fw-bold fs-6 mb-0">Список просроченных задач </span>
-                            <span class="badge bg-transparent">{{countExpiredGoal()}}</span>
-                            <i class="bi bi-caret-up-fill ms-1"></i>
-                        </button>
+{{--                        <button class="btn btn-danger btn-collapse w-100" type="button" data-bs-toggle="collapse"--}}
+{{--                                data-bs-target="#goalsToday" aria-expanded="true" aria-controls="goalsToday">--}}
+{{--                            <span class="card-title fw-bold fs-6 mb-0">Список просроченных задач </span>--}}
+{{--                            <span class="badge bg-transparent">{{countExpiredGoal()}}</span>--}}
+{{--                            <i class="bi bi-caret-up-fill ms-1"></i>--}}
+{{--                        </button>--}}
 
                         @if($goals->isEmpty())
                             <h5 class="text-gray-500 mt-4 mb-0">Просроченных задач нет 😎 </h5>
                         @else
 
                             <div class="table-responsive">
-                                <table class="table table-hover collapse mt-3 show" id="goalsToday">
+                                <table class="table table-hover collapse mt-3 show" id="datatables">
                                     <thead>
                                     <tr>
                                         <th>Статус</th>
@@ -38,6 +38,7 @@
                                         <th>Создана</th>
                                         <th>Выполнить до</th>
                                         <th>Создал задачу</th>
+                                        <th>Ответственный</th>
                                         <th class="text-center">Повторить</th>
                                     </tr>
                                     </thead>
@@ -56,6 +57,9 @@
                                             <td><span class="badge bg-danger ">{{$item->getDeadline()}}</span></td>
                                             <td>
                                                 {{$item->exposed_user->getFullName()}}
+                                            </td>
+                                            <td>
+                                                {{$item->user->getFullName()}}
                                             </td>
                                             <td class="text-center">
                                                 @if($item->isRepeat)

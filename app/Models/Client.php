@@ -21,6 +21,7 @@ class Client extends Model
         'email',
         'date_of_birth',
         'website',
+        'user_id',
     ];
 
     protected $dates = ['deleted_at'];

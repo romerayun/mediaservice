@@ -20,4 +20,8 @@ class ActiveAd extends Model
     public function claim() {
         return $this->belongsTo(Claim::class);
     }
+
+    public function user() {
+        return $this->belongsTo(UserM::class);
+    }
 }

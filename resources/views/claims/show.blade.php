@@ -59,18 +59,28 @@
 
                         <hr>
                         @if($activeAd)
-                            <h4 class="card-title mb-0 mt-2">Рекламная кампания запущена</h4>
-                            <p class="mt-2">
-                                <b class="text-primary">Период рекламной кампании:</b>
-                                {{\Illuminate\Support\Carbon::parse($activeAd->start_date)->format('d.m.Y')}}
-                                -
-                                {{\Illuminate\Support\Carbon::parse($activeAd->end_date)->format('d.m.Y')}}
-                            </p>
-                            <form action="{{route('claim.deleteAd', ['ad'=>$activeAd->id])}}" method="POST">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger">Удалить рекламную кампанию</button>
-                            </form>
+                            @if($activeAd->end_date < now())
+                                <h4 class="card-title mb-0 mt-2">Рекламная кампания завершена</h4>
+                                <p class="mt-2">
+                                    <b class="text-primary">Период рекламной кампании:</b>
+                                    {{\Illuminate\Support\Carbon::parse($activeAd->start_date)->format('d.m.Y')}}
+                                    -
+                                    {{\Illuminate\Support\Carbon::parse($activeAd->end_date)->format('d.m.Y')}}
+                                </p>
+                            @else
+                                <h4 class="card-title mb-0 mt-2">Рекламная кампания запущена</h4>
+                                <p class="mt-2">
+                                    <b class="text-primary">Период рекламной кампании:</b>
+                                    {{\Illuminate\Support\Carbon::parse($activeAd->start_date)->format('d.m.Y')}}
+                                    -
+                                    {{\Illuminate\Support\Carbon::parse($activeAd->end_date)->format('d.m.Y')}}
+                                </p>
+                                <form action="{{route('claim.deleteAd', ['ad'=>$activeAd->id])}}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger">Удалить рекламную кампанию</button>
+                                </form>
+                            @endif
                         @else
                         <div class="form-check form-switch">
                             <label class="form-check-label" for="active-adds">Поставить рекламу на запуск</label>

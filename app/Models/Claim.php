@@ -77,7 +77,7 @@ class Claim extends Model
     }
 
     public function activeAd() {
-        return $this->hasMany(ActiveAd::class);
+        return $this->hasMany(ActiveAd::class)->orderBy('end_date', 'desc');
     }
 
     public function getDeadline(): string {

@@ -608,6 +608,7 @@ class ClaimController extends Controller
                 'claim_id' => $id,
                 'start_date' => $startDate,
                 'end_date' => $endDate,
+                'user_id' => Auth::user()->id,
             ]);
 
             ActiveAd::create($request->all());
@@ -631,10 +632,25 @@ class ClaimController extends Controller
 
     public function getActiveAd() {
 
-        $activeAds = Claim::whereHas('activeAd')
+        $activeAds = Claim::whereHas('activeAd', function ($q) {
+                $q->where('end_date', '>=', now()->second(0)->minute(0)->hour(0));
+            })
             ->where('creator', Auth::user()->id)
             ->get();
 
         return view('activeAd.index', compact('activeAds'));
     }
+
+    public function getPastActiveAd() {
+
+        $activeAds = Claim::whereHas('activeAd', function ($q) {
+            $q->where('end_date', '<=', now()->second(0)->minute(0)->hour(0));
+        })
+            ->where('creator', Auth::user()->id)
+            ->get();
+
+        return view('activeAd.past', compact('activeAds'));
+    }
+
+
 }

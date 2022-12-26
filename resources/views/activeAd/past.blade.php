@@ -5,8 +5,7 @@
             <h3>Активная реклама</h3>
         </div>
         <div class="col-12 col-md-6 text-end">
-            <a href="{{route('claim.pastActiveAd')}}" class="btn btn-danger">Законченная рекламная кампания
-                <span class="badge bg-transparent">{{getCountExActiveAds()}}</span></a>
+            <a href="{{route('claim.activeAd')}}" class="btn btn-primary">Назад</a>
         </div>
     </div>
 @endsection
@@ -18,10 +17,10 @@
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
-                        <h4 class="card-title mb-4 ">Список активной рекламы</h4>
+                        <h4 class="card-title mb-4 ">Список прошедшей активной рекламы</h4>
 
                         @if($activeAds->isEmpty())
-                            <h5 class="text-gray-500">К сожалению, активной рекламы не найдено 😢</h5>
+                            <h5 class="text-gray-500">К сожалению, прошедшей активной рекламы не найдено 😢</h5>
                         @else
                             <table class="table table-lg table-hover" id="datatables">
                                 <thead>

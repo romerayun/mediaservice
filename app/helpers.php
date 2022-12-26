@@ -258,3 +258,40 @@ if (!function_exists('getCountClientIsNotAllow')) {
     }
 }
 
+if (!function_exists('getCountActiveAds')) {
+    function getCountActiveAds()
+    {
+        return Claim::whereHas('activeAd', function ($q) {
+                $q->where('end_date', '>=', now()->second(0)->minute(0)->hour(0));
+            })
+            ->where('creator', Auth::user()->id)
+            ->count();
+    }
+}
+
+if (!function_exists('getCountExActiveAds')) {
+    function getCountExActiveAds()
+    {
+        return Claim::whereHas('activeAd', function ($q) {
+            $q->where('end_date', '<', now()->second(0)->minute(0)->hour(0));
+        })
+            ->where('creator', Auth::user()->id)
+            ->count();
+    }
+}
+
+if (!function_exists('getDiffDate')) {
+    function getDiffDate($end) {
+        $end = \Carbon\Carbon::make($end);
+        if (($end->day == now()->day) && ($end->month == now()->month)) {
+            return 'Сегодня';
+        } else if ($end < now()->second(0)->minute(0)->hour(0)) {
+            return 'Рекламная кампания закончилась';
+        } else {
+            return $end->diffForHumans();
+        }
+    }
+}
+
+
+

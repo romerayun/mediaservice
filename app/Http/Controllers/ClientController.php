@@ -11,6 +11,7 @@ use App\Models\HistoryClient;
 use App\Models\LprClient;
 use App\Models\RequisiteClient;
 use App\Models\StatusClient;
+use App\Models\UserM;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -322,6 +323,46 @@ class ClientController extends Controller
             $request->session()->flash('error', 'При обновлении данных произошла ошибка 😢');
             return back();
         }
+    }
+
+
+    public function distribution() {
+        $clients = Client::where('isAllow', 1)
+            ->get();
+        $users = UserM::all();
+
+        return view('clients.distribution', compact('clients', 'users'));
+    }
+
+    public function distributionUpdate($id, Request $request) {
+
+        $client = Client::find($id);
+        if (!$client) {
+            return response()->json([
+                'error' => 'Клиент не найдена'
+            ], 404);
+        }
+
+        if ($request->user_id == 0) {
+            $request->merge([
+                'user_id' => null,
+            ]);
+        }
+
+        $client->update([
+            'user_id' => $request->user_id,
+        ]);
+
+        $user = '';
+        if ($client->user_id) {
+            $user = "<span>" . $client->user->getFullName() . "</span>";
+        } else {
+            $user = '<span class="text-success">Свободный клиент</span>';
+        }
+
+        return response()->json($user);
+
+
     }
 
 }

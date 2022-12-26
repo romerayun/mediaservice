@@ -139,7 +139,7 @@
                         class="sidebar-item  ">
                         <a href="{{route('claim.activeAd')}}" class='sidebar-link align-items-center'>
                             <i class="bi bi-badge-ad-fill"></i>
-                            <span>Активная <br> реклама </span><span class="badge bg-primary">{{myClaimsIsNotClosed()}}</span>
+                            <span>Активная <br> реклама </span><span class="badge bg-primary">{{getCountActiveAds()}}</span>
                         </a>
                     </li>
 
@@ -358,25 +358,14 @@
             @yield('content')
         </div>
 
-        {{--        <footer>--}}
-        {{--            <div class="footer clearfix mb-0 text-muted">--}}
-        {{--                <div class="float-start">--}}
-        {{--                    <p>2021-{{ date("Y") }} &copy; MediaService</p>--}}
-        {{--                </div>--}}
-        {{--                <div class="float-end">--}}
-        {{--                    <p>Crafted with <span class="text-danger"><i class="bi bi-heart"></i></span> by <a--}}
-        {{--                            href="#">XWeb</a></p>--}}
-        {{--                </div>--}}
-        {{--            </div>--}}
-        {{--        </footer>--}}
     </div>
 </div>
 
 <script src="{{asset('js/all.js')}}"></script>
 <script src="{{asset('js/datatables.js')}}"></script>
 <script src="{{asset('js/apexcharts.js')}}"></script>
-<script src="{{asset('js/main.js')}}"></script>
 <script src="{{asset('js/toastify.js')}}"></script>
+<script src="{{asset('js/main.js')}}"></script>
 <script src="{{asset('js/calendar.js')}}"></script>
 <script src="{{asset('js/popper.js')}}"></script>
 <script src="{{asset('js/rrule-gui.js')}}"></script>

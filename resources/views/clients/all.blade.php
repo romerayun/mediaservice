@@ -5,13 +5,16 @@
             <h3>Клиенты</h3>
         </div>
         <div class="col-12 col-md-6 text-end">
-            <a href="{{route('clients.createFast')}}" class="btn btn-sm btn-success">Быстрое добавление</a>
-            <a href="{{route('clients.create')}}" class="btn btn-sm btn-primary">Добавление</a>
             @if(auth()->user()->role->level == 1)
                 <a href="{{route('clients.allow')}}" class="btn btn-sm btn-primary">Подтверждение клиентов
                     <span class="badge bg-transparent">{{getCountClientIsNotAllow()}}</span>
                 </a>
+                <a href="{{route('clients.distribution')}}" class="btn btn-sm btn-primary">Распределение клиентов между МП
+
+                </a>
             @endif
+            <a href="{{route('clients.create')}}" class="btn btn-sm btn-primary">Добавление</a>
+            <a href="{{route('clients.createFast')}}" class="btn btn-sm btn-success">Быстрое добавление</a>
         </div>
     </div>
 @endsection

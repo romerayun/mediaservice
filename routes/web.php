@@ -52,6 +52,8 @@ Route::get('clients/fast-add', [ClientController::class, 'createFast'])->name('c
 Route::post('clients/fast-add', [ClientController::class, 'storeFast'])->name('clients.storeFast');
 Route::resource('clients', ClientController::class);
 
+Route::patch('/all-clients/distribution/{client}', [ClientController::class, 'distributionUpdate'])->name('clients.distributionUpdate');
+Route::get('/all-clients/distribution', [ClientController::class, 'distribution'])->name('clients.distribution');
 Route::patch('/allow/{client}', [ClientController::class, 'allowUpdate'])->name('clients.allowUpdate');
 Route::get('/allow', [ClientController::class, 'allow'])->name('clients.allow');
 Route::get('/all-clients', [ClientController::class, 'showAll'])->name('clients.showAll');
@@ -117,6 +119,7 @@ Route::patch('calendar/goal-update/{goal}', [CalendarController::class, 'updateG
 Route::delete('calendar/goal-delete/{goal}', [CalendarController::class, 'deleteGoal'])->name('calendar.deleteGoal');
 
 Route::get('active-ad', [ClaimController::class, 'getActiveAd'])->name('claim.activeAd');
+Route::get('active-ad/past', [ClaimController::class, 'getPastActiveAd'])->name('claim.pastActiveAd');
 
 Route::post('/upload-filepond', [UploadController::class, 'store']);
 Route::post('/upload-files-goal', [UploadController::class, 'goalsStore']);

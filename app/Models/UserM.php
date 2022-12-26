@@ -79,6 +79,11 @@ class UserM extends Authenticatable
         return $this->hasMany(Client::class);
     }
 
+    public function activeAds()
+    {
+        return $this->hasMany(ActiveAd::class);
+    }
+
     public function getFullName() {
         return $this->surname . " " . $this->name . " " . $this->patron;
     }

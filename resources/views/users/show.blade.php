@@ -72,6 +72,7 @@
                             <table class="table table-lg table-hover" id="datatables">
                                 <thead>
                                 <tr>
+                                    <th>№ заявки</th>
                                     <th>Месяц / Год</th>
                                     <th>Категория услуг</th>
                                     <th>Наименование услуги</th>
@@ -83,6 +84,9 @@
 
                                 @foreach($userClaims as $key => $item)
                                     <tr>
+                                        <td>
+                                            <a href="{{route('claims.show', ['claim' => $item->id])}}">№{{$item->id}}</a>
+                                        </td>
                                         <td>{{$item->getDate()}}</td>
                                         <td>{{$item->service->category->name}}</td>
                                         <td>{{$item->service->name}}</td>

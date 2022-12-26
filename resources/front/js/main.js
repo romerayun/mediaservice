@@ -12,6 +12,16 @@ import {DataTable} from "../extensions/simple-datatables";
 
 FilePond.registerPlugin(FilePondPluginImagePreview);
 
+function showToast(text, color) {
+    Toastify({
+        text: text,
+        duration: 2000,
+        close: true,
+        gravity: "top",
+        position: "right",
+        backgroundColor: color,
+    }).showToast();
+}
 
 function getSum() {
     let sum = 0;
@@ -205,9 +215,43 @@ $(document).on("click", ".delete", function (event) {
 
 $('.js-example-basic-single').select2();
 
-if (!currentUrl.includes('services') && !currentUrl.includes('edit') && !currentUrl.includes('distribution-claims')) {
+if (!currentUrl.includes('services') && !currentUrl.includes('edit') && !currentUrl.includes('distribution-claims') && !currentUrl.includes('distribution')) {
     $("#user_id").select2({
         'disabled': true,
+    });
+}
+
+if (currentUrl.includes('distribution')) {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('input[name="_token"]').val()
+        }
+    });
+
+    $(".user_id").change(function () {
+        let item = $(this);
+        let user = $(this).val();
+        let client_id = $(this).attr('attr-id');
+
+        if (user == 0) user = null;
+
+        $.ajax({
+            url: '/all-clients/distribution/' + client_id,
+            type: "PATCH",
+            data: {
+                'user_id': +user,
+            },
+            success: function (response) {
+                item.parents('tr').find('td.user-td').html(response);
+                showToast("Ответственный успешно назначен 👌", "linear-gradient(to right, #00B560, #00914D)");
+            },
+            error: function (error) {
+                showToast("При обновлении ответственного, произошла ошибка 😢", "linear-gradient(to right, #ED213A, #93291E)");
+            },
+
+        });
+
+
     });
 }
 

@@ -249,6 +249,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 let color = $("#color").val();
                 let rrule = $("#rrule").val();
 
+                if (isMySelf == 0 && user_id == 0) {
+                    showToast("Выберите для кого создается задача!", "linear-gradient(to right, #ED213A, #93291E)");
+                    return;
+                }
 
                 if (color == '#ffffff') {
                     showToast("Белый цвет запрещен 😢", "linear-gradient(to right, #ED213A, #93291E)");
@@ -417,7 +421,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             url: '/calendar/goal-delete/' + id,
                             type: "DELETE",
                             success: function (response) {
-                                info.event.remove();
+                                calendar.refetchEvents();
                                 $('#viewGoal').modal('toggle');
                                 showToast("Задача успешно удалена 👌", "linear-gradient(to right, #00B560, #00914D)");
                             },

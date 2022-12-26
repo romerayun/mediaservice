@@ -5,13 +5,18 @@ namespace App\Http\Controllers;
 use App\Models\ActiveAd;
 use App\Models\Claim;
 use App\Models\ClaimFile;
+use App\Models\Client;
 use App\Models\Goal;
+use App\Models\Group;
 use App\Models\HistoryClaim;
 use App\Models\HistoryPayment;
+use App\Models\Package;
+use App\Models\Service;
 use App\Models\StatusClaim;
 use App\Models\StatusPayment;
 use App\Models\TemporaryFile;
 use App\Models\UserM;
+use App\Policies\ClaimPolicy;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -50,6 +55,15 @@ class ClaimController extends Controller
      */
     public function store(Request $request)
     {
+        $client = Client::find($request->client_id);
+
+        if (Auth::user()->cannot('create', Claim::class)) {
+            abort(403);
+        }
+        if ($client->user_id != Auth::user()->id) {
+            abort(403);
+        }
+
         $validatedData = $request->validate(
             [
                 'service_id' => 'required|integer',
@@ -189,7 +203,14 @@ class ClaimController extends Controller
      */
     public function edit($id)
     {
-        abort(404);
+        $claim = Claim::findOrFail($id);
+        $groups = Group::all();
+        $services = Service::where('group_id', $claim->service->group->id)->get();
+        $packages = [];
+        if ($claim->service->isPackage) {
+            $packages = Package::where('service_id', $claim->service_id)->get();
+        }
+        return view('claims.update', compact('groups', 'claim', 'services', 'packages'));
     }
 
     /**
@@ -222,6 +243,7 @@ class ClaimController extends Controller
 
     public function claimDistribution() {
         $claims = Claim::whereNull('user_id')
+            ->where('isClose', 0)
             ->with('service')
             ->whereHas('service', function ($q) {
                 $q->where('user_id', \Illuminate\Support\Facades\Auth::user()->id);
@@ -238,6 +260,7 @@ class ClaimController extends Controller
 
     public function claimDistributionComplete() {
         $claims = Claim::whereNotNull('user_id')
+            ->where('isClose', 0)
             ->with('service')
             ->whereHas('service', function ($q) {
                 $q->where('user_id', \Illuminate\Support\Facades\Auth::user()->id);
@@ -385,6 +408,7 @@ class ClaimController extends Controller
     public function claimGroups() {
 
         $claims = Claim::whereNull('user_id')
+            ->where('isClose', 0)
             ->with('service')
             ->whereHas('service', function ($q) {
                 $q->where('group_id', Auth::user()->role->group_id);
@@ -446,6 +470,20 @@ class ClaimController extends Controller
             return back();
         }
     }
+
+    public function createdClaims() {
+
+        $claims = Claim::where('creator', Auth::user()->id)
+            ->where('isClose', 0)
+            ->with('service')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        $users = UserM::all();
+
+        return view('claims.claims-created', compact('claims', 'users'));
+    }
+
 
     public function getClaimsClosed() {
 

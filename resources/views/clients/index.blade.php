@@ -5,8 +5,20 @@
             <h3>Клиенты</h3>
         </div>
         <div class="col-12 col-md-6 text-end">
-            <a href="{{route('clients.createFast')}}" class="btn btn-sm btn-success">Быстрое добавление</a>
-            <a href="{{route('clients.create')}}" class="btn btn-sm btn-primary">Добавление</a>
+            @if (auth()->user()->can('allowClient', \App\Models\Client::class))
+                <a href="{{route('clients.allow')}}" class="btn btn-sm btn-primary">Подтверждение клиентов
+                    <span class="badge bg-transparent">{{getCountClientIsNotAllow()}}</span>
+                </a>
+            @endif
+
+            @if (auth()->user()->can('viewAny', \App\Models\ActiveAd::class))
+                <a href="{{route('clients.distribution')}}" class="btn btn-sm btn-primary">Распределение клиентов между МП</a>
+            @endif
+
+            @if (auth()->user()->can('create', \App\Models\Client::class))
+                <a href="{{route('clients.create')}}" class="btn btn-sm btn-primary">Добавление</a>
+                <a href="{{route('clients.createFast')}}" class="btn btn-sm btn-success">Быстрое добавление</a>
+            @endif
         </div>
     </div>
 @endsection
@@ -124,24 +136,30 @@
 
                             </div>
                             <div class="d-inline-block">
-                                <a href="{{route('clients.show', ['client' => $client->id])}}"
+                                @if (auth()->user()->can('view', $client))
+                                    <a href="{{route('clients.show', ['client' => $client->id])}}"
                                    class="btn btn-sm icon btn-primary me-2 mb-2"><i class="bi bi-eye-fill"></i> Открыть</a>
+                                @endif
                                 <a href="{{route('lpr.createLpr', ['client_id' => $client->id])}}"
                                    class="btn btn-sm icon btn-success me-2 mb-2"><i class="bi bi-people-fill"></i>
                                     Управление ЛПР</a>
                                 <a href="{{route('requisites.edit', ['requisite' => $client->requisite->id])}}"
                                    class="btn btn-sm icon btn-success me-2 mb-2"><i class="bi bi-file-binary-fill"></i>
                                     Управление реквизитами</a>
-                                <a href="{{route('clients.edit', ['client' => $client->id])}}"
-                                   class="btn btn-sm icon btn-primary me-2 mb-2"><i class="bi bi-pencil"></i>
+                                @if (auth()->user()->can('update', $client))
+                                    <a href="{{route('clients.edit', ['client' => $client->id])}}"
+                                    class="btn btn-sm icon btn-primary me-2 mb-2"><i class="bi bi-pencil"></i>
                                     Редактировать</a>
-                                <form action="{{route('clients.destroy', ['client' => $client->id])}}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn icon btn-danger me-2 mb-2 delete btn-sm"><i
-                                            class="bi bi-trash-fill"></i> Удалить
-                                    </button>
-                                </form>
+                                @endif
+                                @if (auth()->user()->can('delete', $client))
+                                    <form action="{{route('clients.destroy', ['client' => $client->id])}}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn icon btn-danger me-2 mb-2 delete btn-sm"><i
+                                                class="bi bi-trash-fill"></i> Удалить
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </div>
                     </div>

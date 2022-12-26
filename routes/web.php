@@ -85,6 +85,7 @@ Route::post('goals/deadline/{goal}', [GoalController::class, 'repeatGoal'])->nam
 Route::post('goals/complete/{goal}', [GoalController::class, 'complete'])->name('goals.complete');
 Route::resource('goals', GoalController::class);
 
+Route::get('/created-claims', [ClaimController::class, 'createdClaims'])->name('claim.created');
 
 Route::get('/distribution-claims', [ClaimController::class, 'claimDistribution'])->name('claim.distribution');
 Route::get('/distribution-claims/complete', [ClaimController::class, 'claimDistributionComplete'])->name('claim.distributionComplete');

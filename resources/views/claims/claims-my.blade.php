@@ -5,7 +5,8 @@
             <h3>Мои заявки</h3>
         </div>
         <div class="col-12 col-md-6 text-end">
-            <a href="{{route('claim.getClaimsClosed')}}" class="btn  btn-danger">Закрытые заявки <span class="badge bg-transparent">{{myClaimsIsClosed()}}</span></a>
+            <a href="{{route('claim.created')}}" class="btn btn-primary">Созданные заявки <span class="badge bg-transparent">{{getCountCreatedClaims()}}</span></a>
+            <a href="{{route('claim.getClaimsClosed')}}" class="btn btn-danger">Закрытые заявки <span class="badge bg-transparent">{{myClaimsIsClosed()}}</span></a>
         </div>
     </div>
 @endsection
@@ -62,7 +63,6 @@
                                         <div class="actions">
                                             <p>Взаимодействия</p>
                                             <a href="{{route('claims.show', ['claim' => $claim->id])}}" class="btn icon btn-primary"><i class="bi bi-eye-fill"></i></a>
-                                            <a href="{{route('claims.show', ['claim' => $claim->id])}}" class="btn icon btn-danger ms-2"><i class="bi bi-trash-fill"></i></a>
                                         </div>
 
                                     </div>

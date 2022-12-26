@@ -65,9 +65,7 @@
 
                                         <div class="actions">
                                             <p>Взаимодействия</p>
-                                            {{--                                            <a href="" class="btn btn-sm icon btn-primary me-2 mb-2">Открыть</a>--}}
                                             <a href="{{route('claims.show', ['claim' => $claim->id])}}" class="btn icon btn-primary"><i class="bi bi-eye-fill"></i></a>
-                                            <a href="{{route('claims.show', ['claim' => $claim->id])}}" class="btn icon btn-danger ms-2"><i class="bi bi-trash-fill"></i></a>
                                         </div>
 
                                     </div>

@@ -5,16 +5,20 @@
             <h3>Клиенты</h3>
         </div>
         <div class="col-12 col-md-6 text-end">
-            @if(auth()->user()->role->level == 1)
+            @if (auth()->user()->can('allowClient', \App\Models\Client::class))
                 <a href="{{route('clients.allow')}}" class="btn btn-sm btn-primary">Подтверждение клиентов
                     <span class="badge bg-transparent">{{getCountClientIsNotAllow()}}</span>
                 </a>
-                <a href="{{route('clients.distribution')}}" class="btn btn-sm btn-primary">Распределение клиентов между МП
-
-                </a>
             @endif
-            <a href="{{route('clients.create')}}" class="btn btn-sm btn-primary">Добавление</a>
-            <a href="{{route('clients.createFast')}}" class="btn btn-sm btn-success">Быстрое добавление</a>
+
+            @if (auth()->user()->can('viewAny', \App\Models\ActiveAd::class))
+                <a href="{{route('clients.distribution')}}" class="btn btn-sm btn-primary">Распределение клиентов между МП</a>
+            @endif
+
+            @if (auth()->user()->can('create', \App\Models\Client::class))
+                <a href="{{route('clients.create')}}" class="btn btn-sm btn-primary">Добавление</a>
+                <a href="{{route('clients.createFast')}}" class="btn btn-sm btn-success">Быстрое добавление</a>
+            @endif
         </div>
     </div>
 @endsection

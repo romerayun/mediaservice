@@ -68,6 +68,16 @@ if (!function_exists('getCountClaimsResponsible')) {
     }
 }
 
+if (!function_exists('getCountClaimsWithoutUser')) {
+    function getCountClaimsWithoutUser()
+    {
+        return \App\Models\Service::whereNull('user_id')
+            ->where('group_id', Auth::user()->role->group_id)
+            ->count();
+//        ('user_id', \Illuminate\Support\Facades\Auth::user()->id)->count();
+    }
+}
+
 if (!function_exists('getCountClaimsResponsibleIsNotRead')) {
     function getCountClaimsResponsibleIsNotRead()
     {
@@ -155,6 +165,14 @@ if (!function_exists('myClaimsIsClosed')) {
     {
         return Claim::where('user_id', Auth::user()->id)
             ->where('isClose', 1)->count();
+
+    }
+}
+
+if (!function_exists('getCountCreatedClaims')) {
+    function getCountCreatedClaims()
+    {
+        return Claim::where('creator', Auth::user()->id)->count();
 
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreGroups;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
@@ -16,6 +17,9 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        if (Auth::user()->cannot('viewAny', Category::class)) {
+            abort(403);
+        }
         $categories = Category::all();
         return view('category.index', compact('categories'));
     }
@@ -27,6 +31,9 @@ class CategoryController extends Controller
      */
     public function create()
     {
+        if (Auth::user()->cannot('create', Category::class)) {
+            abort(403);
+        }
         return view('category.create');
     }
 
@@ -38,6 +45,9 @@ class CategoryController extends Controller
      */
     public function store(StoreGroups $request)
     {
+        if (Auth::user()->cannot('create', Category::class)) {
+            abort(403);
+        }
         DB::beginTransaction();
         try {
             Category::create($request->all());
@@ -60,7 +70,7 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        //
+        abort(404);
     }
 
     /**
@@ -72,6 +82,10 @@ class CategoryController extends Controller
     public function edit($id)
     {
         $category = Category::firstWhere('id', $id);
+        if (Auth::user()->cannot('update', $category)) {
+            abort(403);
+        }
+
         return view('category.edit', compact('category'));
     }
 
@@ -85,6 +99,9 @@ class CategoryController extends Controller
     public function update(StoreGroups $request, $id)
     {
         $category = Category::firstWhere('id', $id);
+        if (Auth::user()->cannot('update', $category)) {
+            abort(403);
+        }
         $category->update($request->all());
         return redirect()->back()->with('success', 'Данные успешно обновлены 👍');
     }
@@ -98,6 +115,9 @@ class CategoryController extends Controller
     public function destroy($id)
     {
         $category = Category::find($id);
+        if (Auth::user()->cannot('delete', $category)) {
+            abort(403);
+        }
         $category->delete();
         return redirect()->back()->with('success', 'Данные успешно удалены 👍');
     }

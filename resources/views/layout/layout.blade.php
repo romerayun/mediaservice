@@ -83,14 +83,17 @@
                         </a>
                     </li>
 
-                    <li
-                        class="sidebar-item  ">
-                        <a href="{{route('clients.showAll')}}" class='sidebar-link'>
-                            <i class="bi bi-person-lines-fill"></i>
-                            <span>Все клиенты</span>
-                        </a>
-                    </li>
+                    @if (auth()->user()->can('viewAny', \App\Models\Client::class))
+                        <li
+                            class="sidebar-item  ">
+                            <a href="{{route('clients.showAll')}}" class='sidebar-link'>
+                                <i class="bi bi-person-lines-fill"></i>
+                                <span>Все клиенты</span>
+                            </a>
+                        </li>
+                    @endif
 
+                    @if (auth()->user()->can('viewAny', \App\Models\Client::class))
                     <li
                         class="sidebar-item  ">
                         <a href="{{route('clients.index')}}" class='sidebar-link'>
@@ -98,6 +101,7 @@
                             <span>Мои клиенты</span>
                         </a>
                     </li>
+                    @endif
 
                     <li
                         class="sidebar-item  ">
@@ -118,13 +122,15 @@
                         </li>
                     @endif
 
-                    <li
-                        class="sidebar-item  ">
-                        <a href="{{route('claim.claimGroups')}}" class='sidebar-link'>
-                            <i class="bi bi-clipboard-fill"></i>
-                            <span>Заявки отдела <span class="badge bg-primary">{{getCountClaimsGroupIsNotRead()}}</span></span>
-                        </a>
-                    </li>
+                    @if(getCountClaimsWithoutUser() != 0)
+                        <li
+                            class="sidebar-item  ">
+                            <a href="{{route('claim.claimGroups')}}" class='sidebar-link'>
+                                <i class="bi bi-clipboard-fill"></i>
+                                <span>Заявки отдела <span class="badge bg-primary">{{getCountClaimsGroupIsNotRead()}}</span></span>
+                            </a>
+                        </li>
+                    @endif
 
 
                     <li
@@ -219,6 +225,7 @@
 
                     <li class="sidebar-title">Управление услугами</li>
 
+                    @if (auth()->user()->can('viewAny', \App\Models\Category::class))
                     <li
                         class="sidebar-item  ">
                         <a href="{{route('category.index')}}" class='sidebar-link'>
@@ -226,6 +233,7 @@
                             <span>Категории услуг</span>
                         </a>
                     </li>
+                    @endif
 
                     <li
                         class="sidebar-item  ">
@@ -270,21 +278,6 @@
                         </a>
                     </li>
 
-                    {{--                    <li--}}
-                    {{--                        class="sidebar-item has-sub">--}}
-                    {{--                        <a href="#" class='sidebar-link'>--}}
-                    {{--                            <i class="bi bi-collection-fill"></i>--}}
-                    {{--                            <span>Учебные группы</span>--}}
-                    {{--                        </a>--}}
-                    {{--                        <ul class="submenu ">--}}
-                    {{--                            <li class="submenu-item ">--}}
-                    {{--                                <a href="{{ route('speciality.index') }}">Специальности</a>--}}
-                    {{--                            </li>--}}
-                    {{--                            <li class="submenu-item ">--}}
-                    {{--                                <a href="#">Группы</a>--}}
-                    {{--                            </li>--}}
-                    {{--                        </ul>--}}
-                    {{--                    </li>--}}
 
 
                 </ul>

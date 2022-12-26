@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreClients;
+use App\Models\ActiveAd;
 use App\Models\Claim;
 use App\Models\Client;
 use App\Models\Group;
@@ -29,6 +30,10 @@ class ClientController extends Controller
      */
     public function index(Request $request)
     {
+        if (Auth::user()->cannot('viewAny', Client::class)) {
+            abort(403);
+        }
+
         $search = '%';
         if ($request->input('search')) {
             $request->merge(['search' => $request->input('search')]);
@@ -46,16 +51,26 @@ class ClientController extends Controller
             $search = '%' . $request->input('search') . '%';
         }
 
-
-        $clients = Client::where('user_id', Auth::user()->id)
-            ->where(function ($q) use ($search) {
-                $q->where('name', 'like', $search);
-                $q->orWhere('phone', 'like', $search);
-                $q->orWhere('address', 'like', $search);
-                $q->orWhere('email', 'like', $search);
-            })
-            ->where('isAllow', 1)
-            ->paginate(9);
+        if (Auth::user()->role->level <= 2) {
+            $clients = Client::where(function ($q) use ($search) {
+                    $q->where('name', 'like', $search);
+                    $q->orWhere('phone', 'like', $search);
+                    $q->orWhere('address', 'like', $search);
+                    $q->orWhere('email', 'like', $search);
+                })
+                ->where('isAllow', 1)
+                ->paginate(9);
+        } else {
+            $clients = Client::where('user_id', Auth::user()->id)
+                ->where(function ($q) use ($search) {
+                    $q->where('name', 'like', $search);
+                    $q->orWhere('phone', 'like', $search);
+                    $q->orWhere('address', 'like', $search);
+                    $q->orWhere('email', 'like', $search);
+                })
+                ->where('isAllow', 1)
+                ->paginate(9);
+        }
 
 
         return view('clients.index', compact('clients'));
@@ -68,17 +83,25 @@ class ClientController extends Controller
      */
     public function create()
     {
+        if (Auth::user()->cannot('create', Client::class)) {
+            abort(403);
+        }
         return view('clients.create');
     }
 
     public function createFast()
     {
-//        return 1;
+        if (Auth::user()->cannot('create', Client::class)) {
+            abort(403);
+        }
         return view('clients.fast');
     }
 
     public function store(StoreClients $request)
     {
+        if (Auth::user()->cannot('create', Client::class)) {
+            abort(403);
+        }
 
         $validatedData = $request->validate(
             [
@@ -155,6 +178,10 @@ class ClientController extends Controller
      */
     public function storeFast(Request $request)
     {
+        if (Auth::user()->cannot('create', Client::class)) {
+            abort(403);
+        }
+
         $validatedData = $request->validate(
             [
                 'name' => 'required',
@@ -207,6 +234,9 @@ class ClientController extends Controller
     public function show($id)
     {
         $client = Client::firstWhere('id', $id);
+        if (Auth::user()->cannot('view', $client)) {
+            abort(403);
+        }
         $statusClient = StatusClient::where('isVisible', 1)->get();
         $listStatusesClient = HistoryClient::where('client_id', $id)->orderBy('id', 'desc')->get();
         $groups = Group::all();
@@ -226,6 +256,9 @@ class ClientController extends Controller
      */
     public function edit($id)
     {
+        if (Auth::user()->cannot('update', Client::class)) {
+            abort(403);
+        }
         $client = Client::firstWhere('id', $id);
         return view('clients.edit', compact('client'));
     }
@@ -239,6 +272,9 @@ class ClientController extends Controller
      */
     public function update(StoreClients $request, $id)
     {
+        if (Auth::user()->cannot('update', Client::class)) {
+            abort(403);
+        }
         $inn = $request->input('inn');
 
         $resultInn = RequisiteClient::where('INN', $inn)->first();
@@ -290,6 +326,9 @@ class ClientController extends Controller
      */
     public function destroy($id)
     {
+        if (Auth::user()->cannot('delete', Client::class)) {
+            abort(403);
+        }
         $client = Client::find($id);
         $client->delete();
         return redirect()->route('clients.index')->with('success', 'Данные успешно удалены 👍');
@@ -297,18 +336,27 @@ class ClientController extends Controller
 
     public function showAll()
     {
+        if (Auth::user()->cannot('viewAny', Client::class)) {
+            abort(403);
+        }
         $clients = Client::where('isAllow', 1)->get();
         return view('clients.all', compact('clients'));
     }
 
     public function allow()
     {
+        if (Auth::user()->cannot('allow', Client::class)) {
+            abort(403);
+        }
         $clients = Client::where('isAllow', 0)->get();
         return view('clients.allow', compact('clients'));
     }
 
     public function allowUpdate($id, Request $request)
     {
+        if (Auth::user()->cannot('allow', Client::class)) {
+            abort(403);
+        }
         DB::beginTransaction();
         try {
             $client = Client::firstWhere('id', $id);
@@ -325,8 +373,15 @@ class ClientController extends Controller
         }
     }
 
+    // ----------**********------------
+    // ********** COMPLETE ************
+    // ----------**********------------
 
     public function distribution() {
+        if (Auth::user()->cannot('viewAny', ActiveAd::class)) {
+            abort(403);
+        }
+
         $clients = Client::where('isAllow', 1)
             ->get();
         $users = UserM::all();
@@ -334,7 +389,15 @@ class ClientController extends Controller
         return view('clients.distribution', compact('clients', 'users'));
     }
 
+    // ----------**********------------
+    // ********** COMPLETE ************
+    // ----------**********------------
+
     public function distributionUpdate($id, Request $request) {
+
+        if (Auth::user()->cannot('viewAny', ActiveAd::class)) {
+            abort(403);
+        }
 
         $client = Client::find($id);
         if (!$client) {

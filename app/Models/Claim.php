@@ -76,6 +76,10 @@ class Claim extends Model
         return $this->belongsTo(Package::class)->withTrashed();
     }
 
+    public function activeAd() {
+        return $this->hasMany(ActiveAd::class);
+    }
+
     public function getDeadline(): string {
         return Carbon::parse($this->deadline)->format('d.m.Y г.');
     }

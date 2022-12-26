@@ -135,6 +135,13 @@
                         </a>
                     </li>
 
+                    <li
+                        class="sidebar-item  ">
+                        <a href="{{route('claim.activeAd')}}" class='sidebar-link align-items-center'>
+                            <i class="bi bi-badge-ad-fill"></i>
+                            <span>Активная <br> реклама </span><span class="badge bg-primary">{{myClaimsIsNotClosed()}}</span>
+                        </a>
+                    </li>
 
                     @if(auth()->user()->userInvoice != 0)
                         <li

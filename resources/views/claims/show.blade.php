@@ -56,34 +56,59 @@
                             <p class="mt-1"><b class="text-primary">Комментарий:</b> {{$claim->comment}}</p>
                         @endif
 
+
                         <hr>
+                        @if($activeAd)
+                            <h4 class="card-title mb-0 mt-2">Рекламная кампания запущена</h4>
+                            <p class="mt-2">
+                                <b class="text-primary">Период рекламной кампании:</b>
+                                {{\Illuminate\Support\Carbon::parse($activeAd->start_date)->format('d.m.Y')}}
+                                -
+                                {{\Illuminate\Support\Carbon::parse($activeAd->end_date)->format('d.m.Y')}}
+                            </p>
+                            <form action="{{route('claim.deleteAd', ['ad'=>$activeAd->id])}}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">Удалить рекламную кампанию</button>
+                            </form>
+                        @else
                         <div class="form-check form-switch">
                             <label class="form-check-label" for="active-adds">Поставить рекламу на запуск</label>
-                            <input class="form-check-input" name="active-adds" type="checkbox">
+                            <input class="form-check-input" name="active-adds" type="checkbox"  @if($errors->has('range_date_hidden')) checked @endif>
                         </div>
 
-                        <div class="form-active-adds mt-3" style="display: none">
-                            <h4 class="card-title mb-0">Поставить рекламу на запуск</h4>
+                        <div class="form-active-adds mt-3" @if($errors->has('range_date_hidden')) style="display: block" @else style="display: none"  @endif>
+                            <h4 class="card-title mb-0 mt-2">Поставить рекламу на запуск</h4>
                             <p class="mb-3 text-warning text-opacity-75"><i>После постановки данной заявки на запуск, за неделю
                                     автоматически сгенерируется задача о приближающемся окончании рекламной кампании
                                 </i></p>
 
-                            <form action="#" method="POST">
+                            <form action="{{route('claim.storeAd', ['claim' => $claim->id])}}" method="POST">
+                                @csrf
                                 <div class="row">
-                                    <div class="col-lg-6 col-md-12">
-                                        <label for="start-date-datepicker" class="mb-2">Выберите начало задачи:</label>
-                                        <div id="start-date-datepicker"></div>
-                                        <input type="hidden" name="start-date-hidden" id="start-date-hidden">
-                                    </div>
-                                    <div class="col-lg-6 col-md-12">
-                                        <label for="end-date-datepicker" class="mb-2">Выберите конец задачи:</label>
-                                        <div id="end-date-datepicker"></div>
+                                    <div class="col-lg-12 col-md-12">
+                                        <div class="form-group">
+                                            <label for="range-ad-datepicker" class="mb-2">Выберите период рекламной кампании:</label>
+                                            @if($errors->has('range_date_hidden'))
+                                                <p class="text-danger">
+                                                    @foreach($errors->get('range_date_hidden') as $message)
+                                                        {{$message}}<br>
+                                                    @endforeach
+                                                </p>
+                                            @endif
+                                            <div id="range-ad-datepicker"></div>
+                                        </div>
+
+                                        <input type="hidden" name="range_date_hidden" id="range-ad-hidden">
+
                                     </div>
                                 </div>
+
+                                <button type="submit" class="btn btn-success mt-3">Запустить</button>
                             </form>
                         </div>
 
-
+                        @endif
 
 
                         @if ($claim->isClose == 0)

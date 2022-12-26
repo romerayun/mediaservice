@@ -101,6 +101,8 @@ Route::get('invoice', [ClaimController::class, 'createInvoice'])->name('claim.in
 Route::get('invoice/closed', [ClaimController::class, 'closedInvoice'])->name('claim.closedInvoice');
 Route::post('invoice/{claim}', [ClaimController::class, 'storeInvoice'])->name('claim.storeInvoice');
 Route::post('invoice/closed/{claim}', [ClaimController::class, 'updateInvoice'])->name('claim.updateInvoice');
+Route::delete('claims/{ad}/deleteAd', [ClaimController::class, 'deleteAd'])->name('claim.deleteAd');
+Route::post('claims/{claim}/storeAd', [ClaimController::class, 'storeAd'])->name('claim.storeAd');
 Route::post('claims/{claim}/storeHistory', [ClaimController::class, 'storeHistory'])->name('claim.storeHistory');
 Route::resource('claims', ClaimController::class);
 
@@ -114,6 +116,7 @@ Route::get('calendar/getGoal/{goal}', [CalendarController::class, 'getGoalById']
 Route::patch('calendar/goal-update/{goal}', [CalendarController::class, 'updateGoal'])->name('calendar.updateGoal');
 Route::delete('calendar/goal-delete/{goal}', [CalendarController::class, 'deleteGoal'])->name('calendar.deleteGoal');
 
+Route::get('active-ad', [ClaimController::class, 'getActiveAd'])->name('claim.activeAd');
 
 Route::post('/upload-filepond', [UploadController::class, 'store']);
 Route::post('/upload-files-goal', [UploadController::class, 'goalsStore']);

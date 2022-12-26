@@ -99,6 +99,19 @@ if (document.getElementById('datepicker-range')) {
     });
 }
 
+if (document.getElementById('range-ad-datepicker')) {
+    new AirDatepicker('#range-ad-datepicker', {
+        isMobile: true,
+        autoClose: true,
+        range: true,
+        dynamicRange: true,
+        multipleDatesSeparator: ' | ',
+        altFieldDateFormat: 'yyyy-MM-dd',
+        altField: '#range-ad-hidden'
+    });
+}
+
+
 if (document.getElementById('month-datepicker')) {
     let monthDatepicker = new AirDatepicker('.month-datepicker', {
         isMobile: true,

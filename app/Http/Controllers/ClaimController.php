@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActiveAd;
 use App\Models\Claim;
 use App\Models\ClaimFile;
 use App\Models\Goal;
@@ -176,7 +177,8 @@ class ClaimController extends Controller
         $countAdds = claimsAdds($claim);
         $statusesClaim = StatusClaim::where('isVisible', 1)->get();
         $users = UserM::all();
-        return view('claims.show', compact('claim', 'countAdds', 'statusesClaim', 'users'));
+        $activeAd = ActiveAd::firstWhere('claim_id', $id);
+        return view('claims.show', compact('claim', 'countAdds', 'statusesClaim', 'users', 'activeAd'));
     }
 
     /**
@@ -580,5 +582,59 @@ class ClaimController extends Controller
             $request->session()->flash('error', 'При обновлении заявки произошла ошибка 😢' . $exception);
             return back();
         }
+    }
+
+
+    public function storeAd($id, Request $request) {
+        $validatedData = $request->validate(
+            [
+                'range_date_hidden' => 'required',
+            ],
+            [
+                "range_date_hidden.required" => 'Выберите период рекламной кампании',
+            ]
+        );
+
+        $date = explode('|', $request->range_date_hidden);
+
+        $startDate = trim($date[0]) . " 00-00-00";
+        $endDate = trim($date[1]) . " 00-00-00";
+
+        DB::beginTransaction();
+
+        try {
+
+            $request->merge([
+                'claim_id' => $id,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+            ]);
+
+            ActiveAd::create($request->all());
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Рекламная кампания успешно запущена 👍');
+        } catch (\Exception $exception) {
+            DB::rollback();
+            $request->session()->flash('error', 'При запуске рекламной кампании произошла ошибка 😢');
+            return back();
+        }
+
+    }
+
+    public function deleteAd($id) {
+        $ad = ActiveAd::find($id);
+        $ad->delete();
+        return redirect()->back()->with('success', 'Рекламная кампания успешно удалена 👍');
+    }
+
+    public function getActiveAd() {
+
+        $activeAds = Claim::whereHas('activeAd')
+            ->where('creator', Auth::user()->id)
+            ->get();
+
+        return view('activeAd.index', compact('activeAds'));
     }
 }

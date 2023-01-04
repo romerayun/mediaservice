@@ -130,6 +130,7 @@ Route::post('/claim-inputs', [ClaimController::class, 'claimInputs'])->name('cla
 Route::post('/get-users-by-group', [ServiceController::class, 'usersByGroup'])->name('services.usersByGroup');
 Route::post('/get-services-by-group', [ServiceController::class, 'servicesByGroup'])->name('services.servicesByGroup');
 Route::post('/get-package-by-service', [ServiceController::class, 'packageByService'])->name('services.packageByService');
+Route::delete('/claim/file-delete/{file}', [ClaimController::class, 'deleteFile'])->name('claim.deleteFile');
 
 
 //AuthUser

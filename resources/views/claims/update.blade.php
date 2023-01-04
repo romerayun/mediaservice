@@ -15,9 +15,10 @@
 @section('content')
 
     <h5 class="text-primary">Создание заявки</h5>
-    <form action="{{route('claims.store')}}" method="POST"
+    <form action="{{route('claims.update', ['claim'=>$claim->id])}}" method="POST"
           enctype="multipart/form-data">
         @csrf
+        @method('PUT')
         <div class="row mt-3">
             <div class="col-lg-6 col-md-12">
                 <div class="form-group @if($errors->has('group_id')) is-invalid @endif">
@@ -107,12 +108,12 @@
             <div class="col-12">
                 <div class="form-group">
                     <label>Выберите дату выполнения: </label>
-                    <input type="hidden" name="deadlineClaim" id="deadlineClaim">
+                    <input type="hidden" name="deadlineClaim" id="deadlineClaim" value="{{$claim->deadline}}">
                     <input type="text" id="deadlineClaim-datepicker"
                            class="form-control deadlineClaim @if($errors->has('deadlineClaim')) is-invalid @endif"
                            name="deadlineClaim-datepicker"
                            placeholder="Выберите дату выполнения задачи..." required
-                           value="{{old('deadlineClaim')}}">
+                           value="{{\Carbon\Carbon::parse($claim->deadline)->format('d.m.Y H:m')}}">
                     @if($errors->has('deadlineClaim'))
                         <div class="invalid-feedback">
                             <i class="bx bx-radio-circle"></i>
@@ -133,7 +134,7 @@
                            class="form-control @if($errors->has('amount')) is-invalid @endif"
                            name="amount"
                            placeholder="Введите стоимость..."
-                           value="{{old('amount')}}">
+                           value="{{$claim->amount}}">
                     @if($errors->has('amount'))
                         <div class="invalid-feedback">
                             <i class="bx bx-radio-circle"></i>
@@ -152,7 +153,7 @@
                 <textarea
                     class="form-control @if($errors->has('comment')) is-invalid @endif"
                     id="comment" name="comment" rows="3"
-                    placeholder="Введите дополнительный комментарий...">{{old('comment')}}</textarea>
+                    placeholder="Введите дополнительный комментарий...">{{$claim->comment}}</textarea>
                 @if($errors->has('comment'))
                     <div class="invalid-feedback">
                         <i class="bx bx-radio-circle"></i>
@@ -167,22 +168,24 @@
         <div class="row mt-4">
             <div class="col-12">
                 <input class="form-check-input me-1" name="isInvoiceC" id="isInvoiceC"
-                       type="checkbox" value=""> Нужен ли счет?
-                <input type="hidden" name="isInvoice" value="0">
+                       type="checkbox" value="" @if ($claim->isInvoice) checked @endif> Нужен ли счет?
+                <input type="hidden" name="isInvoice" value="@if ($claim->isInvoice) 1 @else 0 @endif">
             </div>
         </div>
 
+
         <div class="other-columns">
-            <div class="row mt-3 period-block d-none">
+
+            <div class="row mt-3 period-block @if (!$claim->service->isPeriod) d-none @endif">
                 <div class="col-12">
                     <div class="form-group">
                         <label>Выберите период размещения: </label>
-                        <input type="hidden" name="period-range" id="period-range">
+                        <input type="hidden" name="period-range" id="period-range" value="{{$claim->period}}">
                         <input type="text" id="datepicker-range"
                                class="form-control datepicker-range @if($errors->has('deadline')) is-invalid @endif"
                                name="period"
                                placeholder="Выберите период размещения..." required
-                               value="{{old('period')}}">
+                               value="{{$claim->period}}">
                         @if($errors->has('period'))
                             <div class="invalid-feedback">
                                 <i class="bx bx-radio-circle"></i>
@@ -195,14 +198,20 @@
                 </div>
             </div>
 
-            <div class="row mt-3 brif-block d-none">
+            <div class="row mt-3 brif-block @if (!$claim->service->isBrif) d-none @endif">
                 <div class="col-12">
                     <div class="form-group">
-                        <label>Прикрепите бриф: </label>
+                        <label>Прикрепите бриф:
+                            @if ($claim->brif)
+                                <a href=" {{asset("/storage")."/".$claim->brif}}" download="true">
+                                    (Скачать бриф)</a>
+                            @else
+                                <span class="text-danger">(Бриф не был загружен)</span>
+                            @endif
+                        </label>
                         <input type="file" id="brif"
                                class="form-control @if($errors->has('brif')) is-invalid @endif"
-                               name="brif"
-                               value="{{old('brif')}}">
+                               name="brif">
                         @if($errors->has('brif'))
                             <div class="invalid-feedback">
                                 <i class="bx bx-radio-circle"></i>
@@ -215,7 +224,7 @@
                 </div>
             </div>
 
-            <div class="row mt-3 output-block d-none">
+            <div class="row mt-3 output-block @if (!$claim->service->isOutput) d-none @endif">
                 <div class="col-12 ">
                     <div class="form-group">
                         <label>Количество выходов: </label>
@@ -223,7 +232,7 @@
                                class="form-control @if($errors->has('output')) is-invalid @endif"
                                name="output"
                                placeholder="Введите количество выходов..."
-                               value="{{old('output')}}">
+                               value="@if($claim->output){{$claim->output}}@endif">
                         @if($errors->has('output'))
                             <div class="invalid-feedback">
                                 <i class="bx bx-radio-circle"></i>
@@ -238,10 +247,27 @@
 
         </div>
 
-        <div class="row mt-3 material-block d-none">
+        <div class="row mt-3 material-block @if (!$claim->service->isRequiredMaterial) d-none @endif">
             <div class="col-12 ">
                 <div class="form-group">
+
                     <label>Загрузите материалы: </label>
+                    @if($claimFiles)
+                        @if($claimFiles->count() != 0)
+                            <p class="fw-bold mb-1">Загруженные файлы: </p>
+                            <ul class="list-unstyled">
+                            @foreach($claimFiles as $file)
+                                <li>
+                                    <a href="{{asset("/storage")."/".$file->file}}" download="file-claim">Посмотреть файл -
+                                        <a class="text-danger delFile" href="#" attr-id="{{$file->id}}">(Удалить)</a>
+                                    </a>
+                                </li>
+                            @endforeach
+                            </ul>
+                        @else
+                            <p class="fw-bold text-danger mb-2">Загруженные файлы не найдены</p>
+                        @endif
+                    @endif
                     <input type="file" class="filepond" id="filepond" name="filepond[]"
                            multiple>
                 </div>
@@ -251,7 +277,7 @@
 
         <div class="row mt-4">
             <div class="col-12">
-                <button type="submit" class="btn btn-success">Создать заявку</button>
+                <button type="submit" class="btn btn-success">Сохранить</button>
             </div>
         </div>
 

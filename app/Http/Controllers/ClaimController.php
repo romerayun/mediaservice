@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use mysql_xdevapi\Exception;
 
@@ -210,7 +211,12 @@ class ClaimController extends Controller
         if ($claim->service->isPackage) {
             $packages = Package::where('service_id', $claim->service_id)->get();
         }
-        return view('claims.update', compact('groups', 'claim', 'services', 'packages'));
+        $claimFiles = [];
+        if ($claim->service->isRequiredMaterial) {
+            $claimFiles = ClaimFile::where('claim_id', $claim->id)->get();
+        }
+
+        return view('claims.update', compact('groups', 'claim', 'services', 'packages', 'claimFiles'));
     }
 
     /**
@@ -222,7 +228,116 @@ class ClaimController extends Controller
      */
     public function update(Request $request, $id)
     {
-        abort(404);
+        $claim = Claim::firstWhere('id', $id);
+        $validatedData = $request->validate(
+            [
+                'service_id' => 'required|integer',
+                'deadlineClaim' => 'required|date',
+                'amount' => 'numeric',
+            ],
+            [
+                'service_id.integer' => 'Выберите значение из списка',
+                'deadlineClaim.required' => 'Поле срок выполнения не может быть пустым',
+                'deadlineClaim.date' => 'Поле срок выполения должен быть в формате даты',
+                'amount.numeric' => 'Поле стоимость должно быть формате числа',
+            ]
+        );
+
+        DB::beginTransaction();
+        try {
+
+
+            if ($request->package_id == '0') {
+                $request->merge([
+                    'package_id' => null,
+                ]);
+            }
+
+            $request->merge([
+                'deadline' => $request->deadlineClaim,
+                'user_id' => null,
+            ]);
+
+            $claim->fill($request->all())->save();
+
+
+            if ($request->hasFile('brif')) {
+                if ($claim->brif) {
+                    Storage::delete($claim->brif);
+                }
+                $folder = date("Y-m-d");
+                $brifFilepath = $request->file('brif')->store("images/{$folder}");
+
+                $claim->brif = $brifFilepath;
+                $claim->save();
+            }
+
+            $claimId = $claim->id;
+
+            if ($request->filepond) {
+                if (count($request->filepond) != 0) {
+
+                    $folder = uniqid() . '-' . now()->timestamp;
+                    Storage::disk('public')->makeDirectory('materials/' . $folder);
+
+                    $oldFolders = array();
+                    foreach ($request->filepond as $file) {
+                        $claimFile = ClaimFile::create([
+                            'claim_id' => $claimId,
+                        ]);
+
+                        $temporaryFile = TemporaryFile::where('folder', $file)->first();
+                        if ($temporaryFile) {
+
+                            $oldFile = 'materials/tmp/' . $file . '/' . $temporaryFile->filename;
+                            $newFile = 'materials/' . $folder . '/' . $temporaryFile->filename;
+                            Storage::copy($oldFile, $newFile);
+
+                            $claimFile->file = $newFile;
+                            $claimFile->save();
+                        }
+
+                        $temporaryFile->delete();
+
+                        $oldFolders[] = $file;
+                    }
+
+                    foreach ($oldFolders as $folder) {
+                        Storage::deleteDirectory('materials/tmp/' . $folder);
+                    }
+
+                }
+            }
+
+            $statusClaimId = StatusClaim::where('name', '=', 'Заявка обновлена')->get()->first()->id;
+            HistoryClaim::create([
+                'user_id' => Auth::user()->id,
+                'status_id' => $statusClaimId,
+                'comment' => 'Внесены изменения в заявку',
+                'claim_id' => $claimId,
+            ]);
+
+
+            if ($request->isInvoice) {
+                $statusPayment = StatusPayment::where('name', '=', 'Счет не выставлен')->get()->first()->id;
+                HistoryPayment::create([
+                    'user_id' => Auth::user()->id,
+                    'status_id' => $statusPayment,
+                    'comment' => 'Счет не выставлен',
+                    'claim_id' => $claimId,
+                ]);
+            }
+
+            DB::commit();
+            $request->session()->flash('success', 'Заявка успешно обновлена 👍');
+            return back();
+
+        } catch (\Exception $exception) {
+            DB::rollback();
+            $request->session()->flash('error', 'При обновлении заявки произошла ошибка 😢');
+            return back();
+        }
+
     }
 
     /**
@@ -688,6 +803,20 @@ class ClaimController extends Controller
             ->get();
 
         return view('activeAd.past', compact('activeAds'));
+    }
+
+    public function deleteFile($id) {
+        $file = ClaimFile::find($id);
+        if (!$file) {
+            return response()->json([
+                'error' => 'Файл не найден'
+            ], 404);
+        }
+
+        Storage::delete($file->file);
+        $file->delete();
+
+        return response()->json("Файл успешно удален");
     }
 
 

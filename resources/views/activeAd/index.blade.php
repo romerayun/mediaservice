@@ -53,10 +53,10 @@
                                             </span>
                                         </td>
                                         <td>
-                                            @if($item->isRemind == 0)
+                                            @if($item->activeAd->first()->isRemind == 0)
                                                 <span class="text-primary">Уведомление еще не отправлено</span>
                                             @else
-                                                <span class="text-success">Уведомление еще не отправлено</span>
+                                                <span class="text-success">Уведомление отправлено</span>
                                             @endif
                                         </td>
                                         <td>

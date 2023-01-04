@@ -734,3 +734,42 @@ $('input[name="close-claim"]').change(function () {
         $('.form-close-claim').slideUp();
     }
 });
+
+$(document).on("click", ".delFile", function (event) {
+
+    let link = $(this);
+    let id = $(this).attr('attr-id');
+    event.preventDefault();
+    Swal.fire({
+        title: 'Вы действительно хотите удалить файл? 🥺',
+        text: "Данное действие невозможно!",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#31ce36',
+        cancelButtonColor: '#f25961',
+        confirmButtonText: 'Удалить',
+        cancelButtonText: 'Отмена',
+    }).then((result) => {
+        if (result.isConfirmed) {
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('input[name="_token"]').val()
+                }
+            });
+
+            $.ajax({
+                url: '/claim/file-delete/' + id,
+                type: "DELETE",
+                success: function (response) {
+                    link.parents('li').remove();
+                    showToast("Файл успешно удален 👌", "linear-gradient(to right, #00B560, #00914D)");
+                },
+                error: function (error) {
+                    showToast(error.responseJSON.error, "linear-gradient(to right, #ED213A, #93291E)");
+                },
+
+            });
+        }
+    })
+});

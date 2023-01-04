@@ -345,18 +345,18 @@ class ClientController extends Controller
 
     public function allow()
     {
-        if (Auth::user()->cannot('allow', Client::class)) {
-            abort(403);
-        }
+//        if (Auth::user()->cannot('allow', Client::class)) {
+//            abort(403);
+//        }
         $clients = Client::where('isAllow', 0)->get();
         return view('clients.allow', compact('clients'));
     }
 
     public function allowUpdate($id, Request $request)
     {
-        if (Auth::user()->cannot('allow', Client::class)) {
-            abort(403);
-        }
+//        if (Auth::user()->cannot('allow', Client::class)) {
+//            abort(403);
+//        }
         DB::beginTransaction();
         try {
             $client = Client::firstWhere('id', $id);
@@ -378,9 +378,9 @@ class ClientController extends Controller
     // ----------**********------------
 
     public function distribution() {
-        if (Auth::user()->cannot('viewAny', ActiveAd::class)) {
-            abort(403);
-        }
+//        if (Auth::user()->cannot('viewAny', ActiveAd::class)) {
+//            abort(403);
+//        }
 
         $clients = Client::where('isAllow', 1)
             ->get();
@@ -395,9 +395,9 @@ class ClientController extends Controller
 
     public function distributionUpdate($id, Request $request) {
 
-        if (Auth::user()->cannot('viewAny', ActiveAd::class)) {
-            abort(403);
-        }
+//        if (Auth::user()->cannot('viewAny', ActiveAd::class)) {
+//            abort(403);
+//        }
 
         $client = Client::find($id);
         if (!$client) {

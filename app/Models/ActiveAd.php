@@ -15,6 +15,7 @@ class ActiveAd extends Model
         'start_date',
         'end_date',
         'isRemind',
+        'user_id',
     ];
 
     public function claim() {

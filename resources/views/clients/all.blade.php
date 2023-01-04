@@ -1,10 +1,10 @@
 @extends('layout.layout')
 @section('page-heading')
     <div class="row">
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-3">
             <h3>Клиенты</h3>
         </div>
-        <div class="col-12 col-md-6 text-end">
+        <div class="col-12 col-md-9 text-end">
             @if (auth()->user()->can('allowClient', \App\Models\Client::class))
                 <a href="{{route('clients.allow')}}" class="btn btn-sm btn-primary">Подтверждение клиентов
                     <span class="badge bg-transparent">{{getCountClientIsNotAllow()}}</span>

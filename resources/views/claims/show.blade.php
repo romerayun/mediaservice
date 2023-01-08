@@ -14,7 +14,12 @@
 @section('content')
     <div class="row">
 
-        <div class="col-lg-9 col-md-12">
+        @if (auth()->user()->role->level <= 2 || auth()->user()->role->level == 6 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id)
+            <div class="col-lg-9 col-md-12">
+        @else
+            <div class="col-lg-12 col-md-12">
+        @endif
+
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
@@ -22,9 +27,6 @@
                             <h4 class="card-title">
                                 Заявка №{{$claim->id}} - {{$claim->service->name}} <span
                                     class="ms-2 badge bg-{{$claim->histories->first()->status->color}}"> {{$claim->histories->first()->status->name}}</span>
-                                @if($claim->isRead == 0)
-                                    <span class="badge bg-info ms-2">Новая заявка</span>
-                                @endif
                             </h4>
                             <small>{{$claim->getCreateDate()}}</small>
                         </div>
@@ -50,7 +52,7 @@
                         </div>
 
                         <p class="mt-3 mb-0"><b class="text-primary">Клиент:</b> {{$claim->client->name}}</p>
-                        <p class="mt-1 mb-0"><b class="text-primary">Стоимость:</b> {{$claim->amount}} р.</p>
+                        <p class="mt-1 mb-0"><b class="text-primary">Стоимость:</b> {{money($claim->amount)}} р.</p>
                         <p class="mt-1 mb-0"><b class="text-primary">Выполнить до:</b> {{$claim->getDeadline()}}</p>
                         @if ($claim->comment)
                             <p class="mt-1"><b class="text-primary">Комментарий:</b> {{$claim->comment}}</p>
@@ -82,6 +84,8 @@
                                 </form>
                             @endif
                         @else
+
+                        @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id)
                         <div class="form-check form-switch">
                             <label class="form-check-label" for="active-adds">Поставить рекламу на запуск</label>
                             <input class="form-check-input" name="active-adds" type="checkbox"  @if($errors->has('range_date_hidden')) checked @endif>
@@ -117,10 +121,11 @@
                                 <button type="submit" class="btn btn-success mt-3">Запустить</button>
                             </form>
                         </div>
+                        @endif
 
                         @endif
 
-
+                        @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator)
                         @if ($claim->isClose == 0)
                             <hr>
                             <div class="form-check form-switch">
@@ -156,10 +161,11 @@
                                 </form>
                             </div>
                         @endif
+                            @endif
                     </div>
                 </div>
             </div>
-
+            @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id)
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
@@ -183,6 +189,8 @@
                                     </ol>
                                 @endif
                             </div>
+
+
                             <div class="col-lg-6 col-md-12">
                                 <h4 class="card-title">Добавление истории</h4>
                                 @if ($claim->isClose == 1)
@@ -237,13 +245,16 @@
                                     </form>
                                 @endif
                             </div>
+
                         </div>
                     </div>
                 </div>
             </div>
+            @endif
         </div>
 
         <div class="col-lg-3 col-md-12">
+            @if (auth()->user()->role->level <= 2 || auth()->user()->role->level == 6 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id)
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
@@ -271,99 +282,102 @@
                     </div>
                 </div>
             </div>
-            @if($claim->isInvoice)
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-content">
-                            <div class="card-body">
-                                <h4 class="card-title">Счет</h4>
-                                @if ($claim->invoice)
-                                    <a href=" {{asset("/storage")."/".$claim->invoice}}"
-                                       class="btn icon icon-left btn-primary me-2 mt-2" download="true">
-                                        <i class="bi bi-file-arrow-down-fill"></i> Скачать счет</a>
-                                @else
-                                    <p class="text-gray-500 m-0">Счет не готов 😢</p>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
             @endif
-            @if($claim->service->isRequiredMaterial)
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-content">
-                            <div class="card-body">
-                                <h4 class="card-title mb-1">Материалы</h4>
 
-                                @if (count($claim->files) != 0)
+            @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id)
+                @if($claim->isInvoice)
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="card-body">
+                                    <h4 class="card-title">Счет</h4>
+                                    @if ($claim->invoice)
+                                        <a href=" {{asset("/storage")."/".$claim->invoice}}"
+                                           class="btn icon icon-left btn-primary me-2 mt-2" download="true">
+                                            <i class="bi bi-file-arrow-down-fill"></i> Скачать счет</a>
+                                    @else
+                                        <p class="text-gray-500 m-0">Счет не готов 😢</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+                @if($claim->service->isRequiredMaterial)
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="card-body">
+                                    <h4 class="card-title mb-1">Материалы</h4>
 
-                                    @foreach($claim->files as $file)
-                                        <a href=" {{asset("/storage")."/".$claim->creatorUser->photo}}"
-                                           class="btn icon icon-left btn-primary me-1 mt-2" download="true">
-                                            <i class="bi bi-file-arrow-down-fill"></i> Скачать файл</a>
-                                    @endforeach
+                                    @if (count($claim->files) != 0)
 
-                                @else
-                                    <p class="text-gray-500 m-0">Дополнительные материалы не найдены 😢</p>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                        @foreach($claim->files as $file)
+                                            <a href=" {{asset("/storage")."/".$claim->creatorUser->photo}}"
+                                               class="btn icon icon-left btn-primary me-1 mt-2" download="true">
+                                                <i class="bi bi-file-arrow-down-fill"></i> Скачать файл</a>
+                                        @endforeach
 
-            @endif
-            @if($claim->service->isPackage)
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-content">
-                            <div class="card-body">
-                                <h4 class="card-title">Пакет услуг</h4>
-                                @if ($claim->package_id)
-                                    <p class="m-0"><b>Выбранный пакет: </b>{{$claim->package->name}}</p>
-                                @else
-                                    <p class="text-gray-500 m-0">Пакет услуг не был выбран 😢</p>
-                                @endif
+                                    @else
+                                        <p class="text-gray-500 m-0">Дополнительные материалы не найдены 😢</p>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            @endif
-            @if($claim->service->isPeriod)
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-content">
-                            <div class="card-body">
-                                <h4 class="card-title">Период размещения</h4>
-                                @if ($claim->period)
-                                    <p class="m-0"><b>Выбранный период: </b>{{$claim->period}}</p>
-                                @else
-                                    <p class="text-gray-500 m-0">Период размещения не был выбран 😢</p>
-                                @endif
+
+                @endif
+                @if($claim->service->isPackage)
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="card-body">
+                                    <h4 class="card-title">Пакет услуг</h4>
+                                    @if ($claim->package_id)
+                                        <p class="m-0"><b>Выбранный пакет: </b>{{$claim->package->name}}</p>
+                                    @else
+                                        <p class="text-gray-500 m-0">Пакет услуг не был выбран 😢</p>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            @endif
-            @if($claim->service->isBrif)
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-content">
-                            <div class="card-body">
-                                <h4 class="card-title">Бриф</h4>
-                                @if ($claim->brif)
-                                    <a href=" {{asset("/storage")."/".$claim->brif}}"
-                                       class="btn icon icon-left btn-primary me-2" download="true">
-                                        <i class="bi bi-file-arrow-down-fill"></i> Скачать бриф</a>
-                                @else
-                                    <p class="text-gray-500 m-0">Бриф не был загружен 😢</p>
-                                @endif
+                @endif
+                @if($claim->service->isPeriod)
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="card-body">
+                                    <h4 class="card-title">Период размещения</h4>
+                                    @if ($claim->period)
+                                        <p class="m-0"><b>Выбранный период: </b>{{$claim->period}}</p>
+                                    @else
+                                        <p class="text-gray-500 m-0">Период размещения не был выбран 😢</p>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            @endif
-            @if($claim->service->isOutput)
+                @endif
+                @if($claim->service->isBrif)
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="card-body">
+                                    <h4 class="card-title">Бриф</h4>
+                                    @if ($claim->brif)
+                                        <a href=" {{asset("/storage")."/".$claim->brif}}"
+                                           class="btn icon icon-left btn-primary me-2" download="true">
+                                            <i class="bi bi-file-arrow-down-fill"></i> Скачать бриф</a>
+                                    @else
+                                        <p class="text-gray-500 m-0">Бриф не был загружен 😢</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+                @if($claim->service->isOutput)
                 <div class="col-12">
                     <div class="card">
                         <div class="card-content">
@@ -379,7 +393,7 @@
                     </div>
                 </div>
             @endif
-
+            @endif
 
         </div>
     </div>

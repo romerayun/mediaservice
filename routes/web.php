@@ -41,7 +41,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     if (Auth::check()) {
-        return view('home');
+        return redirect('/calendar');
+//        return view('calendar.index');
     } else {
         return view('users.login');
     }
@@ -65,16 +66,23 @@ Route::resource('requisites', RequisitesClient::class);
 Route::resource('groups', GroupController::class);
 Route::resource('roles', RoleController::class);
 Route::get('users/remoteData', [UserController::class, 'getClaimsPayment'])->name('user.remote');
-Route::resource('users', UserController::class);
-Route::resource('category', CategoryController::class);
-Route::resource('services', ServiceController::class);
-Route::resource('status-material', StatusMaterialController::class);
-Route::resource('packages', PackageController::class);
-Route::resource('status-client', StatusC::class);
-Route::resource('status-claim', StatusClaimController::class);
-Route::resource('status-payment', StatusPaymentController::class);
-Route::resource('history-client', HistoryClientController::class);
+Route::get('users/sales-category', [UserController::class, 'getSalesByCategory'])->name('users.salesCategory');
+Route::post('users/sales-category', [UserController::class, 'getSalesByCategoryAjax']);
 
+Route::resource('users', UserController::class);
+
+Route::group(['middleware' => 'access'], function () {
+    Route::resource('category', CategoryController::class);
+    Route::resource('services', ServiceController::class);
+    Route::resource('status-material', StatusMaterialController::class);
+    Route::resource('packages', PackageController::class);
+    Route::resource('status-client', StatusC::class);
+    Route::resource('status-claim', StatusClaimController::class);
+    Route::resource('status-payment', StatusPaymentController::class);
+    Route::resource('history-client', HistoryClientController::class);
+});
+
+Route::get('plan/services', [SalesPlanController::class, 'services'])->name('plan.services');
 Route::get('plan/statistics', [SalesPlanController::class, 'statistics'])->name('plan.statistics');
 Route::get('plan/statistics/remoteData', [SalesPlanController::class, 'remoteData'])->name('plan.remote');
 Route::resource('plan', SalesPlanController::class);

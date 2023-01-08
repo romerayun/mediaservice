@@ -42,7 +42,6 @@ class ClientLprsBirthdaysCommand extends Command
     public function handle()
     {
         $clients = Client::where('isAllow', 1)
-            ->whereNotNull('date_of_birth')
             ->whereNotNull('user_id')
             ->with('lprs')
             ->get();

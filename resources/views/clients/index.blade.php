@@ -11,7 +11,7 @@
                 </a>
             @endif
 
-            @if (auth()->user()->can('viewAny', \App\Models\ActiveAd::class))
+                @if (auth()->user()->can('allowClient', \App\Models\Client::class))
                 <a href="{{route('clients.distribution')}}" class="btn btn-sm btn-primary">Распределение клиентов между МП</a>
             @endif
 
@@ -152,7 +152,7 @@
                                     Редактировать</a>
                                 @endif
                                 @if (auth()->user()->can('delete', $client))
-                                    <form action="{{route('clients.destroy', ['client' => $client->id])}}" method="POST">
+                                    <form action="{{route('clients.destroy', ['client' => $client->id])}}" method="POST" class="d-inline-block">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn icon btn-danger me-2 mb-2 delete btn-sm"><i

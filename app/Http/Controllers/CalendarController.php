@@ -21,7 +21,10 @@ class CalendarController extends Controller
     public function getGoals()
     {
 
-        $goals = Goal::where('user_id', Auth::user()->id)->get();
+        $goals = Goal::where('user_id', Auth::user()->id)
+            ->where('status', 0)
+            ->orWhereNotNull('rrule')
+            ->get();
         $events = array();
 
         foreach ($goals as $goal) {
@@ -33,6 +36,12 @@ class CalendarController extends Controller
                 $sd = Carbon::createMidnightDate($goal->start_date);
                 $ed = Carbon::createMidnightDate($goal->deadline);
                 $duration = $ed->diffInRealMilliseconds($sd);
+            }
+
+            $rrule = 0;
+            if ($goal->rrule != null) {
+                $rrule = 1;
+                $editable = false;
             }
 
             $events[] = [
@@ -47,6 +56,7 @@ class CalendarController extends Controller
                 'allDay' => $goal->allDay,
                 'duration' => ['milliseconds' => $duration],
                 'rrule' => $goal->rrule,
+                'customRrule' => $rrule,
                 'status' => $goal->status,
                 'editable' => $editable,
             ];

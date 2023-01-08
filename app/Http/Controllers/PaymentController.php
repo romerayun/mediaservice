@@ -13,18 +13,23 @@ class PaymentController extends Controller
 {
     public function index() {
 
-        $claims = Claim::where('isClose', 0)
-            ->with('historiesPayment.status')
-            ->whereDoesntHave('historiesPayment.status', function ($q) {
-                $q->where('name', "Оплачен");
-            })
-            ->orderBy('created_at', 'desc')
-            ->get();
+        if (Auth::user()->role->level <= 2 || Auth::user()->role->level == 6) {
+
+            $claims = Claim::where('isClose', 0)
+                ->with('historiesPayment.status')
+                ->whereDoesntHave('historiesPayment.status', function ($q) {
+                    $q->where('name', "Оплачен");
+                })
+                ->orderBy('created_at', 'desc')
+                ->get();
 
 
-        $statusesPayment = StatusPayment::all();
+            $statusesPayment = StatusPayment::all();
 
-        return view('payment.index', compact('claims', 'statusesPayment'));
+            return view('payment.index', compact('claims', 'statusesPayment'));
+        } else {
+            abort(403);
+        }
     }
 
     public function storeStatus(Request $request) {

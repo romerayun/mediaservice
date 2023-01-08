@@ -24,19 +24,19 @@ class StoreRequisitesClients extends FormRequest
     public function rules()
     {
         return [
-            'fullName' => 'required',
-            'legalForm' => 'required',
+            'fullName' => 'nullable',
+            'legalForm' => 'nullable',
             'INN' => 'required|min:10|max:12|regex:/^[0-9]+$/',
-            'OGRN' => 'required|min:13|max:15|regex:/^[0-9]+$/',
-            'lawAddress' => 'required',
-            'checkingAccount' => 'required|min:20|max:20|regex:/^[0-9]+$/',
-            'correspondentAccount' => 'required|min:20|max:20|regex:/^[0-9]+$/',
-            'BIC' => 'required|min:9|max:9|regex:/^[0-9]+$/',
-            'nameBank' => 'required',
-            'KPP' => 'required|min:9|max:9|regex:/^[0-9]+$/',
-            'KBK' => 'required|min:20|max:20|regex:/^[0-9]+$/',
-            'buhName' => 'required',
-            'phone' => 'required|regex:/^(\+7)(\()[0-9]{3}(\))[0-9]{3}(\-)[0-9]{2}(\-)[0-9]{2}$/',
+            'OGRN' => 'nullable|min:13|max:15|regex:/^[0-9]+$/',
+            'lawAddress' => 'nullable',
+            'checkingAccount' => 'nullable|min:20|max:20|regex:/^[0-9]+$/',
+            'correspondentAccount' => 'nullable|min:20|max:20|regex:/^[0-9]+$/',
+            'BIC' => 'nullable|min:9|max:9|regex:/^[0-9]+$/',
+            'nameBank' => 'nullable',
+            'KPP' => 'nullable|min:9|max:9|regex:/^[0-9]+$/',
+            'KBK' => 'nullable|min:20|max:20|regex:/^[0-9]+$/',
+            'buhName' => 'nullable',
+            'phone' => 'nullable|regex:/^(\+7)(\()[0-9]{3}(\))[0-9]{3}(\-)[0-9]{2}(\-)[0-9]{2}$/',
         ];
     }
 

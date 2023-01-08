@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreGroups;
 use App\Models\Category;
+use App\Models\Client;
+use App\Notifications\GoalRemiderNotification;
+use App\Notifications\RemindClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

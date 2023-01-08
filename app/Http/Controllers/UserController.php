@@ -6,7 +6,9 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\StoreUser;
 use App\Mail\TestMail;
 use App\Mail\UserRegistration;
+use App\Models\Category;
 use App\Models\Claim;
+use App\Models\Group;
 use App\Models\Role;
 use App\Models\SalesPlan;
 use App\Models\UserM;
@@ -34,7 +36,7 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => $request->password,
         ])) {
-            return redirect()->route('home');
+            return redirect()->route('calendar.index');
         }
 
         return redirect()->back()->with('error', "Неверный логин или пароль!");
@@ -119,6 +121,10 @@ class UserController extends Controller
      */
     public function show($id, Request $request)
     {
+        if (auth()->user()->role->level > 2 && auth()->user()->id != $id) {
+            abort(403);
+        }
+        $ajaxMonth = date('Y-m');
         $start = date('Y-m-00') . ' 00:00:00';
         $end = date('Y-m-32') . ' 00:00:00';
         $planMonth = date('Y-m-01');
@@ -127,7 +133,16 @@ class UserController extends Controller
             $start = $request->input('month') . '-00 00:00:00';
             $end = $request->input('month') . '-32 00:00:00';
             $planMonth = $request->input('month') . '-01';
+            $ajaxMonth = $request->input('month');
         }
+
+        $res = new Request();
+        $res->merge([
+            'month' => $ajaxMonth,
+            'user_id' => $id
+        ]);
+
+        $salesByCategory = $this->getSalesByCategoryAjax($res);
 
         $sumPlan = SalesPlan::orderBy('month', 'desc')
             ->where('month', $planMonth)
@@ -165,7 +180,7 @@ class UserController extends Controller
         $user = UserM::firstWhere('id', $id);
 
 
-        return view('users.show', compact('userClaims', 'user', 'sumPlan', 'sumClaims', 'sumPaid', 'id'));
+        return view('users.show', compact('userClaims', 'user', 'sumPlan', 'sumClaims', 'sumPaid', 'id', 'salesByCategory'));
     }
 
     /**
@@ -333,4 +348,174 @@ class UserController extends Controller
 
         return json_encode($res);
     }
+
+    public function getSalesByCategory () {
+        $groups = Group::all();
+        return view('users.sales', compact('groups'));
+    }
+
+    public function getSalesByCategoryAjax(Request $request) {
+
+        $start = $request->month.'-00 00:00:00';
+        $end = $request->month.'-32 00:00:00';
+//        $start = '2022-12-00 00:00:00';
+//        $end = '2022-12-32 00:00:00';
+//        $request->user_id = 1;
+
+        $categoriesAllSum = DB::table('categories')
+            ->leftJoin('services', 'categories.id', '=', 'services.category_id')
+            ->leftJoin('claims', 'services.id', '=', 'claims.service_id')
+            ->leftJoin('history_payments', 'claims.id', '=', 'history_payments.claim_id')
+            ->select('categories.id',
+                'categories.name',
+                DB::raw('sum(claims.amount) as claims_amount'))
+            ->whereNull('categories.deleted_at')
+            ->where('claims.created_at', '>=', $start)
+            ->where('claims.created_at', '<=', $end)
+            ->where('claims.creator', '=', $request->user_id)
+            ->where('history_payments.status_id', '=', 4)
+            ->groupBy('categories.id', 'categories.name')
+            ->get();
+
+        $categories = Category::all();
+
+        $categoriesAllSum = $categoriesAllSum->mapWithKeys(function ($item, $key) {
+            return [$item->id => $item];
+        });
+
+        $allData = array();
+        foreach ($categories as $key => $category) {
+            $i = $key+1;
+
+            $allData[$i] = array('name' => $category->name);
+            if (isset($categoriesAllSum[$category->id])) {
+                $allData[$i]['sum'] = $categoriesAllSum[$category->id]->claims_amount;
+            } else {
+                $allData[$i]['sum'] = 0;
+            }
+
+            $claims = DB::table('categories')
+                ->leftJoin('services', 'categories.id', '=', 'services.category_id')
+                ->leftJoin('claims', 'services.id', '=', 'claims.service_id')
+                ->leftJoin('history_payments', 'claims.id', '=', 'history_payments.claim_id')
+                ->leftJoin('clients', 'clients.id', '=', 'claims.client_id')
+                ->leftJoin('requisites_clients', 'clients.id', '=', 'requisites_clients.client_id')
+                ->select(
+                    'clients.name',
+                    'requisites_clients.fullName',
+                    'claims.amount',
+                )
+                ->whereNull('categories.deleted_at')
+                ->where('categories.id', $category->id)
+                ->where('claims.created_at', '>=', $start)
+                ->where('claims.created_at', '<=', $end)
+                ->where('claims.creator', '=', $request->user_id)
+                ->where('history_payments.status_id', '=', 4)
+                ->get();
+
+            $allData[$i]['users'] = $claims;
+        }
+
+        $res = '';
+        $res .= '<div class="col-12 col-md-12">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-body">
+                        <h4 class="card-title">Итого поступлений</h4>
+                        <table class="table  table-hover datatables"><tr>';
+        $res .= '<th></th>';
+                    foreach ($allData as $item) {
+                        $res .= '<th>' . $item['name'] . '</th>';
+                    }
+        $res .= '</tr>';
+
+        $res .= '<tr>';
+        $res .= '<td class="font-bold">Итого поступлений: </td>';
+        foreach ($allData as $item) {
+            $res .= '<td>' . money($item['sum']) . ' руб.</td>';
+        }
+        $res .= '</tr>';
+
+        $res .= '<tr>';
+        $res .= '<td class="font-bold">Доход: </td>';
+
+        $allClaimsAmount = 0;
+        $allSalary = 0;
+        $bonus = 0;
+
+        foreach ($allData as $item) {
+            $allSalary += $item['sum'] * 0.15;
+            $allClaimsAmount += $item['sum'];
+            $res .= '<td>' . money($item['sum'] * 0.15) . ' руб.</td>';
+        }
+
+        $res .= '</tr>';
+
+        $res .= '<tr>';
+        $res .= '<td class="font-bold text-primary">Общий доход: </td>';
+        $res .= '<td colspan="'.count($allData).'">' . money($allSalary) . ' руб.</td>';
+        $res .= '</tr>';
+
+        if ($allClaimsAmount < 200000) $bonus = 0;
+        else if ($allClaimsAmount < 300000) $bonus = $allClaimsAmount * 0.01;
+        else if ($allClaimsAmount < 500000) $bonus = $allClaimsAmount * 0.02;
+        else if ($allClaimsAmount < 1000000) $bonus = $allClaimsAmount * 0.03;
+        else if ($allClaimsAmount < 3000000) $bonus = $allClaimsAmount * 0.05;
+        else $bonus = $allClaimsAmount * 0.06;
+
+        $res .= '<tr>';
+        $res .= '<td class="font-bold text-primary">Премия: </td>';
+        $res .= '<td colspan="'.count($allData).'">' . money($bonus) . ' руб.</td>';
+        $res .= '</tr>';
+
+        $res .='  </table></div>
+                </div>
+            </div>
+        </div>';
+
+
+
+        foreach($allData as $item) {
+        $res .= '<div class="col-12 col-md-6">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-body">
+                        <h4 class="card-title">'.$item['name'].'</h4>
+                        <p class="text-primary"><b>Общая сумма: </b>'. money($item['sum']) . ' руб.</p>';
+                        if(count($item['users']) == 0) {
+                            $res .= '<p class="text-danger">В данной категории услуг продажи не найдены</p>';
+                        }
+                        else {
+                            $res .= '<table class="table table-lg table-hover datatables">
+                                <thead>
+                                    <th>Клиент</th>
+                                    <th>Юридическое лицо</th>
+                                    <th>Сумма</th>
+                                </thead>';
+                            foreach($item['users'] as $user) {
+                                $res .= "<tr>
+                                        <td>" . $user->name ."</td>";
+
+                                if ($user->fullName) {
+                                    $res .= "<td>" . $user->fullName ."</td>";
+                                } else {
+                                    $res .= "<td class='text-danger'>Данные не заполнены</td>";
+                                }
+
+                                $res .= "<td>" . money($user->amount) ." руб.</td>
+                                    </tr>";
+                            }
+                            $res .= '</table>';
+                        }
+
+             $res .='  </div>
+                </div>
+            </div>
+        </div>';
+        }
+
+        return $res;
+    }
+
+
 }

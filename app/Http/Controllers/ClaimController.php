@@ -58,12 +58,16 @@ class ClaimController extends Controller
     {
         $client = Client::find($request->client_id);
 
-        if (Auth::user()->cannot('create', Claim::class)) {
-            abort(403);
-        }
-        if ($client->user_id != Auth::user()->id) {
-            abort(403);
-        }
+//        $this->authorize('check', $client);
+//        if (Auth::user()->cannot('check', $client, Claim::class)) {
+//            abort(403);
+//        }
+//        if (Auth::user()->cannot('create', Claim::class)) {
+//            abort(403);
+//        }
+//        if ($client->user_id != Auth::user()->id) {
+//            abort(403);
+//        }
 
         $validatedData = $request->validate(
             [
@@ -616,13 +620,17 @@ class ClaimController extends Controller
 
     public function createInvoice() {
 
-        $claims = Claim::where('isInvoice', 1)
-            ->whereNull('invoice')
-            ->with('service')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        if (Auth::user()->role->level <= 2 || auth()->user()->userInvoice != 0) {
+            $claims = Claim::where('isInvoice', 1)
+                ->whereNull('invoice')
+                ->with('service')
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
 
-        return view('claims.invoice', compact('claims'));
+            return view('claims.invoice', compact('claims'));
+        } else {
+            abort(403);
+        }
     }
 
     public function storeInvoice($id, Request $request)
@@ -785,23 +793,38 @@ class ClaimController extends Controller
 
     public function getActiveAd() {
 
-        $activeAds = Claim::whereHas('activeAd', function ($q) {
+        if (Auth::user()->role->level <= 2) {
+
+            $activeAds = Claim::whereHas('activeAd', function ($q) {
+                $q->where('end_date', '>=', now()->second(0)->minute(0)->hour(0));
+            })->get();
+
+        } else {
+            $activeAds = Claim::whereHas('activeAd', function ($q) {
                 $q->where('end_date', '>=', now()->second(0)->minute(0)->hour(0));
             })
-            ->where('creator', Auth::user()->id)
-            ->get();
-
+                ->where('creator', Auth::user()->id)
+                ->get();
+        }
         return view('activeAd.index', compact('activeAds'));
     }
 
     public function getPastActiveAd() {
 
-        $activeAds = Claim::whereHas('activeAd', function ($q) {
-            $q->where('end_date', '<=', now()->second(0)->minute(0)->hour(0));
-        })
-            ->where('creator', Auth::user()->id)
-            ->get();
+        if (Auth::user()->role->level <= 2) {
 
+            $activeAds = Claim::whereHas('activeAd', function ($q) {
+                $q->where('end_date', '>=', now()->second(0)->minute(0)->hour(0));
+            })->get();
+
+        } else {
+
+            $activeAds = Claim::whereHas('activeAd', function ($q) {
+                $q->where('end_date', '<=', now()->second(0)->minute(0)->hour(0));
+            })
+                ->where('creator', Auth::user()->id)
+                ->get();
+        }
         return view('activeAd.past', compact('activeAds'));
     }
 

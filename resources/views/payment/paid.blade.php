@@ -81,22 +81,38 @@
                                 <thead>
                                 <tr>
                                     <th>№ заявки</th>
+                                    <th>Месяц / Год</th>
                                     <th>Клиент</th>
+                                    <th>Сотрудник</th>
                                     <th>Категория услуги</th>
                                     <th>Наименование услуги</th>
                                     <th>Сумма</th>
                                     <th>Статус</th>
-                                    <th class="text-center">Действие</th>
+{{--                                    <th class="text-center">Действие</th>--}}
                                 </tr>
                                 </thead>
                                 <tbody>
                                 @foreach($claims as $key => $item)
                                     <tr>
                                         <td>{{$item->id}}</td>
-                                        <td>{{$item->client->name}}</td>
+                                        <td>{{$item->getDate()}}</td>
+                                        <td>
+                                            <a href="{{route('clients.show', ['client'=>$item->client->id])}}" target="_blank">{{$item->client->name}}
+                                                @if($item->client->requisite->fullName)
+                                                    <span>
+                                                (<b>Юр.имя: </b>
+                                                {{$item->client->requisite->fullName}})
+                                            </span>
+                                                @endif
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{route('users.show', ['user'=>$item->creator])}}" target="_blank">{{$item->creatorUser->getFullName()}}
+                                            </a>
+                                        </td>
                                         <td>{{$item->service->category->name}}</td>
                                         <td>{{$item->service->name}}</td>
-                                        <td>{{$item->amount}} руб.</td>
+                                        <td>{{money($item->amount)}} руб.</td>
                                         <td>
                                             @if(!$item->historiesPayment->count())
                                                 <span class="text-danger">Статус не найден</span>
@@ -106,11 +122,11 @@
                                                 </span>
                                             @endif
                                         </td>
-                                        <td class="text-center">
-                                            <button type="button" class="btn btn-primary changeStatus" data-bs-toggle="modal" data-bs-target="#changeStatus" attr-id="{{$item->id}}">
-                                                Изменить статус оплаты
-                                            </button>
-                                        </td>
+{{--                                        <td class="text-center">--}}
+{{--                                            <button type="button" class="btn btn-primary changeStatus" data-bs-toggle="modal" data-bs-target="#changeStatus" attr-id="{{$item->id}}">--}}
+{{--                                                Изменить статус оплаты--}}
+{{--                                            </button>--}}
+{{--                                        </td>--}}
                                     </tr>
 
                                 @endforeach

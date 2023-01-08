@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Claim;
 use App\Models\Group;
 use App\Models\SalesPlan;
+use App\Models\Service;
 use App\Models\UserM;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -276,7 +278,68 @@ class SalesPlanController extends Controller
         return json_encode($res);
     }
 
+    public function services(Request $request)
+    {
+        $start = date('Y-m-00') . ' 00:00:00';
+        $end = date('Y-m-32') . ' 00:00:00';
 
+        if ($request->input('month')) {
+            $start = $request->input('month').'-00 00:00:00';
+            $end = $request->input('month').'-32 00:00:00';
+        }
+        $categories = Category::all();
+
+        $categoriesAllSum = DB::table('categories')
+            ->leftJoin('services', 'categories.id', '=', 'services.category_id')
+            ->leftJoin('claims', 'services.id', '=', 'claims.service_id')
+            ->leftJoin('history_payments', 'claims.id', '=', 'history_payments.claim_id')
+            ->select('categories.id',
+                'categories.name',
+                DB::raw('sum(claims.amount) as claims_amount'))
+            ->whereNull('categories.deleted_at')
+            ->where('claims.created_at', '>=', $start)
+            ->where('claims.created_at', '<=', $end)
+            ->where('history_payments.status_id', '=', 4)
+            ->groupBy('categories.id', 'categories.name')
+            ->get();
+
+
+        $categoriesAllSum = $categoriesAllSum->mapWithKeys(function ($item, $key) {
+            return [$item->id => $item];
+        });
+
+        $usersSum = array();
+        $allData = array();
+
+        foreach ($categories as $key => $category) {
+
+            $allData[$key] = array('name' => $category->name);
+            if (isset($categoriesAllSum[$category->id])) {
+                $allData[$key]['sum'] = $categoriesAllSum[$category->id]->claims_amount;
+            } else {
+                $allData[$key]['sum'] = 0;
+            }
+
+            $user = DB::table('categories')
+                ->leftJoin('services', 'categories.id', '=', 'services.category_id')
+                ->leftJoin('claims', 'services.id', '=', 'claims.service_id')
+                ->leftJoin('history_payments', 'claims.id', '=', 'history_payments.claim_id')
+                ->select('claims.creator',
+                    DB::raw('sum(claims.amount) as claims_amount'))
+                ->whereNull('categories.deleted_at')
+                ->where('categories.id', $category->id)
+                ->where('claims.created_at', '>=', $start)
+                ->where('claims.created_at', '<=', $end)
+                ->where('history_payments.status_id', '=', 4)
+                ->groupBy('claims.creator')
+                ->get();
+
+            $allData[$key]['users'] = $user;
+        }
+
+
+        return view('plan.services', compact('categories', 'allData'));
+    }
 
 
 }

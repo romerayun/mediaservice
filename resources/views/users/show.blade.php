@@ -49,17 +49,17 @@
                             <h5 class="text-gray-500">К сожалению, заявок не создано 😢</h5>
                         @else
 
-                            <p class="text-gray-500 mb-0"><b class="text-primary">План сотрудника на месяц:</b> {{$sumPlan}} руб.</p>
+                            <p class="text-gray-500 mb-0"><b class="text-primary">План сотрудника на месяц:</b> {{money($sumPlan)}} руб.</p>
                             <p class="text-gray-500 mb-0"><b class="text-primary">Заявок создано на:</b>
                                 @if($sumClaims->first()->total_amount == null)
                                     0 руб.
                                 @else
-                                    {{$sumClaims->first()->total_amount}} руб.
+                                    {{money($sumClaims->first()->total_amount)}} руб.
                                 @endif</p>
                             <p class="text-gray-500 mb-0"><b class="text-primary">Поступления:</b>            @if($sumPaid->first()->total_amount == null)
                                     0 руб.
                                 @else
-                                    {{$sumPaid->first()->total_amount}} руб.
+                                    {{money($sumPaid->first()->total_amount)}} руб.
                                 @endif</p>
                             <p class="text-gray-500 mb-4"><b class="text-primary">Процент выполения:</b>
                                 @if ($sumPlan == 0)
@@ -72,8 +72,9 @@
                             <table class="table table-lg table-hover" id="datatables">
                                 <thead>
                                 <tr>
-                                    <th>№ заявки</th>
                                     <th>Месяц / Год</th>
+                                    <th>№ заявки</th>
+                                    <th>Клиент</th>
                                     <th>Категория услуг</th>
                                     <th>Наименование услуги</th>
                                     <th>Сумма</th>
@@ -84,13 +85,24 @@
 
                                 @foreach($userClaims as $key => $item)
                                     <tr>
+                                        <td>{{$item->getDate()}}</td>
                                         <td>
                                             <a href="{{route('claims.show', ['claim' => $item->id])}}">№{{$item->id}}</a>
                                         </td>
-                                        <td>{{$item->getDate()}}</td>
+                                        <td>
+                                            <a href="{{route('clients.show', ['client'=>$item->client->id])}}" target="_blank">{{$item->client->name}}
+                                            @if($item->client->requisite->fullName)
+                                            <span>
+                                                (<b>Юр.имя: </b>
+                                                {{$item->client->requisite->fullName}})
+                                            </span>
+                                            @endif
+                                            </a>
+                                        </td>
+
                                         <td>{{$item->service->category->name}}</td>
                                         <td>{{$item->service->name}}</td>
-                                        <td>{{$item->amount}} руб.</td>
+                                        <td>{{money($item->amount)}} руб.</td>
                                         <td>
                                             @if(count($item->historiesPayment) != 0)
                                                 <span class="badge custom-bg-{{$item->historiesPayment->first()->status->color}}">{{$item->historiesPayment->first()->status->name}}</span>
@@ -121,6 +133,10 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div id="data" class="row">
+        {!! $salesByCategory !!}
     </div>
 
 @endsection

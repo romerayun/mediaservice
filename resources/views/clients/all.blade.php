@@ -11,7 +11,7 @@
                 </a>
             @endif
 
-            @if (auth()->user()->can('viewAny', \App\Models\ActiveAd::class))
+            @if (auth()->user()->can('allowClient', \App\Models\Client::class))
                 <a href="{{route('clients.distribution')}}" class="btn btn-sm btn-primary">Распределение клиентов между МП</a>
             @endif
 

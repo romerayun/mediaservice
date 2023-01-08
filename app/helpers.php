@@ -300,6 +300,7 @@ if (!function_exists('getCountExActiveAds')) {
 
 if (!function_exists('getDiffDate')) {
     function getDiffDate($end) {
+
         $end = \Carbon\Carbon::make($end);
         if (($end->day == now()->day) && ($end->month == now()->month)) {
             return 'Сегодня';
@@ -309,7 +310,21 @@ if (!function_exists('getDiffDate')) {
             return $end->diffForHumans();
         }
     }
+
 }
 
+if (!function_exists('getUserById')) {
+    function getUserById($id) {
+        $user = \App\Models\UserM::firstWhere('id', $id);
+        if ($user) return $user->getFullName();
+        else return 'Пользователь не найден!';
+    }
+}
+
+if (!function_exists('money')) {
+    function money($value) {
+        return number_format($value, 2, '.',' ');
+    }
+}
 
 

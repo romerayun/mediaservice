@@ -5,7 +5,9 @@
             <h3>Управление планом продаж</h3>
         </div>
         <div class="col-12 col-md-6 text-end">
-            <a href="{{route('plan.statistics')}}" class="btn  btn-primary">Статистика продаж (План/Факт)</a>
+            <a href="{{route('plan.statistics')}}" class="btn  btn-primary">Продажи (План/Факт)</a>
+            <a href="{{route('plan.services')}}" class="btn  btn-primary">Продажи (по услугам)</a>
+            <a href="{{route('users.salesCategory')}}" class="btn  btn-primary">Продажи (по менеджерам)</a>
             <a href="{{route('plan.create')}}" class="btn  btn-success">Добавление плана</a>
         </div>
     </div>
@@ -56,7 +58,7 @@
                                         <td>{{$key+1}}</td>
                                         <td>{{$item->getDate()}}</td>
                                         <td>{{$item->user->getFullName()}}</td>
-                                        <td>{{$item->plan}} руб.</td>
+                                        <td amount="{{$item->plan}} руб.">{{money($item->plan)}} руб.</td>
 
                                         <td class="text-center">
                                             <a href="{{route('plan.edit', ['plan' => $item->id])}}"

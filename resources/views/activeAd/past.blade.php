@@ -26,6 +26,7 @@
                                 <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th>Клиент</th>
                                     <th>Заявка</th>
                                     <th>Запустил кампанию</th>
                                     <th>Начало рекламной кампании</th>
@@ -38,6 +39,9 @@
                                 @foreach($activeAds as $key => $item)
                                     <tr>
                                         <td>{{$key+1}}</td>
+                                        <td>
+                                            <a href="{{route('clients.show', ['client'=>$item->client->id])}}" target="_blank">{{$item->client->name}}</a>
+                                        </td>
                                         <td>Заявка №{{$item->id}} - {{$item->service->name}}</td>
                                         <td>{{$item->user->getFullName()}}</td>
                                         <td>

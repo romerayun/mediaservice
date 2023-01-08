@@ -48,16 +48,7 @@ class ClaimPolicy
         return false;
     }
 
-//    public function createClaim(UserM $userM)
-//    {
-//        return true;
-//        if ($userM->role->level <= 2) {
-//            return true;
-//        } else if ($userM->id == $user_id) {
-//            return true;
-//        }
-//        return false;
-//    }
+
 
     /**
      * Determine whether the user can update the model.
@@ -115,5 +106,16 @@ class ClaimPolicy
     public function forceDelete(UserM $userM, Claim $claim)
     {
         //
+    }
+
+    public function check(UserM $userM, Client $client)
+    {
+        return true;
+        if ($userM->role->level <= 2) {
+            return true;
+        } else if ($userM->id == $client->user_id) {
+            return true;
+        }
+        return false;
     }
 }

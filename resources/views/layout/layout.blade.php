@@ -32,7 +32,7 @@
             <div class="sidebar-header position-relative">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="logo">
-                        <a href="{{route('home')}}">
+                        <a href="{{route('calendar.index')}}">
                             <img class="logo-black" src="{{asset('images/logo/logo-black.png')}}"
                                  alt="Logo MediaService" srcset="">
                             <img class="logo-white" src="{{asset('images/logo/logo.png')}}" alt="Logo MediaService"
@@ -75,13 +75,13 @@
             <div class="sidebar-menu">
                 <ul class="menu">
 
-                    <li
-                        class="sidebar-item">
-                        <a href="{{route('home')}}" class='sidebar-link'>
-                            <i class="bi bi-house-fill"></i>
-                            <span>Главная</span>
-                        </a>
-                    </li>
+{{--                    <li--}}
+{{--                        class="sidebar-item">--}}
+{{--                        <a href="{{route('home')}}" class='sidebar-link'>--}}
+{{--                            <i class="bi bi-house-fill"></i>--}}
+{{--                            <span>Главная</span>--}}
+{{--                        </a>--}}
+{{--                    </li>--}}
 
                     @if (auth()->user()->can('viewAny', \App\Models\Client::class))
                         <li
@@ -93,7 +93,7 @@
                         </li>
                     @endif
 
-                    @if (auth()->user()->can('viewAny', \App\Models\Client::class))
+                    @if (auth()->user()->role->level <= 3)
                     <li
                         class="sidebar-item  ">
                         <a href="{{route('clients.index')}}" class='sidebar-link'>
@@ -102,6 +102,7 @@
                         </a>
                     </li>
                     @endif
+
 
                     <li
                         class="sidebar-item  ">
@@ -141,6 +142,7 @@
                         </a>
                     </li>
 
+                    @if (auth()->user()->role->level <= 5)
                     <li
                         class="sidebar-item  ">
                         <a href="{{route('claim.activeAd')}}" class='sidebar-link align-items-center'>
@@ -148,8 +150,9 @@
                             <span>Активная <br> реклама </span><span class="badge bg-primary">{{getCountActiveAds()}}</span>
                         </a>
                     </li>
+                    @endif
 
-                    @if(auth()->user()->userInvoice != 0)
+                    @if (auth()->user()->role->level <= 2 || auth()->user()->userInvoice != 0)
                         <li
                             class="sidebar-item  ">
                             <a href="{{route('claim.invoice')}}" class='sidebar-link'>
@@ -160,16 +163,19 @@
                         </li>
                     @endif
 
+                    @if (auth()->user()->role->level <= 2 || Auth::user()->role->level == 6)
                     <li
-                        class="sidebar-item  ">
+                        class="sidebar-item">
                         <a href="{{route('payment.index')}}" class='sidebar-link'>
                             <i class="bi bi-wallet-fill"></i>
                             <span>Оплаты{{--<span class="badge bg-primary">{{myClaimsIsNotClosed()}}</span>--}}</span>
                         </a>
                     </li>
+                    @endif
 
+                    @if (auth()->user()->role->level <= 2)
                     <li
-                        class="sidebar-item  ">
+                        class="sidebar-item">
                         <a href="{{route('status-client.index')}}" class='sidebar-link'>
                             <i class="bi bi-info-circle-fill"></i>
                             <span>Статус клиента</span>
@@ -191,7 +197,9 @@
                             <span>Статус оплаты</span>
                         </a>
                     </li>
+                    @endif
 
+                    @if (auth()->user()->role->level <= 2)
                     <li class="sidebar-title">Cтруктура</li>
 
                     <li
@@ -222,6 +230,7 @@
                             <span>План продаж</span>
                         </a>
                     </li>
+
 
                     <li class="sidebar-title">Управление услугами</li>
 
@@ -258,10 +267,11 @@
                             <span>Пакеты услуг</span>
                         </a>
                     </li>
-
+                    @endif
 
                     <li class="sidebar-title">Профиль</li>
 
+                    @if (auth()->user()->role->level <= 3)
                     <li
                         class="sidebar-item  ">
                         <a href="{{route('users.show', ['user' => auth()->user()->id])}}" class='sidebar-link'>
@@ -269,6 +279,7 @@
                             <span>Мои продажи</span>
                         </a>
                     </li>
+                    @endif
 
                     <li
                         class="sidebar-item  ">

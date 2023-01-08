@@ -30,7 +30,7 @@
                                         <div class="form-group">
                                             <label>Полное наименование организации: </label>
                                             <input type="text" id="fullName" class="form-control @if($errors->has('fullName')) is-invalid @endif" name="fullName"
-                                                   placeholder="Введите полное наименование организации..." required
+                                                   placeholder="Введите полное наименование организации..."
                                                    @if(old('fullName')) value="{{old('fullName')}}" @else value="{{$requisites->fullName}}" @endif>
                                             @if($errors->has('fullName'))
                                                 <div class="invalid-feedback">
@@ -46,7 +46,7 @@
                                         <div class="form-group">
                                             <label>Организацинно-правовая форма: </label>
                                             <input type="text" id="legalForm" class="form-control @if($errors->has('legalForm')) is-invalid @endif" name="legalForm"
-                                                   placeholder="Введите организацинно-правовую форму организации..." required
+                                                   placeholder="Введите организацинно-правовую форму организации..."
                                                    @if(old('legalForm')) value="{{old('legalForm')}}" @else value="{{$requisites->legalForm}}" @endif>
                                             @if($errors->has('legalForm'))
                                                 <div class="invalid-feedback">
@@ -81,7 +81,7 @@
                                         <div class="form-group">
                                             <label>ОГРН/ОГРНИП: </label>
                                             <input type="text" id="OGRN" class="form-control @if($errors->has('OGRN')) is-invalid @endif" name="OGRN"
-                                                   placeholder="Введите ОГРН/ОГРНИП организации..." required
+                                                   placeholder="Введите ОГРН/ОГРНИП организации..."
                                                    @if(old('OGRN')) value="{{old('OGRN')}}" @else value="{{$requisites->OGRN}}" @endif>
                                             @if($errors->has('OGRN'))
                                                 <div class="invalid-feedback">
@@ -100,7 +100,7 @@
                                         <div class="form-group">
                                             <label>Юридический адрес организации: </label>
                                             <input type="text" id="lawAddress" class="form-control @if($errors->has('lawAddress')) is-invalid @endif" name="lawAddress"
-                                                   placeholder="Введите юридический адрес организации..." required
+                                                   placeholder="Введите юридический адрес организации..."
                                                    @if(old('lawAddress')) value="{{old('lawAddress')}}" @else value="{{$requisites->lawAddress}}" @endif>
                                             @if($errors->has('lawAddress'))
                                                 <div class="invalid-feedback">
@@ -121,7 +121,7 @@
                                         <div class="form-group">
                                             <label>Расчетный счет: </label>
                                             <input type="text" id="checkingAccount" class="form-control @if($errors->has('checkingAccount')) is-invalid @endif" name="checkingAccount"
-                                                   placeholder="Введите расчетный счет организации..." required
+                                                   placeholder="Введите расчетный счет организации..."
                                                    @if(old('checkingAccount')) value="{{old('checkingAccount')}}" @else value="{{$requisites->checkingAccount}}" @endif>
                                             @if($errors->has('checkingAccount'))
                                                 <div class="invalid-feedback">
@@ -137,7 +137,7 @@
                                         <div class="form-group">
                                             <label>Корреспондентский счет: </label>
                                             <input type="text" id="correspondentAccount" class="form-control @if($errors->has('correspondentAccount')) is-invalid @endif" name="correspondentAccount"
-                                                   placeholder="Введите корреспондентский счет организации..." required
+                                                   placeholder="Введите корреспондентский счет организации..."
                                                    @if(old('correspondentAccount')) value="{{old('correspondentAccount')}}" @else value="{{$requisites->correspondentAccount}}" @endif>
                                             @if($errors->has('correspondentAccount'))
                                                 <div class="invalid-feedback">
@@ -156,7 +156,7 @@
                                         <div class="form-group">
                                             <label>Наименование банка: </label>
                                             <input type="text" id="nameBank" class="form-control @if($errors->has('nameBank')) is-invalid @endif" name="nameBank"
-                                                   placeholder="Введите наименование банка..." required
+                                                   placeholder="Введите наименование банка..."
                                                    @if(old('nameBank')) value="{{old('nameBank')}}" @else value="{{$requisites->nameBank}}" @endif>
                                             @if($errors->has('nameBank'))
                                                 <div class="invalid-feedback">
@@ -175,7 +175,7 @@
                                         <div class="form-group">
                                             <label>БИК: </label>
                                             <input type="text" id="BIC" class="form-control @if($errors->has('BIC')) is-invalid @endif" name="BIC"
-                                                   placeholder="Введите БИК..." required
+                                                   placeholder="Введите БИК..."
                                                    @if(old('BIC')) value="{{old('BIC')}}" @else value="{{$requisites->BIC}}" @endif>
                                             @if($errors->has('BIC'))
                                                 <div class="invalid-feedback">
@@ -191,7 +191,7 @@
                                         <div class="form-group">
                                             <label>КПП: </label>
                                             <input type="text" id="KPP" class="form-control @if($errors->has('KPP')) is-invalid @endif" name="KPP"
-                                                   placeholder="Введите КПП..." required
+                                                   placeholder="Введите КПП..."
                                                    @if(old('KPP')) value="{{old('KPP')}}" @else value="{{$requisites->KPP}}" @endif>
                                             @if($errors->has('KPP'))
                                                 <div class="invalid-feedback">
@@ -207,7 +207,7 @@
                                         <div class="form-group">
                                             <label>КБК: </label>
                                             <input type="text" id="KBK" class="form-control @if($errors->has('KBK')) is-invalid @endif" name="KBK"
-                                                   placeholder="Введите КБК..." required
+                                                   placeholder="Введите КБК..."
                                                    @if(old('KBK')) value="{{old('KBK')}}" @else value="{{$requisites->KBK}}" @endif>
                                             @if($errors->has('KBK'))
                                                 <div class="invalid-feedback">
@@ -228,7 +228,7 @@
                                         <div class="form-group">
                                             <label>ФИО бухгалтера: </label>
                                             <input type="text" id="buhName" class="form-control @if($errors->has('buhName')) is-invalid @endif" name="buhName"
-                                                   placeholder="Введите ФИО бухгалтера организации..." required
+                                                   placeholder="Введите ФИО бухгалтера организации..."
                                                    @if(old('buhName')) value="{{old('buhName')}}" @else value="{{$requisites->buhName}}" @endif>
                                             @if($errors->has('buhName'))
                                                 <div class="invalid-feedback">
@@ -244,7 +244,7 @@
                                         <div class="form-group">
                                             <label>Телефон бухгалтера: </label>
                                             <input type="text" id="phone" class="form-control @if($errors->has('phone')) is-invalid @endif" name="phone"
-                                                   placeholder="Введите телефон бухгалтера..." required
+                                                   placeholder="Введите телефон бухгалтера..."
                                                    @if(old('phone')) value="{{old('phone')}}" @else value="{{$requisites->phone}}" @endif>
                                             @if($errors->has('phone'))
                                                 <div class="invalid-feedback">

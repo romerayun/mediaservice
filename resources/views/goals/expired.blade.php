@@ -46,7 +46,7 @@
                                     @foreach($goals as $key => $item)
 
 
-                                        <tr @if(!$item->isReadExpired) class="bg-light-danger" @endif>
+                                        <tr>
                                             <td>
                                                 <span class="badge bg-danger ">
                                                     Просрочена

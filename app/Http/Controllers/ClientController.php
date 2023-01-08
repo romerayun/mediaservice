@@ -234,9 +234,11 @@ class ClientController extends Controller
     public function show($id)
     {
         $client = Client::firstWhere('id', $id);
+
         if (Auth::user()->cannot('view', $client)) {
             abort(403);
         }
+
         $statusClient = StatusClient::where('isVisible', 1)->get();
         $listStatusesClient = HistoryClient::where('client_id', $id)->orderBy('id', 'desc')->get();
         $groups = Group::all();
@@ -345,18 +347,19 @@ class ClientController extends Controller
 
     public function allow()
     {
-//        if (Auth::user()->cannot('allow', Client::class)) {
-//            abort(403);
-//        }
+        if (Auth::user()->cannot('allowClient', Client::class)) {
+            abort(403);
+        }
         $clients = Client::where('isAllow', 0)->get();
         return view('clients.allow', compact('clients'));
     }
 
     public function allowUpdate($id, Request $request)
     {
-//        if (Auth::user()->cannot('allow', Client::class)) {
-//            abort(403);
-//        }
+        if (Auth::user()->cannot('allowClient', Client::class)) {
+            abort(403);
+        }
+
         DB::beginTransaction();
         try {
             $client = Client::firstWhere('id', $id);
@@ -378,9 +381,9 @@ class ClientController extends Controller
     // ----------**********------------
 
     public function distribution() {
-//        if (Auth::user()->cannot('viewAny', ActiveAd::class)) {
-//            abort(403);
-//        }
+        if (Auth::user()->cannot('allowClient', Client::class)) {
+            abort(403);
+        }
 
         $clients = Client::where('isAllow', 1)
             ->get();

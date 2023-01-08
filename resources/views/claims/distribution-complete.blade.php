@@ -55,7 +55,7 @@
                                             <b>Текущий статус - </b> {{$claim->histories->first()->status->name}}
                                         </p>
                                         <p class="mb-1">
-                                            <b>Стоимость - </b> {{$claim->amount}} руб.
+                                            <b>Стоимость - </b> {{money($claim->amount)}} руб.
                                         </p>
 
                                         <hr>

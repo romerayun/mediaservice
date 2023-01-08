@@ -26,6 +26,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('client:birthday')->everyMinute();
         $schedule->command('client:lprBirthday')->everyMinute();
         $schedule->command('goals:active_ad')->everyMinute();
+        $schedule->command('client:interaction')->everyMinute();
     }
 
     /**

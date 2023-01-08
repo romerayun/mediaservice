@@ -18,7 +18,7 @@ class ClientPolicy
      */
     public function viewAny(UserM $userM)
     {
-        if ($userM->role->level <= 5) {
+        if ($userM->role->level <= 6) {
             return true;
         }
 
@@ -34,7 +34,7 @@ class ClientPolicy
      */
     public function view(UserM $userM, Client $client)
     {
-        if ($userM->role->level <= 5) {
+        if ($userM->role->level <= 6) {
             return true;
         } else if ($userM->id == $client->user_id) {
             return true;
@@ -116,6 +116,17 @@ class ClientPolicy
 
     public function allowClient(UserM $userM) {
         if ($userM->role->level <= 2) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function interaction(UserM $userM, Client $client)
+    {
+        if ($userM->role->level <= 2) {
+            return true;
+        } else if ($userM->id == $client->user_id) {
             return true;
         }
 

@@ -31,11 +31,11 @@ function getSum() {
     let pie = [];
     $('#plan-table tr td').each(function (index) {
         if (index === 3) {
-            sum += +$(this).text().slice(0, -5);
-            series.push(+$(this).text().slice(0, -5));
+            sum += +$(this).attr('amount').slice(0, -5);
+            series.push(+$(this).attr('amount').slice(0, -5));
         } else if (index % 5 === 3) {
-            sum += +$(this).text().slice(0, -5);
-            series.push(+$(this).text().slice(0, -5));
+            sum += +$(this).attr('amount').slice(0, -5);
+            series.push(+$(this).attr('amount').slice(0, -5));
         }
 
         if (index === 2) {
@@ -161,7 +161,7 @@ if (document.getElementById('phone')) {
     var elPhone = document.getElementById('phone');
     var maskOptions = {
         mask: '+{7}(000)000-00-00',
-        lazy: false
+        lazy: true
     };
     var mask = IMask(elPhone, maskOptions);
 }
@@ -520,7 +520,8 @@ if (document.getElementById('plan-table')) {
         });
     }
 
-    $("#sum").text(getSum()[2]);
+    let amount = new Intl.NumberFormat('ru-RU').format(getSum()[2]);
+    $("#sum").text(amount);
 
 
 }
@@ -772,4 +773,69 @@ $(document).on("click", ".delFile", function (event) {
             });
         }
     })
+});
+
+$(".datatables").each(function( index ) {
+    let dataTable = new simpleDatatables.DataTable($(this)[0], {
+        searchable: true,
+        fixedHeight: false,
+        labels: {
+            placeholder: "Поиск...",
+            perPage: "{select} записей на странице",
+            noRows: "Ничего не найдено",
+            info: "Показано с {start} по {end} из {rows} записей",
+        }
+    });
+
+    dataTable.on("datatable.init", function () {
+        adaptPageDropdown(dataTable);
+        adaptPagination(dataTable);
+    });
+
+    dataTable.on("datatable.page", adaptPagination);
+});
+
+$('#find-sales').click(function () {
+
+    let validate = true;
+    let user_id = $("#user_id").val();
+    let month = $("#month").val();
+    if (user_id == 0) {
+        validate = false;
+        $("#user_id").parents('.form-group').addClass('is-invalid');
+    } else {
+        $("#user_id").parents('.form-group').removeClass('is-invalid');
+    }
+    if (month == '') {
+        validate = false;
+        $("#month-f").addClass('is-invalid');
+    } else {
+        $("#month-f").removeClass('is-invalid');
+    }
+
+    if (validate) {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('input[name="_token"]').val()
+            }
+        });
+
+        $.ajax({
+            url: '/users/sales-category',
+            type: "POST",
+            data: {
+                'user_id': user_id,
+                'month': month,
+            },
+            success: function (response) {
+                $("#data").html(response);
+                showToast("Данные успешно загружены 👌", "linear-gradient(to right, #00B560, #00914D)");
+            },
+            error: function (error) {
+                showToast("Данные не найдены 😢", "linear-gradient(to right, #ED213A, #93291E)");
+            },
+
+        });
+    }
+
 });

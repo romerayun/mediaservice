@@ -162,12 +162,17 @@ document.addEventListener('DOMContentLoaded', function () {
             title.innerHTML = arg.event.title;
             container.appendChild(title)
 
-            if (arg.event.extendedProps.status == 0) {
-                status.innerHTML = 'Статус: Не выполнена';
-            } else if (arg.event.extendedProps.status == 1) {
-                status.innerHTML = 'Статус: Выполнена';
+
+            if (arg.event.extendedProps.customRrule == 0) {
+                if (arg.event.extendedProps.status == 0) {
+                    status.innerHTML = 'Статус: Не выполнена';
+                } else if (arg.event.extendedProps.status == 1) {
+                    status.innerHTML = 'Статус: Выполнена';
+                } else {
+                    status.innerHTML = 'Статус: Просрочена';
+                }
             } else {
-                status.innerHTML = 'Статус: Просрочена';
+                status.innerHTML = 'Повторяющаяся задача';
             }
 
             container.appendChild(status)

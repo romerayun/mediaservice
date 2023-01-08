@@ -48,17 +48,17 @@
                             <h5 class="text-gray-500">К сожалению, план не был установлен 😢</h5>
                         @else
 
-                            <p class="text-gray-500 mb-0"><b class="text-primary">Общий план всех сотрудников:</b> {{$sumPlan}} руб.</p>
+                            <p class="text-gray-500 mb-0"><b class="text-primary">Общий план всех сотрудников:</b> {{money($sumPlan)}} руб.</p>
                             <p class="text-gray-500 mb-0"><b class="text-primary">Заявок создано на:</b>
                                 @if($sumClaims->first()->total_amount == null)
                                     0 руб.
                                 @else
-                                    {{$sumClaims->first()->total_amount}} руб.
+                                    {{money($sumClaims->first()->total_amount)}} руб.
                                 @endif</p>
                             <p class="text-gray-500 mb-0"><b class="text-primary">Поступления:</b>            @if($sumPaid->first()->total_amount == null)
                                     0 руб.
                                 @else
-                                    {{$sumPaid->first()->total_amount}} руб.
+                                    {{money($sumPaid->first()->total_amount)}} руб.
                                 @endif</p>
                             <p class="text-gray-500 mb-4"><b class="text-primary">Процент выполения:</b> {{round($sumPaid->first()->total_amount / $sumPlan * 100, 2)}}%</p>
 
@@ -87,17 +87,17 @@
                                             {{$item->user->getFullName()}}</a>
                                         </td>
                                         <td>{{$item->getDate()}}</td>
-                                        <td>{{$item->plan}} руб.</td>
+                                        <td>{{money($item->plan)}} руб.</td>
                                         <td>
                                             @if(isset($multiplied[$item->user_id]))
-                                                {{$multiplied[$item->user_id]->total_amount}} руб.
+                                                {{money($multiplied[$item->user_id]->total_amount)}} руб.
                                             @else
                                                 <span class="text-danger">Заявок не создано</span>
                                             @endif
                                         </td>
                                         <td>
                                             @if(isset($multipliedPaidClaims[$item->user_id]))
-                                                {{$multipliedPaidClaims[$item->user_id]->total_amount}} руб.
+                                                {{money($multipliedPaidClaims[$item->user_id]->total_amount)}} руб.
                                                 @php $fact = $multipliedPaidClaims[$item->user_id]->total_amount @endphp
                                             @else
                                                 <span class="text-danger">0 руб.</span>
@@ -106,11 +106,11 @@
                                         <td>
                                             @php $res = $fact - $plan @endphp
                                             @if($res > 0)
-                                                <span class="text-success">+{{$res}} руб.</span>
+                                                <span class="text-success">+{{money($res)}} руб.</span>
                                             @elseif($fact>0 && $fact < $plan)
-                                                <span class="text-warning">{{$res}} руб.</span>
+                                                <span class="text-warning">{{money($res)}} руб.</span>
                                             @else
-                                                <span class="text-danger">{{$res}} руб.</span>
+                                                <span class="text-danger">{{money($res)}} руб.</span>
                                             @endif
                                         </td>
 

@@ -25,6 +25,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
+        Gate::define('interaction-client', 'App\Policies\ClientPolicy@interaction');
         //
     }
 }

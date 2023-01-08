@@ -6,6 +6,8 @@
         </div>
         <div class="col-12 col-md-6 text-end">
             <a href="{{route('payment.paid')}}" class="btn btn-success">Оплаченные счета <span class="badge bg-transparent">{{getCountCompletePayment()}}</span></a>
+            <a href="{{route('plan.services')}}" class="btn  btn-primary">Продажи (по услугам)</a>
+            <a href="{{route('users.salesCategory')}}" class="btn  btn-primary">Продажи (по менеджерам)</a>
         </div>
     </div>
 @endsection
@@ -77,11 +79,13 @@
                         @if($claims->isEmpty())
                             <h5 class="text-gray-500">К сожалению, заявок не найдено 😢</h5>
                         @else
-                            <table class="table table-lg table-hover" id="datatables">
+                            <table class="table  table-hover" id="datatables">
                                 <thead>
                                 <tr>
                                     <th>№ заявки</th>
+                                    <th>Месяц / Год</th>
                                     <th>Клиент</th>
+                                    <th>Сотрудник</th>
                                     <th>Категория услуги</th>
                                     <th>Наименование услуги</th>
                                     <th>Сумма</th>
@@ -93,10 +97,24 @@
                                 @foreach($claims as $key => $item)
                                     <tr>
                                         <td>{{$item->id}}</td>
-                                        <td>{{$item->client->name}}</td>
+                                        <td>{{$item->getDate()}}</td>
+                                        <td>
+                                            <a href="{{route('clients.show', ['client'=>$item->client->id])}}" target="_blank">{{$item->client->name}}
+                                                @if($item->client->requisite->fullName)
+                                                    <span>
+                                                (<b>Юр.имя: </b>
+                                                {{$item->client->requisite->fullName}})
+                                            </span>
+                                                @endif
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{route('users.show', ['user'=>$item->creator])}}" target="_blank">{{$item->creatorUser->getFullName()}}
+                                            </a>
+                                        </td>
                                         <td>{{$item->service->category->name}}</td>
                                         <td>{{$item->service->name}}</td>
-                                        <td>{{$item->amount}} руб.</td>
+                                        <td>{{money($item->amount)}} руб.</td>
                                         <td>
                                             @if(!$item->historiesPayment->count())
                                                 <span class="text-danger">Статус не найден</span>

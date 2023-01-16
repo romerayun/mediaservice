@@ -57,8 +57,8 @@
                                       class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn icon btn-danger me-2 mb-2 delete btn-sm"><i
-                                            class="bi bi-trash-fill"></i> Удалить
+                                    <button type="submit" class="btn icon btn-danger me-2 mb-2 block btn-sm"><i
+                                            class="bi bi-lock-fill"></i> Заблокировать
                                     </button>
                                 </form>
                             </div>

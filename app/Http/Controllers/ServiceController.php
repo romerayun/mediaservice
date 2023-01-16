@@ -128,8 +128,31 @@ class ServiceController extends Controller
     public function usersByGroup(Request $request) {
 
         if ($request->value > 0) {
+//        $request->value = 3;
 
-            $users = Group::with('roles.users')->find($request->value);
+//        $users = Group::with('roles.users')->find($request->value);
+//            $users = Group::with('roles')
+//                ->whereHas('roles', function ($q) {
+//                    $q->with('users')
+//                        ->whereHas('users', function ($q2) {
+//                            $q2->where('isBlocked', '=' , 0);
+//                        });
+//                })
+//                ->where('id', $request->value)
+//                ->get();
+
+        $users = UserM::with('role')
+            ->whereHas('role', function ($q) use ($request) {
+                $q->with('group')
+                ->whereHas('group', function ($q2) use ($request) {
+                    $q2->where('id', $request->value);
+                });
+            })
+            ->where('isBlocked', 0)
+            ->get();
+
+//            dd($users);
+
 
             $htmlRes = '<option value="0">Не выбрано</option>';
             if (!$users) {
@@ -137,15 +160,10 @@ class ServiceController extends Controller
                 return;
             }
 
-            if (!$users->roles->isEmpty()) {
-                foreach ($users->roles as $role) {
-                    $nameRole = $role->name;
-                    if (!$role->users->isEmpty()) {
-                        foreach ($role->users as $user) {
-                            $htmlRes .= "<option value='$user->id'>$user->surname $user->name $user->patron ($nameRole)</option>";
-                        }
-                    }
-
+            if (count($users) != 0) {
+                foreach ($users as $user) {
+                    $nameRole = $user->role->name;
+                    $htmlRes .= "<option value='$user->id'>$user->surname $user->name $user->patron ($nameRole)</option>";
                 }
             }
 

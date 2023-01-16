@@ -1,3 +1,7 @@
+@if(auth()->user()->isBlocked)
+    <script>window.location = "/logout";</script>
+@endif
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -108,7 +112,13 @@
                         class="sidebar-item  ">
                         <a href="{{route('calendar.index')}}" class='sidebar-link'>
                             <i class="bi bi-people-fill"></i>
-                            <span>Мои задачи <span class="badge bg-primary">{{getCountGoals()}}</span></span>
+
+                            <span>Мои задачи
+                                @if (getCountGoals() != 0)
+                                <span class="badge bg-primary">{{getCountGoals()}}</span>
+                                @endif
+                            </span>
+
                         </a>
                     </li>
 
@@ -117,8 +127,11 @@
                             class="sidebar-item  ">
                             <a href="{{route('claim.distribution')}}" class='sidebar-link'>
                                 <i class="bi bi-clipboard-plus-fill"></i>
-                                <span>Распределение заявок <span
-                                        class="badge bg-primary">{{getCountClaimsResponsibleIsNotRead()}}</span></span>
+                                <span>Распределение заявок
+                                    @if (getCountClaimsResponsibleIsNotRead() != 0)
+                                    <span class="badge bg-primary">{{getCountClaimsResponsibleIsNotRead()}}</span>
+                                    @endif
+                                </span>
                             </a>
                         </li>
                     @endif
@@ -128,7 +141,11 @@
                             class="sidebar-item  ">
                             <a href="{{route('claim.claimGroups')}}" class='sidebar-link'>
                                 <i class="bi bi-clipboard-fill"></i>
-                                <span>Заявки отдела <span class="badge bg-primary">{{getCountClaimsGroupIsNotRead()}}</span></span>
+                                <span>Заявки отдела
+                                    @if (getCountClaimsGroupIsNotRead() != 0)
+                                    <span class="badge bg-primary">{{getCountClaimsGroupIsNotRead()}}</span>
+                                    @endif
+                                </span>
                             </a>
                         </li>
                     @endif
@@ -138,7 +155,11 @@
                         class="sidebar-item  ">
                         <a href="{{route('claim.claimsMy')}}" class='sidebar-link'>
                             <i class="bi bi-clipboard-check-fill"></i>
-                            <span>Мои заявки <span class="badge bg-primary">{{myClaimsIsNotClosed()}}</span></span>
+                            <span>Мои заявки
+                                @if (myClaimsIsNotClosed() != 0)
+                                <span class="badge bg-primary">{{myClaimsIsNotClosed()}}</span>
+                                @endif
+                            </span>
                         </a>
                     </li>
 
@@ -147,7 +168,10 @@
                         class="sidebar-item  ">
                         <a href="{{route('claim.activeAd')}}" class='sidebar-link align-items-center'>
                             <i class="bi bi-badge-ad-fill"></i>
-                            <span>Активная <br> реклама </span><span class="badge bg-primary">{{getCountActiveAds()}}</span>
+                            <span>Активная @if (getCountActiveAds() != 0)<br>@endif реклама </span>
+                            @if (getCountActiveAds() != 0)
+                            <span class="badge bg-primary">{{getCountActiveAds()}}</span>
+                            @endif
                         </a>
                     </li>
                     @endif
@@ -157,8 +181,11 @@
                             class="sidebar-item  ">
                             <a href="{{route('claim.invoice')}}" class='sidebar-link'>
                                 <i class="bi bi-receipt"></i>
-                                <span>Счета <span
-                                        class="badge bg-primary">{{getCountNotCompleteInvoice()}}</span></span>
+                                <span>Счета
+                                    @if (getCountNotCompleteInvoice() != 0)
+                                    <span class="badge bg-primary">{{getCountNotCompleteInvoice()}}</span>
+                                    @endif
+                                </span>
                             </a>
                         </li>
                     @endif

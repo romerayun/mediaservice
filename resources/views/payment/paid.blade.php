@@ -88,7 +88,7 @@
                                     <th>Наименование услуги</th>
                                     <th>Сумма</th>
                                     <th>Статус</th>
-{{--                                    <th class="text-center">Действие</th>--}}
+                                    <th class="text-center">Редактирование</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -122,11 +122,11 @@
                                                 </span>
                                             @endif
                                         </td>
-{{--                                        <td class="text-center">--}}
-{{--                                            <button type="button" class="btn btn-primary changeStatus" data-bs-toggle="modal" data-bs-target="#changeStatus" attr-id="{{$item->id}}">--}}
-{{--                                                Изменить статус оплаты--}}
-{{--                                            </button>--}}
-{{--                                        </td>--}}
+                                        <td class="text-center">
+                                            <a href="{{route('payment.list-paid', ['claim' => $item->id])}}">
+                                                <i class="bi bi-pen-fill"></i>
+                                            </a>
+                                        </td>
                                     </tr>
 
                                 @endforeach

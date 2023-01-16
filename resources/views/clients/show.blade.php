@@ -311,6 +311,18 @@
                                         <form action="{{route('claims.store')}}" method="POST"
                                               enctype="multipart/form-data">
                                             @csrf
+
+                                            <div class="row mt-3">
+                                                <div class="col">
+                                                    <input class="form-check-input" name="isInvoiceC" id="isInvoiceC"
+                                                           type="checkbox" value=""> Нужен ли счет?
+                                                    <input type="hidden" name="isInvoice" value="0">
+
+                                                    <input class="form-check-input ms-3" name="notIncludeC" id="notIncludeC" type="checkbox" value=""> Не включать в план продаж
+                                                    <input type="hidden" name="notInclude" value="0">
+                                                </div>
+                                            </div>
+
                                             <div class="row mt-3">
                                                 <div class="col-lg-6 col-md-12">
                                                     <div class="form-group @if($errors->has('group_id')) is-invalid @endif">
@@ -435,13 +447,7 @@
                                                 </div>
                                             </div>
 
-                                            <div class="row mt-4">
-                                                <div class="col-12">
-                                                    <input class="form-check-input me-1" name="isInvoiceC" id="isInvoiceC"
-                                                           type="checkbox" value=""> Нужен ли счет?
-                                                    <input type="hidden" name="isInvoice" value="0">
-                                                </div>
-                                            </div>
+
 
                                             <div class="other-columns">
                                                 <div class="row mt-3 period-block d-none">

@@ -195,7 +195,7 @@ class ClaimController extends Controller
         $claim = Claim::find($id);
         $countAdds = claimsAdds($claim);
         $statusesClaim = StatusClaim::where('isVisible', 1)->get();
-        $users = UserM::all();
+        $users = UserM::where('isBlocked', 0)->get();
         $activeAd = ActiveAd::firstWhere('claim_id', $id);
         return view('claims.show', compact('claim', 'countAdds', 'statusesClaim', 'users', 'activeAd'));
     }
@@ -372,7 +372,7 @@ class ClaimController extends Controller
 
         claimsIsRead();
 
-        $users = UserM::all();
+        $users = UserM::where('isBlocked', 0)->get();
 
         return view('claims.distribution', compact('claims', 'users'));
     }
@@ -387,7 +387,7 @@ class ClaimController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        $users = UserM::all();
+        $users = UserM::where('isBlocked', 0)->get();
 
         return view('claims.distribution-complete', compact('claims', 'users'));
     }
@@ -535,7 +535,7 @@ class ClaimController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        $users = UserM::all();
+        $users = UserM::where('isBlocked', 0)->get();
 
 
         return view('claims.claim-group', compact('claims', 'users'));
@@ -549,7 +549,7 @@ class ClaimController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        $users = UserM::all();
+        $users = UserM::where('isBlocked', 0)->get();
 
         return view('claims.claims-my', compact('claims', 'users'));
     }
@@ -598,7 +598,7 @@ class ClaimController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        $users = UserM::all();
+        $users = UserM::where('isBlocked', 0)->get();
 
         return view('claims.claims-created', compact('claims', 'users'));
     }
@@ -612,7 +612,7 @@ class ClaimController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        $users = UserM::all();
+        $users = UserM::where('isBlocked', 0)->get();
 
         return view('claims.claims-close', compact('claims', 'users'));
     }

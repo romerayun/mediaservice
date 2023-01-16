@@ -387,7 +387,7 @@ class ClientController extends Controller
 
         $clients = Client::where('isAllow', 1)
             ->get();
-        $users = UserM::all();
+        $users = UserM::where('isBlocked', 0)->get();
 
         return view('clients.distribution', compact('clients', 'users'));
     }

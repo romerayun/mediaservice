@@ -27,6 +27,12 @@
                             <h4 class="card-title">
                                 Заявка №{{$claim->id}} - {{$claim->service->name}} <span
                                     class="ms-2 badge bg-{{$claim->histories->first()->status->color}}"> {{$claim->histories->first()->status->name}}</span>
+
+                                @if($claim->notInclude)
+                                    <span class="ms-1 badge bg-danger">
+                                        Не включена в план продаж
+                                    </span>
+                                @endif
                             </h4>
                             <small>{{$claim->getCreateDate()}}</small>
                         </div>

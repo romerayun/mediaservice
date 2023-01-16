@@ -8,10 +8,12 @@ use App\Mail\TestMail;
 use App\Mail\UserRegistration;
 use App\Models\Category;
 use App\Models\Claim;
+use App\Models\Client;
 use App\Models\Group;
 use App\Models\Role;
 use App\Models\SalesPlan;
 use App\Models\UserM;
+use App\Notifications\RemindClient;
 use http\Client\Curl\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,7 +37,9 @@ class UserController extends Controller
         if (Auth::attempt([
             'email' => $request->email,
             'password' => $request->password,
+            'isBlocked' => 0,
         ])) {
+
             return redirect()->route('calendar.index');
         }
 
@@ -56,7 +60,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = UserM::all();
+
+
+        $users = UserM::where('isBlocked', 0)->get();
         return view('users.index', compact('users'));
     }
 
@@ -256,8 +262,12 @@ class UserController extends Controller
     public function destroy($id)
     {
         $user = UserM::find($id);
-        $user->delete();
-        return redirect()->route('users.index')->with('success', 'Данные успешно удалены 👍');
+        $user->isBlocked = 1;
+        $user->save();
+
+        Client::where('user_id', $id)->update(['user_id'=>null]);
+        Claim::where('user_id', $id)->update(['user_id'=>null]);
+        return redirect()->route('users.index')->with('success', 'Пользователь успешно заблокирован 👍');
     }
 
 

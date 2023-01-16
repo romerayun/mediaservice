@@ -119,6 +119,8 @@ Route::resource('claims', ClaimController::class);
 
 Route::get('payments', [PaymentController::class, 'index'])->name('payment.index');
 Route::get('payments/paid', [PaymentController::class, 'paid'])->name('payment.paid');
+Route::get('payments/paid/{claim}', [PaymentController::class, 'paidListClaims'])->name('payment.list-paid');
+Route::delete('payments/paid/{id}', [PaymentController::class, 'deletePaidClaims'])->name('payment.del-paid');
 Route::post('payments', [PaymentController::class, 'storeStatus'])->name('payment.store');
 
 Route::get('calendar', [CalendarController::class, 'index'])->name('calendar.index');

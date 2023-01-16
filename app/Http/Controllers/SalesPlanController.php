@@ -107,7 +107,7 @@ class SalesPlanController extends Controller
     {
         $plan = SalesPlan::firstWhere('id', $id);
         $groups = Group::all();
-        $users = UserM::all();
+        $users = UserM::where('isBlocked', 0)->get();
         return view('plan.edit', compact('plan', 'users', 'groups'));
     }
 

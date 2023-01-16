@@ -3,7 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Models\Client;
+use App\Models\Role;
+use App\Models\UserM;
 use App\Notifications\RemindClient;
+use http\Client\Curl\User;
 use Illuminate\Console\Command;
 
 class RemindInteractionClientCommand extends Command
@@ -44,14 +47,32 @@ class RemindInteractionClientCommand extends Command
             if ($client->histories->first()->created_at) {
                 $lastDate = \Carbon\Carbon::make($client->histories->first()->created_at);
                 $diffDays = $lastDate->diff(now())->days;
-                if ($diffDays > 90) {
-                    if ($client->user_id) {
-                        if ($client->interactionsRemind == 0) {
+                if ($diffDays > 60) {
+                    if ($client->interactionsRemind == 0) {
+
+                        $client->interactionsRemind = 1;
+                        $client->save();
+
+                        $ropUser = Role::with('users')
+                            ->where('level', 2)
+                            ->get();
+
+                        if (count($ropUser) != 0) {
+                            foreach ($ropUser as $role) {
+                                if (count($role->users) != 0) {
+                                    foreach ($role->users as $user) {
+                                        $user->notify(new RemindClient($client));
+                                    }
+                                }
+                            }
+                        }
+
+                        if ($client->user_id) {
                             $client->user->notify(new RemindClient($client));
-                            $client->interactionsRemind = 1;
-                            $client->save();
                         }
                     }
+
+
                 } else {
                     $client->interactionsRemind = 0;
                     $client->save();

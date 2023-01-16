@@ -19,6 +19,20 @@
           enctype="multipart/form-data">
         @csrf
         @method('PUT')
+
+        <div class="row mt-3">
+            <div class="col-12">
+                <input class="form-check-input me-1" name="isInvoiceC" id="isInvoiceC"
+                       type="checkbox" value="" @if ($claim->isInvoice) checked @endif> Нужен ли счет?
+                <input type="hidden" name="isInvoice" value="@if ($claim->isInvoice) 1 @else 0 @endif">
+
+
+                <input class="form-check-input ms-3" name="notIncludeC" id="notIncludeC" type="checkbox" value="" @if ($claim->notInclude) checked @endif> Не включать в план продаж
+                <input type="hidden" name="notInclude" value="@if ($claim->notInclude) 1 @else 0 @endif">
+            </div>
+        </div>
+
+
         <div class="row mt-3">
             <div class="col-lg-6 col-md-12">
                 <div class="form-group @if($errors->has('group_id')) is-invalid @endif">
@@ -165,13 +179,6 @@
             </div>
         </div>
 
-        <div class="row mt-4">
-            <div class="col-12">
-                <input class="form-check-input me-1" name="isInvoiceC" id="isInvoiceC"
-                       type="checkbox" value="" @if ($claim->isInvoice) checked @endif> Нужен ли счет?
-                <input type="hidden" name="isInvoice" value="@if ($claim->isInvoice) 1 @else 0 @endif">
-            </div>
-        </div>
 
 
         <div class="other-columns">

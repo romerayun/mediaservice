@@ -26,6 +26,7 @@ class Claim extends Model
         'package_id',
         'creator',
         'comment',
+        'notInclude'
     ];
 
     public function getDate() {

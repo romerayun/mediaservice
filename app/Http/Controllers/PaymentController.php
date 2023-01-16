@@ -75,4 +75,19 @@ class PaymentController extends Controller
 
         return view('payment.paid', compact('claims', 'statusesPayment'));
     }
+
+    public function paidListClaims($id) {
+
+        $historiesPaidClaims = HistoryPayment::where('claim_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('payment.paid-claims', compact('historiesPaidClaims'));
+    }
+
+    public function deletePaidClaims($id) {
+        $hp = HistoryPayment::find($id);
+        $hp->delete();
+        return redirect()->back()->with('success', 'Данные успешно удалены 👍');
+    }
 }

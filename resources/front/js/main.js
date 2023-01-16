@@ -213,6 +213,25 @@ $(document).on("click", ".delete", function (event) {
     })
 });
 
+$(document).on("click", ".block", function (event) {
+    var form = $(this).closest("form");
+    event.preventDefault();
+    Swal.fire({
+        title: 'Вы действительно хотите заблокировать пользователя? 🥺',
+        text: "Вы сможете разблокировать пользователя в любой момент!",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#31ce36',
+        cancelButtonColor: '#f25961',
+        confirmButtonText: 'Заблокировать',
+        cancelButtonText: 'Отмена',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            form.submit();
+        }
+    })
+});
+
 $('.js-example-basic-single').select2();
 
 if (!currentUrl.includes('services') && !currentUrl.includes('edit') && !currentUrl.includes('distribution-claims') && !currentUrl.includes('distribution')) {

@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Claim;
 use App\Models\Client;
 use App\Models\Goal;
 use App\Models\Group;
+use App\Models\HistoryPayment;
+use App\Models\StatusPayment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CalendarController extends Controller
 {

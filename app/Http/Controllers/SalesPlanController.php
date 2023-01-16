@@ -94,7 +94,7 @@ class SalesPlanController extends Controller
      */
     public function show($id)
     {
-        //
+        abort(404);
     }
 
     /**
@@ -297,9 +297,11 @@ class SalesPlanController extends Controller
                 'categories.name',
                 DB::raw('sum(claims.amount) as claims_amount'))
             ->whereNull('categories.deleted_at')
-            ->where('claims.created_at', '>=', $start)
-            ->where('claims.created_at', '<=', $end)
+//            ->where('claims.created_at', '>=', $start)
+//            ->where('claims.created_at', '<=', $end)
             ->where('history_payments.status_id', '=', 4)
+            ->where('history_payments.created_at', '>=', $start)
+            ->where('history_payments.created_at', '<=', $end)
             ->groupBy('categories.id', 'categories.name')
             ->get();
 
@@ -328,9 +330,11 @@ class SalesPlanController extends Controller
                     DB::raw('sum(claims.amount) as claims_amount'))
                 ->whereNull('categories.deleted_at')
                 ->where('categories.id', $category->id)
-                ->where('claims.created_at', '>=', $start)
-                ->where('claims.created_at', '<=', $end)
+//                ->where('claims.created_at', '>=', $start)
+//                ->where('claims.created_at', '<=', $end)
                 ->where('history_payments.status_id', '=', 4)
+                ->where('history_payments.created_at', '>=', $start)
+                ->where('history_payments.created_at', '<=', $end)
                 ->groupBy('claims.creator')
                 ->get();
 

@@ -431,4 +431,31 @@ class ClientController extends Controller
 
     }
 
+    public function kanban() {
+
+        $statusClients = StatusClient::all();
+        $allData = array();
+        $clients = Client::where('user_id', Auth::user()->id)->get();
+
+        foreach ($statusClients as $key => $statusClient) {
+
+            $i = $key+1;
+
+            $allData[$i] = array('name' => $statusClient->name);
+
+
+            foreach ($clients as $index => $client) {
+                if ($client->histories->first()->status_id == $statusClient->id) {
+
+                    $allData[$i]['clients'][] = $client;
+                    unset($clients[$index]);
+                }
+            }
+
+        }
+
+
+        return view('clients.kanban', compact('allData'));
+    }
+
 }

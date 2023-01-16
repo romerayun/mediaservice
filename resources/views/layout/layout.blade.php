@@ -201,6 +201,18 @@
                     @endif
 
                     @if (auth()->user()->role->level <= 2)
+
+                    <li
+                        class="sidebar-item">
+                        <a href="{{route('claim.complete')}}" class='sidebar-link'>
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Выполненные заявки</span>
+                        </a>
+                    </li>
+
+
+                    <li class="sidebar-title">Статусы</li>
+
                     <li
                         class="sidebar-item">
                         <a href="{{route('status-client.index')}}" class='sidebar-link'>
@@ -279,13 +291,13 @@
                         </a>
                     </li>
 
-                    <li
-                        class="sidebar-item  ">
-                        <a href="{{route('status-material.index')}}" class='sidebar-link'>
-                            <i class="bi bi-info-circle-fill"></i>
-                            <span>Статус материалов</span>
-                        </a>
-                    </li>
+{{--                    <li--}}
+{{--                        class="sidebar-item  ">--}}
+{{--                        <a href="{{route('status-material.index')}}" class='sidebar-link'>--}}
+{{--                            <i class="bi bi-info-circle-fill"></i>--}}
+{{--                            <span>Статус материалов</span>--}}
+{{--                        </a>--}}
+{{--                    </li>--}}
 
                     <li
                         class="sidebar-item  ">

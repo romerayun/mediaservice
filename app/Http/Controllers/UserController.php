@@ -380,10 +380,12 @@ class UserController extends Controller
                 'categories.name',
                 DB::raw('sum(claims.amount) as claims_amount'))
             ->whereNull('categories.deleted_at')
-            ->where('claims.created_at', '>=', $start)
-            ->where('claims.created_at', '<=', $end)
+//            ->where('claims.created_at', '>=', $start)
+//            ->where('claims.created_at', '<=', $end)
             ->where('claims.creator', '=', $request->user_id)
             ->where('history_payments.status_id', '=', 4)
+            ->where('history_payments.created_at', '>=', $start)
+            ->where('history_payments.created_at', '<=', $end)
             ->groupBy('categories.id', 'categories.name')
             ->get();
 
@@ -417,10 +419,12 @@ class UserController extends Controller
                 )
                 ->whereNull('categories.deleted_at')
                 ->where('categories.id', $category->id)
-                ->where('claims.created_at', '>=', $start)
-                ->where('claims.created_at', '<=', $end)
+//                ->where('claims.created_at', '>=', $start)
+//                ->where('claims.created_at', '<=', $end)
                 ->where('claims.creator', '=', $request->user_id)
                 ->where('history_payments.status_id', '=', 4)
+                ->where('history_payments.created_at', '>=', $start)
+                ->where('history_payments.created_at', '<=', $end)
                 ->get();
 
             $allData[$i]['users'] = $claims;

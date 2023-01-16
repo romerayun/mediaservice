@@ -858,3 +858,76 @@ $('#find-sales').click(function () {
     }
 
 });
+
+$('#find-complete-claims').click(function () {
+
+    let validate = true;
+    let user_id = $("#user_id").val();
+    let month = $("#month").val();
+    if (user_id == 0) {
+        validate = false;
+        $("#user_id").parents('.form-group').addClass('is-invalid');
+    } else {
+        $("#user_id").parents('.form-group').removeClass('is-invalid');
+    }
+    if (month == '') {
+        validate = false;
+        $("#month-f").addClass('is-invalid');
+    } else {
+        $("#month-f").removeClass('is-invalid');
+    }
+
+    if (validate) {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('input[name="_token"]').val()
+            }
+        });
+
+        $.ajax({
+            url: '/claims/complete',
+            type: "POST",
+            data: {
+                'user_id': user_id,
+                'month': month,
+            },
+            success: function (response) {
+                $("#data").html(response);
+                showToast("Данные успешно загружены 👌", "linear-gradient(to right, #00B560, #00914D)");
+            },
+            error: function (error) {
+                showToast("Данные не найдены 😢", "linear-gradient(to right, #ED213A, #93291E)");
+            },
+
+        });
+    }
+
+});
+
+const swiper = new Swiper('.swiper', {
+    direction: 'horizontal',
+    slidesPerView: 4,
+    spaceBetween: 30,
+    grabCursor: true,
+
+    breakpoints: {
+        480: {
+            slidesPerView: 1,
+        },
+        640: {
+            slidesPerView: 2,
+            spaceBetween: 20,
+        },
+        768: {
+            slidesPerView: 4,
+            spaceBetween: 40,
+        },
+        1280: {
+            slidesPerView: 5,
+            spaceBetween: 50,
+        },
+    },
+    scrollbar: {
+        el: '.swiper-scrollbar',
+    },
+});

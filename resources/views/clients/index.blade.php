@@ -16,6 +16,7 @@
             @endif
 
             @if (auth()->user()->can('create', \App\Models\Client::class))
+                <a href="{{route('clients.kanban')}}" class="btn btn-sm btn-primary">Показать по статусам</a>
                 <a href="{{route('clients.create')}}" class="btn btn-sm btn-primary">Добавление</a>
                 <a href="{{route('clients.createFast')}}" class="btn btn-sm btn-success">Быстрое добавление</a>
             @endif

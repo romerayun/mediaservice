@@ -843,4 +843,87 @@ class ClaimController extends Controller
     }
 
 
+    public function complete() {
+        $groups = Group::all();
+        return view('claims.complete', compact('groups'));
+    }
+
+    public function getCompleteClaims(Request $request) {
+
+        $start = $request->month.'-00 00:00:00';
+        $end = $request->month.'-32 00:00:00';
+//
+//        $start = '2023-01-00 00:00:00';
+//        $end = '2023-01-32 00:00:00';
+
+
+
+        $user_id = $request->user_id;
+//        $user_id = 3;
+        $user = UserM::firstWhere('id', $user_id);
+
+        $claims = Claim::with('histories')
+            ->whereHas('histories', function ($q) use ($start, $end) {
+                $q->where('created_at', '>=', $start)
+                    ->where('created_at', '<=', $end)
+                    ->with('status')
+                    ->whereHas('status', function ($w) {
+                        $w->where('name', "Выполнено");
+                    });
+            })
+            ->where('user_id', $user_id)
+            ->get();
+
+
+
+        $res = '';
+        $res .= '<div class="col-12 col-md-12">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-body">
+                        <h4 class="card-title">Выполненные заявки сотрудника - ' . $user->getFullName() . '</h4>
+                        <table class="table mt-3 table-hover datatables">';
+
+        if (count($claims) == 0) {
+            $res .= "<h5 class='mt-3'>Заявок не найдено</h5>";
+        } else {
+
+
+            $res .= '<thead>
+                <tr>
+                    <th>№ заявки</th>
+                    <th>Категория услуги</th>
+                    <th>Наименование услуги</th>
+                    <th>Стоимость заявки</th>
+                </tr>
+            </thead><tbody>';
+
+            $amount = 0;
+
+            foreach ($claims as $claim) {
+
+                $amount += $claim->amount;
+
+                $res .= '<tr>
+                        <td>' . $claim->id . '</td>
+                        <td>' . $claim->service->category->name . '</td>
+                        <td>' . $claim->service->name . '</td>
+                        <td>' . money($claim->amount) . ' руб.</td>
+                    </tr>';
+
+            }
+
+            $res .= '<tr><td colspan="2"><b>Итого выполненно услуг на сумму:</b></td><td class="text-primary"><b>' . money($amount) . ' руб.</b></td></tr></tbody>';
+        }
+
+        $res .='  </table></div>
+                </div>
+            </div>
+        </div>';
+
+
+        return $res;
+
+    }
+
 }

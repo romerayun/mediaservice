@@ -71,6 +71,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('users/sales-category', [UserController::class, 'getSalesByCategory'])->name('users.salesCategory');
     Route::post('users/sales-category', [UserController::class, 'getSalesByCategoryAjax']);
 
+    Route::get('users/settings', [UserController::class, 'settings'])->name('users.settings');
+    Route::post('users/settings', [UserController::class, 'storeSettings'])->name('users.storeSettings');
     Route::resource('users', UserController::class);
 
     Route::group(['middleware' => 'access'], function () {

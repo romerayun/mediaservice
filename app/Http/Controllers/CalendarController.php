@@ -42,6 +42,11 @@ class CalendarController extends Controller
                 $duration = $ed->diffInRealMilliseconds($sd);
             }
 
+            $allDay = false;
+            if ($goal->allDay == 1) {
+                $allDay = true;
+            }
+
             $rrule = 0;
             if ($goal->rrule != null) {
                 $rrule = 1;
@@ -57,7 +62,7 @@ class CalendarController extends Controller
                 'borderColor' => $goal->color,
                 'display' => 'block',
                 'exposed' => 'Создал задачу: ' . $goal->exposed_user->getFullName(),
-                'allDay' => $goal->allDay,
+                'allDay' => $allDay,
                 'duration' => ['milliseconds' => $duration],
                 'rrule' => $goal->rrule,
                 'customRrule' => $rrule,

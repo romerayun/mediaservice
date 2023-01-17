@@ -1,7 +1,7 @@
 @component('mail::layout')
 {{-- Header --}}
 
-![Bla bla](https://www.chtotib.ru/images/logo.png)
+![Bla bla](https://crm-mediaservice.ru/images/logo/logo-black.png)
 @slot('header')
 
 @component('mail::header', ['url' => config('app.url')])

@@ -1,5 +1,5 @@
 @component('mail::message')
-    <p style="text-align: center !important; font-weight: bold; color: #222;">
+    <p style="text-align: center !important; font-weight: bold; color: #222; margin-top: 25px;">
         Ваши регистрационные данные 📨
     </p>
 
@@ -9,7 +9,7 @@
     **Ваш пароль:** {{$params['password']}}
 @endcomponent
 
-@component('mail::button', ['url' => 'https:/vk.com'])
+@component('mail::button', ['url' => config('app.url')])
 Перейти на сайт
 @endcomponent
 

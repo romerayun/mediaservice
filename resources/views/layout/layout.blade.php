@@ -322,6 +322,14 @@
 
                     <li
                         class="sidebar-item  ">
+                        <a href="{{route('users.settings')}}" class='sidebar-link'>
+                            <i class="bi bi-gear-wide-connected"></i>
+                            <span>Настройки</span>
+                        </a>
+                    </li>
+
+                    <li
+                        class="sidebar-item  ">
                         <a href="{{route('users.logout')}}" class='sidebar-link'>
                             <i class="bi bi-door-open-fill"></i>
                             <span>Выйти</span>
@@ -368,7 +376,7 @@
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end shadow-lg"
                                     aria-labelledby="topbarUserDropdown" style="">
-                                    <li><a class="dropdown-item" href="#">Настройки</a></li>
+                                    <li><a class="dropdown-item" href="{{route('users.settings')}}">Настройки</a></li>
                                     <li><a class="dropdown-item" href="{{route('users.logout')}}">Выход</a></li>
                                 </ul>
                             </div>

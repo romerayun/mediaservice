@@ -682,3 +682,7 @@ body.theme-dark .fc-popover {
 #auth #auth-left .auth-logo img {
     height: 6rem !important;
 }
+body .dropdown .avatar {
+    margin-right: 0rem !important;
+    margin-left: 0.6rem !important;
+}

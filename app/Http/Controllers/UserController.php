@@ -531,5 +531,53 @@ class UserController extends Controller
         return $res;
     }
 
+    public function settings() {
+        return view('users.settings');
+    }
+
+    public function storeSettings(Request $request) {
+
+        $request->validate(
+            [
+                'photo' => 'required|image',
+            ],
+            [
+                'photo.required' => 'Поле фото не может быть пустым',
+                'photo.image' => 'Формат загружемого файла должен быть (jpg, jpeg, png, bmp, gif, svg, or webp)',
+            ]
+        );
+        $userOld = UserM::firstWhere('id', Auth::user()->id);
+
+        DB::beginTransaction();
+
+        try {
+            if ($request->hasFile('photo')) {
+                if ($userOld->photo) {
+                    Storage::delete($userOld->logo);
+                }
+                $folder = date("Y-m-d");
+                $data['photo'] = $request->file('photo')->store("images/{$folder}");
+                $userOld->photo = $data['photo'];
+                $userOld->save();
+                DB::commit();
+            }
+
+            $request->session()->flash('success', 'Аватар успешно обновлен 👍');
+            return back();
+        } catch (\Exception $exception) {
+            DB::rollback();
+
+            $request->session()->flash('error', 'При обновлении автара произошла ошибка 😢' . $exception);
+            return back();
+        }
+    }
+//
+//if ($request->hasFile('photo')) {
+//$folder = date("Y-m-d");
+//$data['photo'] = $request->file('photo')->store("images/{$folder}");
+//$user->photo = $data['photo'];
+//$user->save();
+//DB::commit();
+//}
 
 }

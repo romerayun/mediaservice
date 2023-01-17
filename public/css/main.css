@@ -35,8 +35,6 @@
 }
 
 
-
-
 .overlay-spinner p {
     margin-top: 25px !important;
 }
@@ -679,4 +677,8 @@ body.theme-dark .fc-popover {
 
 .fc .fc-list-sticky .fc-list-day>* {
     z-index: 99;
+}
+
+#auth #auth-left .auth-logo img {
+    height: 6rem !important;
 }

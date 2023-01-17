@@ -17,8 +17,10 @@
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
-                        <h4 class="card-title mb-4 ">Добавление статуса заявки</h4>
-
+                        <h4 class="card-title mb-3 ">Добавление статуса заявки</h4>
+                        <p class="font-bold mb-4"><sup class="text-danger">*</sup> Внимание! Для работы системы созданы некоторые статусы, а именно - "Заявка создана", "Назначен ответственный", "Заявка закрыта", "Счет выставлен".
+                            <br>
+                            Повтор данных статусов может привести к неккоректной работе системы. </p>
                         <form action="{{route('status-claim.store')}}" method="POST">
                             @csrf
                             <div class="form-body">

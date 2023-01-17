@@ -18,7 +18,9 @@
                 <div class="card-content">
                     <div class="card-body">
                         <h4 class="card-title mb-4 ">Добавление статуса клиента</h4>
-
+                        <p class="font-bold mb-4"><sup class="text-danger">*</sup> Внимание! Для работы системы создан статус - "Создан клиент"
+                            <br>
+                            Повтор данного статуса может привести к неккоректной работе системы. </p>
                         <form action="{{route('status-client.store')}}" method="POST">
                             @csrf
                             <div class="form-body">

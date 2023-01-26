@@ -48,7 +48,7 @@
                         </td>
                         <td class="user-td">
                             @if ($item->user)
-                                {{$item->user->getFullName()}}
+                                <span>{{$item->user->getFullName()}}</span>
                             @else
                                 <span class="text-success">Свободный клиент</span>
                             @endif

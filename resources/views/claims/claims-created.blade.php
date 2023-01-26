@@ -48,7 +48,9 @@
                                             @endif
                                         </div>
                                         <hr>
-
+                                        <p class="mb-1">
+                                            <b>Клиент - </b> <a href="{{route('clients.show', ['client' => $claim->client_id])}}">{{$claim->client->name}}</a>
+                                        </p>
                                         <p class="mb-1">
                                             <b>Текущий статус - </b> {{$claim->histories->first()->status->name}}
                                         </p>
@@ -62,6 +64,11 @@
                                             <p>Взаимодействия</p>
                                             <a href="{{route('claims.show', ['claim' => $claim->id])}}" class="btn icon btn-primary"><i class="bi bi-eye-fill"></i></a>
                                             <a href="{{route('claims.edit', ['claim' => $claim->id])}}" class="btn icon btn-warning"><i class="bi bi-pencil-fill"></i></a>
+                                            <form action="{{route('claims.destroy', ['claim' => $claim->id])}}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <a href="#" class="btn icon btn-danger delete"><i class="bi bi-trash-fill"></i></a>
+                                            </form>
                                         </div>
 
                                     </div>

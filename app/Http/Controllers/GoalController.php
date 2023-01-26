@@ -49,7 +49,7 @@ class GoalController extends Controller
         $request->validate(
             [
                 'text' => 'required',
-                'user_id' => 'nullable|integer',
+                'user_id' => 'nullable',
             ],
             [
                 'text.required' => 'Поле описание не может быть пустым',
@@ -77,36 +77,76 @@ class GoalController extends Controller
             ]);
         }
 
+
+
         DB::beginTransaction();
         try {
-            $goal = Goal::create($request->all());
-            $goal_id = $goal->id;
+            if ($request->isMySelf == 0) {
+                $user_ids = explode(',', $request->user_id);
+                foreach ($user_ids as $user) {
+                    $request->merge([
+                        'user_id' => $user,
+                    ]);
+                    $goal = Goal::create($request->all());
+                    $goal_id = $goal->id;
 
-            if ($request->filepond) {
-                if (count($request->filepond) != 0) {
-                    $files = $request->file('filepond');
+                    if ($request->filepond) {
+                        if (count($request->filepond) != 0) {
+                            $files = $request->file('filepond');
 
-                    foreach ($files as $file) {
+                            foreach ($files as $file) {
 
-                        $filename = $file->getClientOriginalName();
-                        $folder = uniqid() . '-' . now()->timestamp;
+                                $filename = $file->getClientOriginalName();
+                                $folder = uniqid() . '-' . now()->timestamp;
 
-                        $file->storeAs('goals/' . $folder, $filename);
+                                $file->storeAs('goals/' . $folder, $filename);
 
-                        $goalFile = GoalFile::create([
-                            'goal_id' => $goal_id,
-                            'file' => 'goals/' . $folder . '/' . $filename,
-                        ]);
+                                $goalFile = GoalFile::create([
+                                    'goal_id' => $goal_id,
+                                    'file' => 'goals/' . $folder . '/' . $filename,
+                                ]);
 
+                            }
+                        }
+                    }
+
+                    DB::commit();
+                    $res[] = [
+                        'goal' => $goal,
+                        'user' => $goal->exposed_user->getFullName(),
+                    ];
+                }
+                return response()->json($res);
+            } else {
+                $goal = Goal::create($request->all());
+                $goal_id = $goal->id;
+
+                if ($request->filepond) {
+                    if (count($request->filepond) != 0) {
+                        $files = $request->file('filepond');
+
+                        foreach ($files as $file) {
+
+                            $filename = $file->getClientOriginalName();
+                            $folder = uniqid() . '-' . now()->timestamp;
+
+                            $file->storeAs('goals/' . $folder, $filename);
+
+                            $goalFile = GoalFile::create([
+                                'goal_id' => $goal_id,
+                                'file' => 'goals/' . $folder . '/' . $filename,
+                            ]);
+
+                        }
                     }
                 }
-            }
 
-            DB::commit();
-            return response()->json([
-                'goal' => $goal,
-                'user' => $goal->exposed_user->getFullName(),
-            ]);
+                DB::commit();
+                return response()->json([
+                    'goal' => $goal,
+                    'user' => $goal->exposed_user->getFullName(),
+                ]);
+            }
         } catch (\Exception $exception) {
             DB::rollback();
             return $exception;

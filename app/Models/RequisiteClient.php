@@ -25,6 +25,7 @@ class RequisiteClient extends Model
         'buhName',
         'phone',
         'client_id',
+        'comment'
     ];
 
     public function client()

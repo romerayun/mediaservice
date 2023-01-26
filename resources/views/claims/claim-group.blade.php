@@ -46,7 +46,9 @@
                                             {{$claim->creatorUser->getFullName()}}
                                         </div>
                                         <hr>
-
+                                        <p class="mb-1">
+                                            <b>Клиент - </b> <a href="{{route('clients.show', ['client' => $claim->client_id])}}">{{$claim->client->name}}</a>
+                                        </p>
                                         <p class="mb-1">
                                             <b>Текущий статус - </b> {{$claim->histories->first()->status->name}}
                                         </p>

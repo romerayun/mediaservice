@@ -19,26 +19,35 @@
                         <h4 class="card-title mb-4 ">Выберите данные для поиска</h4>
                             @csrf
                             <div class="row mt-3 user-form show">
-                                <div class="col-lg-4 col-md-12">
-                                    <div class="form-group">
-                                        <label>Выберите отдел: </label>
-                                        <select class="js-example-basic-single is-invalid" name="group_id"
-                                                id="group_id">
-                                            <option value="">Не выбрано</option>
-                                            @foreach($groups as $group)
-                                                <option value="{{$group->id}}">{{$group->name}}</option>
-                                            @endforeach
-                                        </select>
+{{--                                <div class="col-lg-4 col-md-12">--}}
+{{--                                    <div class="form-group">--}}
+{{--                                        <label>Выберите отдел: </label>--}}
+{{--                                        <select class="js-example-basic-single is-invalid" name="group_id"--}}
+{{--                                                id="group_id">--}}
+{{--                                            <option value="">Не выбрано</option>--}}
+{{--                                            @foreach($groups as $group)--}}
+{{--                                                <option value="{{$group->id}}">{{$group->name}}</option>--}}
+{{--                                            @endforeach--}}
+{{--                                        </select>--}}
 
-                                    </div>
-                                </div>
+{{--                                    </div>--}}
+{{--                                </div>--}}
 
-                                <div class="col-lg-4 col-md-12">
+                                <div class="col-lg-6 col-md-12">
                                     <div class="form-group">
                                         <label>Выберите сотрудника: </label>
-                                        <select disabled="disabled" class="js-example-basic-single is-invalid"
+                                        <select class="js-example-basic-single is-invalid"
                                                 name="user_id" id="user_id">
-                                            <option value="0">Выберите отдел</option>
+                                            <option value="0">Не выбрано</option>
+                                            @if(count($users) != 0)
+                                                @foreach($users as $group)
+                                                    @foreach($group->roles as $role)
+                                                        @foreach($role->users as $user)
+                                                            <option value="{{$user->id}}">{{$user->getFullName()}}</option>
+                                                        @endforeach
+                                                    @endforeach
+                                                @endforeach
+                                            @endif
                                         </select>
                                         <div class="invalid-feedback d-block">
                                             <span id="userError"></span>
@@ -46,7 +55,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-lg-4">
+                                <div class="col-lg-6 col-md-12">
                                     <div class="form-group ">
                                         <label>Выберите месяц: </label>
                                         <div class="d-flex">

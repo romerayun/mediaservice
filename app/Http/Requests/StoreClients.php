@@ -27,10 +27,10 @@ class StoreClients extends FormRequest
             'name' => 'required',
             'logo' => 'nullable|image',
             'phone' => 'required|regex:/^(\+7)(\()[0-9]{3}(\))[0-9]{3}(\-)[0-9]{2}(\-)[0-9]{2}$/',
-            'email' => 'required|email',
-            'address' => 'required',
-            'website' => 'required',
-            'date_of_birth' => 'required|date',
+            'email' => 'nullable|email',
+            'address' => 'nullable',
+            'website' => 'nullable',
+            'date_of_birth' => 'nullable|date',
 
         ];
     }

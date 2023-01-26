@@ -3,6 +3,7 @@ import 'filepond/dist/filepond.min.css';
 
 import AirDatepicker from 'air-datepicker';
 import 'air-datepicker/air-datepicker.css';
+import {user} from "../extensions/feather-icons/feather";
 const Swal = require('sweetalert2');
 
 
@@ -22,9 +23,7 @@ function resetCreateEvent() {
     if (!$(".user-form").hasClass('show')) {
         $(".user-form").addClass('show');
     }
-    $("#group_id").select2();
     $("#user_id").select2();
-    $("#user_id").attr('disabled', 'disabled');
     goalsFile.removeFiles();
     startDatePicker.update({
         timepicker: true,
@@ -301,10 +300,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         $('#newGoal').trigger('reset');
                         $('.user-form').addClass('show');
                         $("input[name='isMySelf']").val(0);
-                        if (isMySelf == 1) {
-                            calendar.refetchEvents();
-                            resetCreateEvent();
-                        }
+                        calendar.refetchEvents();
+                        resetCreateEvent();
+
                         showToast("Задача успешно создана 👌", "linear-gradient(to right, #00B560, #00914D)");
                         calendar.unselect();
                     },

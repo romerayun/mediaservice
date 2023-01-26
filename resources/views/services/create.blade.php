@@ -88,8 +88,11 @@
                                     <div class="col-lg-6 col-md-12">
                                         <div class="form-group @if($errors->has('user_id')) is-invalid @endif">
                                             <label>Выберите ответственного за распределение заявок: </label>
-                                            <select disabled="disabled" class="js-example-basic-single is-invalid" name="user_id" id="user_id">
-                                                <option value="0">Выберите отдел</option>
+                                            <select class="js-example-basic-single is-invalid" name="user_id" id="user_id">
+                                                <option value="0">Не выбрано</option>
+                                                @foreach($users as $user)
+                                                    <option value="{{$user->id}}">{{$user->getFullName()}} ({{$user->role->name}})</option>
+                                                @endforeach
                                             </select>
                                             @if($errors->has('user_id'))
                                                 <div class="invalid-feedback">

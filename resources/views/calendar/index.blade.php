@@ -3,15 +3,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.css"/>
 
     <div class="row align-items-center">
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-4">
             <h3>Календарь задач</h3>
         </div>
 
-        <div class="col-12 col-md-6 text-end">
-            <a href="{{route('goals.deadline')}}" class="btn  btn-danger">Просроченные задачи <span
+        <div class="col-12 col-md-8 text-end">
+            @if (auth()->user()->role->level <= 2)
+                <a href="{{route('goals.reports')}}" class="btn btn-sm btn-primary">Отчеты сотрудников</a>
+            @endif
+            <a href="{{route('goals.deadline')}}" class="btn btn-sm btn-danger">Просроченные задачи <span
                     class="badge bg-transparent">{{countExpiredGoal()}}</span></a>
-            <a href="{{route('goals.send')}}" class="btn  btn-primary">Отправленные задачи</a>
-            <a id="createGoalWithoutCalendar" class="btn  btn-success">Создать задачу</a>
+            <a href="{{route('goals.send')}}" class="btn btn-sm btn-primary">Отправленные задачи</a>
+            <a id="createGoalWithoutCalendar" class="btn btn-sm btn-success">Создать задачу</a>
         </div>
     </div>
 @endsection
@@ -53,26 +56,35 @@
                             </div>
 
                             <div class="row mt-3 user-form show">
-                                <div class="col-lg-12 col-md-12">
-                                    <div class="form-group">
-                                        <label>Выберите отдел: </label>
-                                        <select class="js-example-basic-single is-invalid" name="group_id"
-                                                id="group_id">
-                                            <option value="">Не выбрано</option>
-                                            @foreach($groups as $group)
-                                                <option value="{{$group->id}}">{{$group->name}}</option>
-                                            @endforeach
-                                        </select>
+{{--                                <div class="col-lg-12 col-md-12">--}}
+{{--                                    <div class="form-group">--}}
+{{--                                        <label>Выберите отдел: </label>--}}
+{{--                                        <select class="js-example-basic-single is-invalid" name="group_id"--}}
+{{--                                                id="group_id">--}}
+{{--                                            <option value="">Не выбрано</option>--}}
+{{--                                            @foreach($groups as $group)--}}
+{{--                                                <option value="{{$group->id}}">{{$group->name}}</option>--}}
+{{--                                            @endforeach--}}
+{{--                                        </select>--}}
 
-                                    </div>
-                                </div>
+{{--                                    </div>--}}
+{{--                                </div>--}}
 
                                 <div class="col-lg-12 col-md-12 mt-3">
                                     <div class="form-group">
                                         <label>Выберите ответственного за данную задачу: </label>
-                                        <select disabled="disabled" class="js-example-basic-single is-invalid"
-                                                name="user_id" id="user_id">
-                                            <option value="0">Выберите отдел</option>
+                                        <select class="js-example-basic-single is-invalid"
+                                                name="user_id[]" id="user_id" multiple="multiple">
+{{--                                            <option value="0">Не выбрано</option>--}}
+                                            @if(count($users) != 0)
+                                                @foreach($users as $group)
+                                                    @foreach($group->roles as $role)
+                                                        @foreach($role->users as $user)
+                                                            <option value="{{$user->id}}">{{$user->getFullName()}} ({{$user->role->name}})</option>
+                                                        @endforeach
+                                                    @endforeach
+                                                @endforeach
+                                            @endif
                                         </select>
                                         <div class="invalid-feedback d-block">
                                             <span id="userError"></span>

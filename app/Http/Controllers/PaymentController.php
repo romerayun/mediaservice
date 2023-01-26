@@ -15,11 +15,11 @@ class PaymentController extends Controller
 
         if (Auth::user()->role->level <= 2 || Auth::user()->role->level == 6) {
 
-            $claims = Claim::where('isClose', 0)
-                ->with('historiesPayment.status')
+            $claims = Claim::with('historiesPayment.status')
                 ->whereDoesntHave('historiesPayment.status', function ($q) {
                     $q->where('name', "Оплачен");
                 })
+                ->where('notInclude',0)
                 ->orderBy('created_at', 'desc')
                 ->get();
 
@@ -68,6 +68,7 @@ class PaymentController extends Controller
             ->whereHas('historiesPayment.status', function ($q) {
                 $q->where('name', "Оплачен");
             })
+            ->where('notInclude',0)
             ->orderBy('created_at', 'desc')
             ->get();
 

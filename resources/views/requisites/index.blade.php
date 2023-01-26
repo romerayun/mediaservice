@@ -221,6 +221,15 @@
                                     </div>
                                 </div>
 
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label>Дополнительный комментарий: </label>
+                                            <textarea class="form-control " id="comment" name="comment" rows="3" placeholder="Например, дополнительные реквизиты...">@if(old('comment')){{old('comment')}}@else{{$requisites->comment}}@endif</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <h4 class="card-title mb-4 mt-4">Информация о бухгалтере клиента</h4>
 
                                 <div class="row mt-3">

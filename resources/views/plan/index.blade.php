@@ -5,10 +5,10 @@
             <h3>Управление планом продаж</h3>
         </div>
         <div class="col-12 col-md-6 text-end">
-            <a href="{{route('plan.statistics')}}" class="btn  btn-primary">Продажи (План/Факт)</a>
-            <a href="{{route('plan.services')}}" class="btn  btn-primary">Продажи (по услугам)</a>
-            <a href="{{route('users.salesCategory')}}" class="btn  btn-primary">Продажи (по менеджерам)</a>
-            <a href="{{route('plan.create')}}" class="btn  btn-success">Добавление плана</a>
+            <a href="{{route('plan.statistics')}}" class="btn mb-2 btn-sm btn-primary">Продажи (План/Факт)</a>
+            <a href="{{route('plan.services')}}" class="btn mb-2 btn-sm btn-primary">Продажи (по услугам)</a>
+            <a href="{{route('users.salesCategory')}}" class="btn mb-2 btn-sm btn-primary">Продажи (по менеджерам)</a>
+            <a href="{{route('plan.create')}}" class="btn mb-2 btn-sm btn-success">Добавление плана</a>
         </div>
     </div>
 @endsection

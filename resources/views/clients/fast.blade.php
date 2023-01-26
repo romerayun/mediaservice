@@ -19,7 +19,7 @@
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label>Наименование организации: </label>
-                                            <input type="text" id="name" class="form-control @if($errors->has('name')) is-invalid @endif" name="name"
+                                            <input type="text" id="name" class="form-control typing-client @if($errors->has('name')) is-invalid @endif" name="name"
                                                    placeholder="Введите наименование..." required
                                                    value="{{old('name')}}">
                                             @if($errors->has('name'))
@@ -46,11 +46,25 @@
                                             @endif
                                         </div>
 
+                                        <div class="row mt-3 mb-3">
+                                            <div class="col-12">
+                                                <div class="form-group">
+                                                    <label>Дополнительный комментарий: </label>
+                                                    <textarea class="form-control " id="comment" name="comment" rows="3" placeholder="Например, дополнительные реквизиты...">{{old('comment')}}</textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
                                         <button type="submit" class="btn btn-success">Сохранить</button>
                                     </div>
                                 </div>
                             </div>
                         </form>
+
+                        <div class="content-client mt-4">
+
+                        </div>
                     </div>
                 </div>
             </div>

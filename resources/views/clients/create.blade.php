@@ -84,7 +84,7 @@
                                         <div class="form-group">
                                             <label>Адрес организации: </label>
                                             <input type="text" id="address" class="form-control @if($errors->has('address')) is-invalid @endif" name="address"
-                                                   placeholder="Введите адрес..." required
+                                                   placeholder="Введите адрес..."
                                                    value="{{old('address')}}">
                                             @if($errors->has('address'))
                                                 <div class="invalid-feedback">
@@ -98,7 +98,7 @@
                                         <div class="form-group">
                                             <label>E-mail: </label>
                                             <input type="email" id="email" class="form-control @if($errors->has('email')) is-invalid @endif" name="email"
-                                                   placeholder="Введите e-mail..." required
+                                                   placeholder="Введите e-mail..."
                                                    value="{{old('email')}}">
                                             @if($errors->has('email'))
                                                 <div class="invalid-feedback">
@@ -114,7 +114,7 @@
                                             <small class="text-info text-opacity-75">(Например.
                                                 <i>https://namesite.com</i>)</small>
                                             <input type="text" id="website" class="form-control @if($errors->has('website')) is-invalid @endif" name="website"
-                                                   placeholder="Введите адрес сайта..." required
+                                                   placeholder="Введите адрес сайта..."
                                                    value="{{old('website')}}">
                                             @if($errors->has('website'))
                                                 <div class="invalid-feedback">
@@ -129,7 +129,7 @@
                                             <label>День рождения компании: </label>
                                             <input type="text" id="date_of_birth" class="form-control @if($errors->has('date_of_birth')) is-invalid @endif"
                                                    name="date_of_birth"
-                                                   placeholder="Выберите дату рождения компании" required
+                                                   placeholder="Выберите дату рождения компании"
                                                    value="{{old('date_of_birth')}}">
                                             @if($errors->has('date_of_birth'))
                                                 <div class="invalid-feedback">
@@ -139,6 +139,15 @@
                                                     @endforeach
                                                 </div>
                                             @endif
+                                        </div>
+
+                                        <div class="row mt-3 mb-3">
+                                            <div class="col-12">
+                                                <div class="form-group">
+                                                    <label>Дополнительный комментарий: </label>
+                                                    <textarea class="form-control " id="comment" name="comment" rows="3" placeholder="Например, дополнительные реквизиты...">{{old('comment')}}</textarea>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <button type="submit" class="btn btn-success">Сохранить</button>

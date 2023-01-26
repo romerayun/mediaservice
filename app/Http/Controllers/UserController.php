@@ -131,13 +131,13 @@ class UserController extends Controller
             abort(403);
         }
         $ajaxMonth = date('Y-m');
-        $start = date('Y-m-00') . ' 00:00:00';
-        $end = date('Y-m-32') . ' 00:00:00';
+        $start = date('Y-m-01') . ' 00:00:00';
+        $end = date('Y-m-31') . ' 23:59:59';
         $planMonth = date('Y-m-01');
 
         if ($request->input('month')) {
-            $start = $request->input('month') . '-00 00:00:00';
-            $end = $request->input('month') . '-32 00:00:00';
+            $start = $request->input('month') . '-01 00:00:00';
+            $end = $request->input('month') . '-31 23:59:59';
             $planMonth = $request->input('month') . '-01';
             $ajaxMonth = $request->input('month');
         }
@@ -159,6 +159,7 @@ class UserController extends Controller
             ->select(DB::raw('SUM(amount) as total_amount'))
             ->whereNotNull('creator')
             ->where('creator', $id)
+            ->where('notInclude', '=',0)
             ->where('created_at', '>=', $start)
             ->where('created_at', '<=', $end)
             ->get();
@@ -172,6 +173,7 @@ class UserController extends Controller
                         $w->where('name', "Оплачен");
                     });
             })
+            ->where('notInclude', 0)
             ->where('creator', $id)
             ->where('created_at', '>=', $start)
             ->where('created_at', '<=', $end)
@@ -181,6 +183,7 @@ class UserController extends Controller
         $userClaims = Claim::where('creator', $id)
             ->where('created_at', '>=', $start)
             ->where('created_at', '<=', $end)
+            ->where('notInclude', 0)
             ->get();
 
         $user = UserM::firstWhere('id', $id);
@@ -274,14 +277,14 @@ class UserController extends Controller
     public function getClaimsPayment(Request $request)
     {
 
-        $start = date('Y-m-00') . ' 00:00:00';
-        $end = date('Y-m-32') . ' 00:00:00';
+        $start = date('Y-m-01') . ' 00:00:00';
+        $end = date('Y-m-31') . ' 23:59:59';
         $planMonth = date('Y-m-01');
         $id = $request->input('id');
 
         if ($request->input('month')) {
-            $start = $request->input('month') . '-00 00:00:00';
-            $end = $request->input('month') . '-32 00:00:00';
+            $start = $request->input('month') . '-01 00:00:00';
+            $end = $request->input('month') . '-31 23:59:59';
             $planMonth = $request->input('month') . '-01';
         }
 
@@ -295,6 +298,7 @@ class UserController extends Controller
             ->select(DB::raw('SUM(amount) as total_amount'))
             ->whereNotNull('creator')
             ->where('creator', $id)
+            ->where('notInclude', 0)
             ->where('created_at', '>=', $start)
             ->where('created_at', '<=', $end)
             ->get();
@@ -308,6 +312,7 @@ class UserController extends Controller
                         $w->where('name', "Оплачен");
                     });
             })
+            ->where('notInclude', 0)
             ->where('creator', $id)
             ->where('created_at', '>=', $start)
             ->where('created_at', '<=', $end)
@@ -361,13 +366,16 @@ class UserController extends Controller
 
     public function getSalesByCategory () {
         $groups = Group::all();
-        return view('users.sales', compact('groups'));
+        $users = Group::with('roles.users')
+            ->where('name', 'Отдел продаж')
+            ->get();
+        return view('users.sales', compact('groups', 'users'));
     }
 
     public function getSalesByCategoryAjax(Request $request) {
 
-        $start = $request->month.'-00 00:00:00';
-        $end = $request->month.'-32 00:00:00';
+        $start = $request->month.'-01 00:00:00';
+        $end = $request->month.'-31 23:59:59';
 //        $start = '2022-12-00 00:00:00';
 //        $end = '2022-12-32 00:00:00';
 //        $request->user_id = 1;
@@ -382,6 +390,7 @@ class UserController extends Controller
             ->whereNull('categories.deleted_at')
 //            ->where('claims.created_at', '>=', $start)
 //            ->where('claims.created_at', '<=', $end)
+            ->where('claims.notInclude', 0)
             ->where('claims.creator', '=', $request->user_id)
             ->where('history_payments.status_id', '=', 4)
             ->where('history_payments.created_at', '>=', $start)
@@ -421,6 +430,7 @@ class UserController extends Controller
                 ->where('categories.id', $category->id)
 //                ->where('claims.created_at', '>=', $start)
 //                ->where('claims.created_at', '<=', $end)
+                ->where('claims.notInclude', 0)
                 ->where('claims.creator', '=', $request->user_id)
                 ->where('history_payments.status_id', '=', 4)
                 ->where('history_payments.created_at', '>=', $start)
@@ -567,7 +577,7 @@ class UserController extends Controller
         } catch (\Exception $exception) {
             DB::rollback();
 
-            $request->session()->flash('error', 'При обновлении автара произошла ошибка 😢' . $exception);
+            $request->session()->flash('error', 'При обновлении автара произошла ошибка 😢');
             return back();
         }
     }
@@ -579,5 +589,32 @@ class UserController extends Controller
 //$user->save();
 //DB::commit();
 //}
+
+    public function repeatPassword(Request $request, $id) {
+
+        $user = UserM::firstWhere('id', $id);
+
+        $email = $user->email;
+        $password = Str::random(8);
+        $params = [
+            'email' => $email,
+            'password' => $password,
+        ];
+
+        $user->password = Hash::make($password);
+        $user->save();
+
+        Mail::to($email)->send(new UserRegistration($params));
+
+        if (Mail::failures()) {
+            $request->session()->flash('error', 'При отправке нового пароля произошла ошибка 😢');
+            return back();
+        } else {
+            $request->session()->flash('success', 'Новый пароль успешно отправлен 👍');
+            return back();
+        }
+
+
+    }
 
 }

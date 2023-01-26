@@ -92,10 +92,21 @@ class ClaimController extends Controller
                 ]);
             }
 
+            if ($request->anotherUser == '0') {
+                $request->merge([
+                    'creator' => Auth::user()->id,
+                ]);
+            } else {
+                $request->merge([
+                    'creator' => $request->creator,
+                ]);
+            }
+
+
             $request->merge([
                 'deadline' => $request->deadlineClaim,
                 'user_id' => null,
-                'creator' => Auth::user()->id,
+
             ]);
 
 
@@ -352,7 +363,9 @@ class ClaimController extends Controller
      */
     public function destroy($id)
     {
-        abort(404);
+        $claim = Claim::find($id);
+        $claim->delete();
+        return redirect()->back()->with('success', 'Данные успешно удалены 👍');
     }
 
     public function claimInputs()
@@ -926,4 +939,42 @@ class ClaimController extends Controller
 
     }
 
+
+    public function completeInvoice(Request $request)
+    {
+
+        $id = $request->id;
+
+        DB::beginTransaction();
+
+        try {
+
+            $claim = Claim::find($id);
+            $claim->invoice = ' ';
+            $claim->save();
+            $statusClaimId = StatusClaim::where('name', '=', 'Счет выставлен')->get()->first()->id;
+            HistoryClaim::create([
+                'user_id' => Auth::user()->id,
+                'status_id' => $statusClaimId,
+                'comment' => "Выставлен счет",
+                'claim_id' => $claim->id,
+            ]);
+
+            $statusPayment = StatusPayment::where('name', '=', 'Счет выставлен')->get()->first()->id;
+            HistoryPayment::create([
+                'user_id' => Auth::user()->id,
+                'status_id' => $statusPayment,
+                'comment' => 'Выставлен счет',
+                'claim_id' => $claim->id,
+            ]);
+
+
+            DB::commit();
+
+            return "success";
+        } catch (\Exception $exception) {
+            DB::rollback();
+            return "error";
+        }
+    }
 }

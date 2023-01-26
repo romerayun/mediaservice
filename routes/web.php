@@ -50,6 +50,7 @@ Route::get('/', function () {
 
 Route::middleware(['auth'])->group(function () {
 
+    Route::post('clients/typing', [ClientController::class, 'typing'])->name('clients.typing');
     Route::get('clients/kanban', [ClientController::class, 'kanban'])->name('clients.kanban');
     Route::get('clients/fast-add', [ClientController::class, 'createFast'])->name('clients.createFast');
     Route::post('clients/fast-add', [ClientController::class, 'storeFast'])->name('clients.storeFast');
@@ -71,6 +72,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('users/sales-category', [UserController::class, 'getSalesByCategory'])->name('users.salesCategory');
     Route::post('users/sales-category', [UserController::class, 'getSalesByCategoryAjax']);
 
+    Route::get('users/repeat-password/{user}', [UserController::class, 'repeatPassword'])->name('users.repeat-password');
     Route::get('users/settings', [UserController::class, 'settings'])->name('users.settings');
     Route::post('users/settings', [UserController::class, 'storeSettings'])->name('users.storeSettings');
     Route::resource('users', UserController::class);
@@ -83,14 +85,16 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('status-client', StatusC::class);
         Route::resource('status-claim', StatusClaimController::class);
         Route::resource('status-payment', StatusPaymentController::class);
-        Route::resource('history-client', HistoryClientController::class);
-    });
 
+    });
+    Route::resource('history-client', HistoryClientController::class);
     Route::get('plan/services', [SalesPlanController::class, 'services'])->name('plan.services');
     Route::get('plan/statistics', [SalesPlanController::class, 'statistics'])->name('plan.statistics');
     Route::get('plan/statistics/remoteData', [SalesPlanController::class, 'remoteData'])->name('plan.remote');
     Route::resource('plan', SalesPlanController::class);
 
+    Route::post('goals/reports', [CalendarController::class, 'createReport'])->name('goals.create-report');
+    Route::get('goals/reports', [CalendarController::class, 'reports'])->name('goals.reports');
     Route::get('goals/deadline', [GoalController::class, 'deadline'])->name('goals.deadline');
     Route::get('goals/send', [GoalController::class, 'send'])->name('goals.send');
     Route::post('goals/deadline/{goal}', [GoalController::class, 'repeatGoal'])->name('goals.repeatGoal');
@@ -112,10 +116,12 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('zip-download', [ZipController::class, 'downloadFiles'])->name('zip.downloadFiles');
 
+    Route::post('invoice/complete', [ClaimController::class, 'completeInvoice'])->name('claim.complete');
     Route::get('invoice', [ClaimController::class, 'createInvoice'])->name('claim.invoice');
     Route::get('invoice/closed', [ClaimController::class, 'closedInvoice'])->name('claim.closedInvoice');
     Route::post('invoice/{claim}', [ClaimController::class, 'storeInvoice'])->name('claim.storeInvoice');
     Route::post('invoice/closed/{claim}', [ClaimController::class, 'updateInvoice'])->name('claim.updateInvoice');
+
 
     Route::post('claims/complete', [ClaimController::class, 'getCompleteClaims']);
     Route::get('claims/complete', [ClaimController::class, 'complete'])->name('claim.complete');

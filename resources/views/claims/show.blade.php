@@ -131,11 +131,11 @@
 
                         @endif
 
-                        @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator)
+                        @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id)
                         @if ($claim->isClose == 0)
                             <hr>
                             <div class="form-check form-switch">
-                                <label class="form-check-label" for="close-claim">Закрыть задачу</label>
+                                <label class="form-check-label" for="close-claim">Закрыть заявку</label>
                                 <input class="form-check-input" name="close-claim" type="checkbox">
                             </div>
 
@@ -167,7 +167,29 @@
                                 </form>
                             </div>
                         @endif
-                            @endif
+                        @endif
+
+{{--                        @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id)--}}
+{{--                            <hr>--}}
+{{--                            <div class="form-check form-switch">--}}
+{{--                                <label class="form-check-label" for="send-claim">Отправить заявку</label>--}}
+{{--                                <input class="form-check-input" name="send-claim" type="checkbox" checked>--}}
+{{--                            </div>--}}
+
+{{--                            <div class="form-active-adds mt-3">--}}
+{{--                                <h4 class="card-title mb-0 mt-2">Перенаправление заявки</h4>--}}
+{{--                                <p class="mb-3 text-warning text-opacity-75"><i>Выберите сотрудника на которого Вы хотите перенаправить заявку--}}
+{{--                                    </i></p>--}}
+
+{{--                                <form action="{{route('claim.storeAd', ['claim' => $claim->id])}}" method="POST">--}}
+{{--                                    @csrf--}}
+
+
+{{--                                    <button type="submit" class="btn btn-success mt-3">Отправить</button>--}}
+{{--                                </form>--}}
+{{--                            </div>--}}
+{{--                        @endif--}}
+
                     </div>
                 </div>
             </div>
@@ -299,7 +321,7 @@
                                     <h4 class="card-title">Счет</h4>
                                     @if ($claim->invoice)
                                         <a href=" {{asset("/storage")."/".$claim->invoice}}"
-                                           class="btn icon icon-left btn-primary me-2 mt-2" download="true">
+                                           class="btn icon icon-left btn-primary me-2 mt-2" download>
                                             <i class="bi bi-file-arrow-down-fill"></i> Скачать счет</a>
                                     @else
                                         <p class="text-gray-500 m-0">Счет не готов 😢</p>
@@ -319,8 +341,8 @@
                                     @if (count($claim->files) != 0)
 
                                         @foreach($claim->files as $file)
-                                            <a href=" {{asset("/storage")."/".$claim->creatorUser->photo}}"
-                                               class="btn icon icon-left btn-primary me-1 mt-2" download="true">
+                                            <a href=" {{asset("/storage")."/".$file->file}}"
+                                               class="btn icon icon-left btn-primary me-1 mt-2" download="{{$file->file}}">
                                                 <i class="bi bi-file-arrow-down-fill"></i> Скачать файл</a>
                                         @endforeach
 
@@ -373,7 +395,7 @@
                                     <h4 class="card-title">Бриф</h4>
                                     @if ($claim->brif)
                                         <a href=" {{asset("/storage")."/".$claim->brif}}"
-                                           class="btn icon icon-left btn-primary me-2" download="true">
+                                           class="btn icon icon-left btn-primary me-2" download>
                                             <i class="bi bi-file-arrow-down-fill"></i> Скачать бриф</a>
                                     @else
                                         <p class="text-gray-500 m-0">Бриф не был загружен 😢</p>

@@ -44,7 +44,11 @@
                                             <a href="{{route('clients.show', ['client'=>$item->client->id])}}" target="_blank">{{$item->client->name}}</a>
                                         </td>
                                         <td>Заявка №{{$item->id}} - {{$item->service->name}}</td>
-                                        <td>{{$item->user->getFullName()}}</td>
+                                        @if ($item->user_id)
+                                            <td>{{$item->user->getFullName()}}</td>
+                                        @else
+                                            <td>-</td>
+                                        @endif
                                         <td>
                                             <span class="badge bg-success fs-6">
                                                 {{\Carbon\Carbon::parse($item->activeAd->first()->start_date)->format('d.m.Y')}}

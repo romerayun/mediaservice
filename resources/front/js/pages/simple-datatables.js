@@ -28,11 +28,12 @@ function adaptPagination(dataTable) {
     for (const paginationLink of paginationLinks) {
         paginationLink.classList.add("page-link")
     }
+
 }
 
 
 if (document.getElementById('datatables')) {
-    let dataTable = new simpleDatatables.DataTable("#datatables", {
+    var dataTable = new simpleDatatables.DataTable("#datatables", {
         searchable: true,
         fixedHeight: false,
         labels: {
@@ -40,14 +41,28 @@ if (document.getElementById('datatables')) {
             perPage: "{select} записей на странице",
             noRows: "Ничего не найдено",
             info: "Показано с {start} по {end} из {rows} записей",
-        }
+        },
     });
 
     dataTable.on("datatable.init", function () {
         adaptPageDropdown(dataTable)
         adaptPagination(dataTable)
-    })
+    });
 
-    dataTable.on("datatable.page", adaptPagination)
+    dataTable.on('datatable.perpage', function()  {
+        $('.js-example-basic-single').select2();
+    });
+    dataTable.on('datatable.sort', function()  {
+        $('.js-example-basic-single').select2();
+    });
+    dataTable.on('datatable.search', function() {
+        $('.js-example-basic-single').select2();
+    });
+    dataTable.on("datatable.page", function () {
+        $('.js-example-basic-single').select2();
+        adaptPagination(dataTable);
+    });
+
 
 }
+

@@ -44,6 +44,9 @@ class ClientLprsBirthdaysCommand extends Command
         $clients = Client::where('isAllow', 1)
             ->whereNotNull('user_id')
             ->with('lprs')
+            ->whereHas('lprs', function ($q) {
+                $q->whereNotNull('date_of_birth');
+            })
             ->get();
 
         foreach ($clients as $client) {

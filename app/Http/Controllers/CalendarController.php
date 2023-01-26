@@ -6,8 +6,10 @@ use App\Models\Claim;
 use App\Models\Client;
 use App\Models\Goal;
 use App\Models\Group;
+use App\Models\HistoryClient;
 use App\Models\HistoryPayment;
 use App\Models\StatusPayment;
+use App\Models\UserM;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -19,7 +21,10 @@ class CalendarController extends Controller
     public function index()
     {
         $groups = Group::all();
-        return view('calendar.index', compact('groups'));
+        $users = Group::with('roles.users')
+//            ->where('name', 'Отдел продаж')
+            ->get();
+        return view('calendar.index', compact('groups', 'users'));
     }
 
     public function getGoals()
@@ -144,4 +149,130 @@ class CalendarController extends Controller
         return $id;
     }
 
+
+    public function reports(Request $request) {
+        $users = Group::with('roles.users')
+            ->where('name', 'Отдел продаж')
+            ->get();
+
+        return view('goals.report', compact('users'));
+    }
+
+
+    public function createReport(Request $request) {
+
+        $start = $request->day.' 00:00:01';
+        $end = $request->day.' 23:59:59';
+
+        $user_id = $request->user_id;
+        $user = UserM::firstWhere('id', $user_id);
+
+        $historiesC = HistoryClient::where('user_id', $user_id)
+                    ->where('created_at', '>=', $start)
+                    ->where('created_at', '<=', $end)
+                    ->orderBy('status_id', 'asc')
+                    ->get();
+
+        $goals = Goal::where('exposed', $user_id)
+            ->where('updated_at', '>=', $start)
+            ->where('updated_at', '<=', $end)
+            ->orderBy('status', 'asc')
+            ->get();
+
+
+        $res = '';
+        $res .= '<div class="col-12 col-md-12">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-body">
+                        <h4 class="card-title">Отчет сотрудника - ' . $user->getFullName() . ' (за '. Carbon::create($request->day)->format('d.m.Y') .')</h4>
+
+                        <h6 class="mt-4">Взаимодействия с клиентами</h6>
+                        <table class="table mt-2 table-hover datatables">';
+
+        if (count($historiesC) == 0) {
+            $res .= "<p class='mt-3'>К сожалению, ничего не найдно</p>";
+        } else {
+
+
+            $res .= '<thead>
+                <tr>
+                    <th>№</th>
+                    <th>Клиент</th>
+                    <th>Описание</th>
+                    <th>Статус</th>
+                </tr>
+            </thead><tbody>';
+
+            $i = 1;
+            foreach ($historiesC as $history) {
+                $res .= '<tr>
+                        <td>' . $i . '</td>
+                        <td>' . $history->client->name . '</td>
+                        <td>' . $history->comment . '</td>
+                        <td><span class="badge custom-bg-' . $history->status->color . '">' . $history->status->name . '</span></td>
+                    </tr>';
+
+                $i++;
+            }
+
+        }
+        $res .= '</tbody></table>';
+        $res .= '<h6 class="mt-4">Задачи сотрудника</h6>
+                        <table class="table mt-2 table-hover datatables">';
+
+        if (count($goals) == 0) {
+            $res .= "<p class='mt-3'>К сожалению, ничего не найдно</p>";
+        } else {
+            $res .= '<thead>
+                <tr>
+                    <th>№</th>
+                    <th>Выполнить до</th>
+                    <th>Клиент</th>
+                    <th>Описание</th>
+                    <th>Статус</th>
+                </tr>
+            </thead><tbody>';
+
+            $i = 1;
+            foreach ($goals as $goal) {
+
+                $res .= '<tr>
+                        <td>' . $i . '</td>';
+
+                $res .= '<td>
+                        '.Carbon::create($goal->deadline)->format('d.m.Y H:i').'
+                        </td>';
+
+                if ($goal->client_id != null) {
+                    $res .= '<td>' . $goal->client->name . '</td>';
+                } else {
+                    $res .= '<td>-</td>';
+                }
+
+                $res .= '<td>' . $goal->text . '</td>';
+
+                if ($goal->status == 0) {
+                    $res .= '<td><span class="badge bg-danger">Не выполнено</span></td>';
+                } else if ($goal->status == 1) {
+                    $res .= '<td><span class="badge bg-success">Выполнено</span></td>';
+                } else {
+                    $res .= '<td><span class="badge bg-danger">Просрочена</span></td>';
+                }
+
+                $res .= '</tr>';
+                $i++;
+            }
+
+//            $res .= '<tr><td colspan="2"><b>Итого выполненно услуг на сумму:</b></td><td class="text-primary"><b>' . money($amount) . ' руб.</b></td></tr></tbody>';
+        }
+
+        $res .='  </table></div>
+                </div>
+            </div>
+        </div>';
+
+
+        return $res;
+    }
 }

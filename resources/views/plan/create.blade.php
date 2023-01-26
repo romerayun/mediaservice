@@ -23,33 +23,42 @@
                             @csrf
                             <div class="form-body">
                                 <div class="row mt-3">
-                                    <div class="col-lg-6 col-md-12">
-                                        <div class="form-group @if($errors->has('group_id')) is-invalid @endif">
-                                            <label>Выберите отдел: </label>
-                                            <select class="js-example-basic-single is-invalid" name="group_id"
-                                                    id="group_id">
-                                                <option value="">Не выбрано</option>
-                                                @foreach($groups as $group)
-                                                    <option value="{{$group->id}}">{{$group->name}}</option>
-                                                @endforeach
-                                            </select>
-                                            @if($errors->has('group_id'))
-                                                <div class="invalid-feedback">
-                                                    <i class="bx bx-radio-circle"></i>
-                                                    @foreach($errors->get('group_id') as $message)
-                                                        {{$message}}<br>
-                                                    @endforeach
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
+{{--                                    <div class="col-lg-6 col-md-12">--}}
+{{--                                        <div class="form-group @if($errors->has('group_id')) is-invalid @endif">--}}
+{{--                                            <label>Выберите отдел: </label>--}}
+{{--                                            <select class="js-example-basic-single is-invalid" name="group_id"--}}
+{{--                                                    id="group_id">--}}
+{{--                                                <option value="">Не выбрано</option>--}}
+{{--                                                @foreach($groups as $group)--}}
+{{--                                                    <option value="{{$group->id}}">{{$group->name}}</option>--}}
+{{--                                                @endforeach--}}
+{{--                                            </select>--}}
+{{--                                            @if($errors->has('group_id'))--}}
+{{--                                                <div class="invalid-feedback">--}}
+{{--                                                    <i class="bx bx-radio-circle"></i>--}}
+{{--                                                    @foreach($errors->get('group_id') as $message)--}}
+{{--                                                        {{$message}}<br>--}}
+{{--                                                    @endforeach--}}
+{{--                                                </div>--}}
+{{--                                            @endif--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
 
-                                    <div class="col-lg-6 col-md-12">
+                                    <div class="col-lg-12 col-md-12">
                                         <div class="form-group @if($errors->has('user_id')) is-invalid @endif">
                                             <label>Выберите сотрудника: </label>
-                                            <select disabled="disabled" class="js-example-basic-single is-invalid"
+                                            <select class="js-example-basic-single is-invalid"
                                                     name="user_id" id="user_id">
-                                                <option value="0">Выберите отдел</option>
+                                                <option value="0">Не выбрано</option>
+                                                @if(count($users) != 0)
+                                                    @foreach($users as $group)
+                                                    @foreach($group->roles as $role)
+                                                        @foreach($role->users as $user)
+                                                            <option value="{{$user->id}}">{{$user->getFullName()}}</option>
+                                                        @endforeach
+                                                        @endforeach
+                                                    @endforeach
+                                                @endif
                                             </select>
                                             @if($errors->has('user_id'))
                                                 <div class="invalid-feedback">

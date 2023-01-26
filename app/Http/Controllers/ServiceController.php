@@ -36,7 +36,8 @@ class ServiceController extends Controller
     {
         $categories = Category::all();
         $groups = Group::all();
-        return view('services.create', compact('groups', 'categories'));
+        $users = UserM::where('isBlocked', 0)->get();
+        return view('services.create', compact('groups', 'categories', 'users'));
     }
 
     /**
@@ -75,7 +76,7 @@ class ServiceController extends Controller
      */
     public function show($id)
     {
-        //
+        abort(404);
     }
 
     /**
@@ -89,8 +90,9 @@ class ServiceController extends Controller
         $service = Service::firstWhere('id', $id);
         $categories = Category::all();
         $groups = Group::all();
-        if (!$service->user_id) $users = false;
-        else $users = Group::with('roles.users')->find($service->group_id);
+        $users = UserM::where('isBlocked', 0)->get();
+//        if (!$service->user_id) $users = false;
+//        else $users = Group::with('roles.users')->find($service->group_id);
         return view('services.edit', compact('service', 'categories', 'groups', 'users'));
     }
 

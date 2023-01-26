@@ -2,7 +2,7 @@
 @section('page-heading')
     <div class="row align-items-center">
         <div class="col-12 col-md-6">
-            <h3>Управление пользователями</h3>
+            <h3>Пользователи</h3>
         </div>
         <div class="col-12 col-md-6 text-end">
             <a href="{{route('users.create')}}" class="btn  btn-success">Добавление</a>
@@ -43,11 +43,19 @@
                             <p class="mb-1"><b>E-Mail: </b><a href="mailto:{{$user->email}}">{{$user->email}}</a></p>
 
 
+                            @if (auth()->user()->role->level <= 2)
                             <div class="divider divider-left">
                                 <div class="divider-text">Действия</div>
 
                             </div>
-                            <div class="d-inline-block">
+
+                            <div class="d-block">
+
+                            </div>
+                            <div class="d-inline-block w-100">
+                                <a href="{{route('users.repeat-password', ['user' => $user->id])}}"
+                                   class="btn btn-sm icon btn-success me-2 mb-2"><i class="bi bi-arrow-repeat"></i> Повторить пароль</a>
+
                                 <a href="{{route('users.show', ['user' => $user->id])}}"
                                    class="btn btn-sm icon btn-primary me-2 mb-2"><i class="bi bi-eye-fill"></i> Открыть</a>
                                 <a href="{{route('users.edit', ['user' => $user->id])}}"
@@ -57,11 +65,12 @@
                                       class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn icon btn-danger me-2 mb-2 block btn-sm"><i
+                                    <button type="submit" class="btn icon btn-danger mb-2 block btn-sm"><i
                                             class="bi bi-lock-fill"></i> Заблокировать
                                     </button>
                                 </form>
                             </div>
+                            @endif
                         </div>
                     </div>
                 </div>

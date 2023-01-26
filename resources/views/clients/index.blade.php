@@ -147,11 +147,11 @@
                                 <a href="{{route('requisites.edit', ['requisite' => $client->requisite->id])}}"
                                    class="btn btn-sm icon btn-success me-2 mb-2"><i class="bi bi-file-binary-fill"></i>
                                     Управление реквизитами</a>
-                                @if (auth()->user()->can('update', $client))
+{{--                                @if (auth()->user()->can('update', $client))--}}
                                     <a href="{{route('clients.edit', ['client' => $client->id])}}"
                                     class="btn btn-sm icon btn-primary me-2 mb-2"><i class="bi bi-pencil"></i>
                                     Редактировать</a>
-                                @endif
+{{--                                @endif--}}
                                 @if (auth()->user()->can('delete', $client))
                                     <form action="{{route('clients.destroy', ['client' => $client->id])}}" method="POST" class="d-inline-block">
                                         @csrf

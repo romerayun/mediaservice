@@ -41,8 +41,11 @@ class LprController extends Controller
         DB::beginTransaction();
         try {
 
-            $date = Carbon::createFromFormat('d.m.Y', $request->date_of_birth)->format('Y-m-d');
-            $request->merge(['date_of_birth' => $date, 'client_id' => $client_id]);
+            if ($request->date_of_birth) {
+                $date = Carbon::createFromFormat('d.m.Y', $request->date_of_birth)->format('Y-m-d');
+                $request->merge(['date_of_birth' => $date]);
+            }
+            $request->merge(['client_id' => $client_id]);
             $lpr = LprClient::create($request->all());
             DB::commit();
             $request->session()->flash('success', 'Данные успешно добавлены 👍');
@@ -100,8 +103,11 @@ class LprController extends Controller
     public function update(Request $request, $id)
     {
         $lpr = LprClient::firstWhere('id', $id);
-        $date = Carbon::createFromFormat('d.m.Y', $request->date_of_birth)->format('Y-m-d');
-        $request->merge(['date_of_birth' => $date]);
+        if ($request->date_of_birth) {
+            $date = Carbon::createFromFormat('d.m.Y', $request->date_of_birth)->format('Y-m-d');
+            $request->merge(['date_of_birth' => $date]);
+        }
+
         $lpr->update($request->all());
         return redirect()->back()->with('success', 'Данные успешно обновлены 👍');
     }

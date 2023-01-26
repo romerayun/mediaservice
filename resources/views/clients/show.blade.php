@@ -7,7 +7,16 @@
                 class="badge custom-bg-{{$listStatusesClient->first()->status->color}} fs-6"><b>Текущий статус клиента</b> - {{$listStatusesClient->first()->status->name}}</span>
         </div>
         <div class="col-12 col-md-6 text-end">
-            <a href="{{route('clients.index')}}" class="btn btn-sm btn-primary">Вернуться назад</a>
+            <a href="{{route('lpr.createLpr', ['client_id' => $client->id])}}"
+               class="btn btn-sm icon btn-success me-2 mb-2"><i class="bi bi-people-fill"></i>
+                Управление ЛПР</a>
+            <a href="{{route('requisites.edit', ['requisite' => $client->requisite->id])}}"
+               class="btn btn-sm icon btn-success me-2 mb-2"><i class="bi bi-file-binary-fill"></i>
+                Управление реквизитами</a>
+            <a href="{{route('clients.edit', ['client' => $client->id])}}"
+               class="btn btn-sm icon btn-primary me-2 mb-2"><i class="bi bi-pencil"></i>
+                Редактировать</a>
+            <a href="{{route('clients.index')}}" class="btn icon btn-sm btn-primary mb-2"><i class="bi bi-arrow-left"></i> Вернуться назад</a>
         </div>
     </div>
 
@@ -48,6 +57,9 @@
                             <span class="text-danger">Не заполнено</span> @endif</p>
                     <p class="mb-1"><b>День рождения
                             компании: </b>@if($client->date_of_birth){{$client->getUntilBirthday()}} @else <span
+                            class="text-danger">Не заполнено</span> @endif</p>
+
+                    <p class="mb-1"><b>Комментарий: </b>@if($client->comment){{$client->comment}} @else <span
                             class="text-danger">Не заполнено</span> @endif</p>
                 </div>
             </div>
@@ -148,7 +160,7 @@
                                     <ul class="nav nav-tabs" id="myTab" role="tablist">
                                         @if (auth()->user()->can('interaction-client', $client))
                                             <li class="nav-item" role="presentation">
-                                                <a class="nav-link active" id="request-tab" data-bs-toggle="tab" href="#request"
+                                                <a class="nav-link @if($errors->has('deadlineClaim') || $errors->has('amount')) @else active @endif" id="request-tab" data-bs-toggle="tab" href="#request"
                                                    role="tab" aria-controls="request" aria-selected="false" tabindex="-1">Добавление
                                                     статуса</a>
                                             </li>
@@ -163,13 +175,14 @@
                                         @endif
                                         @if (auth()->user()->can('interaction-client', $client))
                                         <li class="nav-item" role="presentation">
-                                            <a class="nav-link" id="create-request-tab" data-bs-toggle="tab"
+                                            <a class="nav-link @if($errors->has('deadlineClaim') || $errors->has('amount')) active @endif" id="create-request-tab" data-bs-toggle="tab"
                                                href="#create-request" role="tab" aria-controls="create-request"
                                                aria-selected="false" tabindex="-1">Создание заявки</a>
                                         </li>
                                         @endif
                                         @if (auth()->user()->can('interaction-client', $client))
                                         <li class="nav-item" role="presentation">
+
                                             <a class="nav-link" id="history-tab" data-bs-toggle="tab" href="#history"
                                                role="tab" aria-controls="history" aria-selected="false" tabindex="-1">История
                                                 заявок</a>
@@ -179,7 +192,7 @@
                                 </div>
 
                                 <div class="tab-content mt-4">
-                                    <div class="tab-pane fade show active" id="request" role="tabpanel"
+                                    <div class="tab-pane fade show @if($errors->has('deadlineClaim') || $errors->has('amount')) @else active @endif" id="request" role="tabpanel"
                                          aria-labelledby="request-tab">
                                         <h5 class="text-primary">Изменение статуса клиента</h5>
 
@@ -305,7 +318,7 @@
                                         </ol>
                                     </div>
 
-                                    <div class="tab-pane fade show" id="create-request" role="tabpanel"
+                                    <div class="tab-pane fade show @if($errors->has('deadlineClaim') || $errors->has('amount')) active @endif" id="create-request" role="tabpanel"
                                          aria-labelledby="create-request-tab">
                                         <h5 class="text-primary">Создание заявки</h5>
                                         <form action="{{route('claims.store')}}" method="POST"
@@ -320,6 +333,39 @@
 
                                                     <input class="form-check-input ms-3" name="notIncludeC" id="notIncludeC" type="checkbox" value=""> Не включать в план продаж
                                                     <input type="hidden" name="notInclude" value="0">
+
+                                                    <input class="form-check-input ms-3" name="anotherUserC" id="anotherUserC" type="checkbox" value=""> Внештатный сотрудник
+                                                    <input type="hidden" name="anotherUser" id="anotherUser" value="0">
+                                                </div>
+                                            </div>
+
+
+                                            <div class="row mt-3 d-none users-form">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group @if($errors->has('group_id')) is-invalid @endif">
+                                                        <label>Выберите сотрудника: </label>
+                                                        <select class="js-example-basic-single is-invalid" name="creator"
+                                                                id="creator">
+                                                            <option value="">Не выбрано</option>
+                                                            @if(count($users) != 0)
+                                                                @foreach($users as $group)
+                                                                    @foreach($group->roles as $role)
+                                                                        @foreach($role->users as $user)
+                                                                            <option value="{{$user->id}}">{{$user->getFullName()}}</option>
+                                                                        @endforeach
+                                                                    @endforeach
+                                                                @endforeach
+                                                            @endif
+                                                        </select>
+                                                        @if($errors->has('group_id'))
+                                                            <div class="invalid-feedback">
+                                                                <i class="bx bx-radio-circle"></i>
+                                                                @foreach($errors->get('group_id') as $message)
+                                                                    {{$message}}<br>
+                                                                @endforeach
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -415,6 +461,7 @@
                                                         <input type="text" id="amount"
                                                                class="form-control @if($errors->has('amount')) is-invalid @endif"
                                                                name="amount"
+                                                               required
                                                                placeholder="Введите стоимость..."
                                                                value="{{old('amount')}}">
                                                         @if($errors->has('amount'))
@@ -528,7 +575,7 @@
 
                                             <div class="row mt-4">
                                                 <div class="col-12">
-                                                    <button type="submit" class="btn btn-success">Создать заявку</button>
+                                                    <button type="submit" class="btn btn-success create-claim">Создать заявку</button>
                                                 </div>
                                             </div>
 

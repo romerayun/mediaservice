@@ -9,6 +9,7 @@ import 'filepond/dist/filepond.min.css';
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 import {DataTable} from "../extensions/simple-datatables";
+import th from "air-datepicker/locale/th";
 
 FilePond.registerPlugin(FilePondPluginImagePreview);
 
@@ -84,6 +85,15 @@ new AirDatepicker('.datepicker', {
     altFieldDateFormat: 'yyyy-MM-dd HH:mm:00',
     altField: '#deadline'
 });
+
+if (document.getElementById('report-datepicker')) {
+    new AirDatepicker('#report-datepicker', {
+        isMobile: true,
+        autoClose: true,
+        altFieldDateFormat: 'yyyy-MM-dd',
+        altField: '#deadline'
+    });
+}
 
 if (document.getElementById('deadlineClaim-datepicker')) {
     new AirDatepicker('.deadlineClaim', {
@@ -213,6 +223,62 @@ $(document).on("click", ".delete", function (event) {
     })
 });
 
+$(document).on('select2:open', () => {
+    document.querySelector('.select2-search__field').focus();
+});
+
+$(document).on("click", ".create-claim", function (event) {
+    var form = $(this).closest("form");
+    event.preventDefault();
+
+    let submit = true;
+
+    if ($(".service-group").val() == 0) {
+        $(".service-group").parents('.form-group').addClass('is-invalid');
+        submit = false;
+    } else {
+        $(".service-group").parents('.form-group').removeClass('is-invalid');
+        submit = true;
+    }
+
+    if ($("#anotherUserC").prop('checked')) {
+        if ($("#creator").val() == 0) {
+            $("#creator").parents('.form-group').addClass('is-invalid');
+            submit = false;
+        } else {
+            $("#creator").parents('.form-group').removeClass('is-invalid');
+            submit = true;
+        }
+    }
+
+
+    if ($("#deadlineClaim").val() == '') {
+        $("#deadlineClaim-datepicker").addClass('is-invalid');
+        submit = false;
+    } else {
+        $("#deadlineClaim-datepicker").removeClass('is-invalid');
+        submit = true;
+    }
+
+    if ($("#amount").val() == '') {
+        $("#amount").addClass('is-invalid');
+        submit = false;
+    } else {
+        $("#amount").removeClass('is-invalid');
+        submit = true;
+    }
+
+    if (submit) {
+        form.submit();
+    } else {
+        showToast("Заполните обязательные поля!", "linear-gradient(to right, #ED213A, #93291E)");
+    }
+
+
+
+});
+
+
 $(document).on("click", ".block", function (event) {
     var form = $(this).closest("form");
     event.preventDefault();
@@ -232,13 +298,18 @@ $(document).on("click", ".block", function (event) {
     })
 });
 
+// table.on( 'draw', function () {
+//     alert( 'Table redrawn' );
+// } );
+
 $('.js-example-basic-single').select2();
 
-if (!currentUrl.includes('services') && !currentUrl.includes('edit') && !currentUrl.includes('distribution-claims') && !currentUrl.includes('distribution')) {
+if (!currentUrl.includes('services') && !currentUrl.includes('edit') && !currentUrl.includes('distribution-claims') && !currentUrl.includes('distribution') && !currentUrl.includes('plan') && !currentUrl.includes('users') && !currentUrl.includes('reports') && !currentUrl.includes('calendar')) {
     $("#user_id").select2({
         'disabled': true,
     });
 }
+
 
 if (currentUrl.includes('distribution')) {
     $.ajaxSetup({
@@ -247,7 +318,8 @@ if (currentUrl.includes('distribution')) {
         }
     });
 
-    $(".user_id").change(function () {
+    $(document).on( "change", ".user_id", function() {
+    // $(".user_id").change(function () {
         let item = $(this);
         let user = $(this).val();
         let client_id = $(this).attr('attr-id');
@@ -279,28 +351,30 @@ $("form").submit(function (event) {
     $(".overlay-spinner").addClass('show');
 });
 
-$("#group_id").change(function () {
-    if ($(this).find(':selected').val() !== '') {
-        let value = $(this).find(':selected').val();
-        let _token = $('input[name="_token"]').val();
+if (!currentUrl.includes('services')) {
+    $("#group_id").change(function () {
+        if ($(this).find(':selected').val() !== '') {
+            let value = $(this).find(':selected').val();
+            let _token = $('input[name="_token"]').val();
 
-        $.ajax({
-            url: "/get-users-by-group",
-            method: "POST",
-            data: {
-                'value': value,
-                '_token': _token,
-            },
-            success: function (result) {
-                $("#user_id").html(result);
-                $("#user_id").removeAttr('disabled');
-                $('#user_id').select2()
-            },
+            $.ajax({
+                url: "/get-users-by-group",
+                method: "POST",
+                data: {
+                    'value': value,
+                    '_token': _token,
+                },
+                success: function (result) {
+                    $("#user_id").html(result);
+                    $("#user_id").removeAttr('disabled');
+                    $('#user_id').select2()
+                },
 
-        });
-    }
+            });
+        }
 
-});
+    });
+}
 
 $("#group_idS").change(function () {
     if ($(this).find(':selected').val() !== '') {
@@ -367,20 +441,35 @@ $(".service-group").change(function () {
             success: function (result) {
                 result = JSON.parse(result);
 
-                if (result.service.isPeriod) {
-                    dNone('.period-block');
+
+                if (result.service.isPeriod == 1) {
+                    $('.period-block').removeClass('d-none');
+                } else {
+                    $('.period-block').addClass('d-none');
                 }
-                if (result.service.isPackage) {
-                    dNone('.package-block');
+
+                if (result.service.isPackage == 1) {
+                    $('.package-block').removeClass('d-none');
+                } else {
+                    $('.package-block').addClass('d-none');
                 }
-                if (result.service.isBrif) {
-                    dNone('.brif-block');
+
+                if (result.service.isBrif == 1) {
+                    $('.brif-block').removeClass('d-none');
+                } else {
+                    $('.brif-block').addClass('d-none');
                 }
-                if (result.service.isOutput) {
-                    dNone('.output-block');
+
+                if (result.service.isOutput == 1) {
+                    $('.output-block').removeClass('d-none');
+                } else {
+                    $('.output-block').addClass('d-none');
                 }
-                if (result.service.isRequiredMaterial) {
-                    dNone('.material-block');
+
+                if (result.service.isRequiredMaterial == 1) {
+                    $('.material-block').removeClass('d-none');
+                } else {
+                    $('.material-block').addClass('d-none');
                 }
 
                 $(".service-package").html(result.html);
@@ -393,6 +482,22 @@ $(".service-group").change(function () {
 
 });
 
+$(".typing-client").keyup(function () {
+    let client = $(this).val();
+    let _token = $('input[name="_token"]').val();
+
+    $.ajax({
+        url: "/clients/typing",
+        method: "POST",
+        data: {
+            'client': client,
+            '_token': _token,
+        },
+        success: function (result) {
+            $(".content-client").html(result);
+        }
+    });
+});
 
 $("input[type=checkbox]").change(function () {
 
@@ -402,6 +507,15 @@ $("input[type=checkbox]").change(function () {
 
     $('input[name=' + nameCheckbox + ']').val(currentVal);
 
+});
+
+$("#anotherUserC").change( function() {
+
+    if ($(this).prop("checked")) {
+        $(".users-form").removeClass('d-none');
+    } else {
+        $(".users-form").addClass('d-none');
+    }
 });
 
 $("#goal").change(function () {
@@ -903,6 +1017,80 @@ $('#find-complete-claims').click(function () {
     }
 
 });
+$('#create-report').click(function () {
+
+    let validate = true;
+    let user_id = $("#user_id").val();
+    let month = $("#deadline").val();
+    if (user_id == 0) {
+        validate = false;
+        $("#user_id").parents('.form-group').addClass('is-invalid');
+    } else {
+        $("#user_id").parents('.form-group').removeClass('is-invalid');
+    }
+    if (month == '') {
+        validate = false;
+        $("#report-datepicker").addClass('is-invalid');
+    } else {
+        $("#report-datepicker").removeClass('is-invalid');
+    }
+
+    if (validate) {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('input[name="_token"]').val()
+            }
+        });
+
+        $.ajax({
+            url: '/goals/reports',
+            type: "POST",
+            data: {
+                'user_id': user_id,
+                'day': month,
+            },
+            success: function (response) {
+                $("#data").html(response);
+                showToast("Данные успешно загружены 👌", "linear-gradient(to right, #00B560, #00914D)");
+            },
+            error: function (error) {
+                showToast("Данные не найдены 😢", "linear-gradient(to right, #ED213A, #93291E)");
+            },
+
+        });
+    }
+
+});
+
+$('#invoice-complete').click(function () {
+
+    let id = $(this).attr('attr-id');
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('input[name="_token"]').val()
+            }
+        });
+
+        $.ajax({
+            url: '/invoice/complete',
+            type: "POST",
+            data: {
+                'id': id,
+            },
+            success: function (response) {
+                if (response == 'success') location.reload();
+                else showToast("Произошла ошибка 😢", "linear-gradient(to right, #ED213A, #93291E)");
+            },
+            error: function (error) {
+                showToast("Произошла ошибка 😢", "linear-gradient(to right, #ED213A, #93291E)");
+            },
+
+        });
+
+
+});
+
 
 const swiper = new Swiper('.swiper', {
     direction: 'horizontal',
@@ -931,3 +1119,5 @@ const swiper = new Swiper('.swiper', {
         el: '.swiper-scrollbar',
     },
 });
+
+

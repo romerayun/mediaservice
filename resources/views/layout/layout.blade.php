@@ -238,9 +238,9 @@
                     </li>
                     @endif
 
-                    @if (auth()->user()->role->level <= 2)
-                    <li class="sidebar-title">Cтруктура</li>
 
+                    <li class="sidebar-title">Cтруктура</li>
+                    @if (auth()->user()->role->level <= 2)
                     <li
                         class="sidebar-item  ">
                         <a href="{{route('groups.index')}}" class='sidebar-link'>
@@ -255,6 +255,7 @@
                             <span>Должности</span>
                         </a>
                     </li>
+                    @endif
                     <li
                         class="sidebar-item  ">
                         <a href="{{route('users.index')}}" class='sidebar-link'>
@@ -262,6 +263,7 @@
                             <span>Пользователи</span>
                         </a>
                     </li>
+                    @if (auth()->user()->role->level <= 2)
                     <li
                         class="sidebar-item  ">
                         <a href="{{route('plan.index')}}" class='sidebar-link'>
@@ -359,9 +361,7 @@
                                    class="user-dropdown d-flex align-items-center dropend dropdown-toggle"
                                    data-bs-toggle="dropdown" aria-expanded="false">
                                     <div class="text">
-                                        <h6 class="user-dropdown-name">{{auth()->user()->surname}} {{\Illuminate\Support\Str::substr(auth()->user()->name, 0, 1)}}
-                                            .
-                                            {{\Illuminate\Support\Str::substr(auth()->user()->patron, 0, 1)}}.</h6>
+                                        <h6 class="user-dropdown-name">{{auth()->user()->surname}} {{\Illuminate\Support\Str::substr(auth()->user()->name, 0, 1)}}. {{\Illuminate\Support\Str::substr(auth()->user()->patron, 0, 1)}}.</h6>
                                         <p class="user-dropdown-status text-sm text-muted">{{auth()->user()->role->name}}</p>
                                     </div>
                                     <div class="avatar avatar-md2">
@@ -416,7 +416,7 @@
 <script src="{{asset('js/datatables.js')}}"></script>
 <script src="{{asset('js/apexcharts.js')}}"></script>
 <script src="{{asset('js/toastify.js')}}"></script>
-<script src="{{asset('js/main.js')}}"></script>
+<script src="{{asset('js/main.js')}}?v8"></script>
 <script src="{{asset('js/calendar.js')}}"></script>
 <script src="{{asset('js/popper.js')}}"></script>
 <script src="{{asset('js/rrule-gui.js')}}"></script>

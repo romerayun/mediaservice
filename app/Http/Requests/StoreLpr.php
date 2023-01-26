@@ -26,10 +26,10 @@ class StoreLpr extends FormRequest
         return [
             'surname' => 'required',
             'name' => 'required',
-            'patron' => 'required',
-            'post' => 'required',
-            'phone' => 'required|regex:/^(\+7)(\()[0-9]{3}(\))[0-9]{3}(\-)[0-9]{2}(\-)[0-9]{2}$/',
-            'date_of_birth' => 'required|date',
+            'patron' => 'nullable',
+            'post' => 'nullable',
+            'phone' => 'nullable|regex:/^(\+7)(\()[0-9]{3}(\))[0-9]{3}(\-)[0-9]{2}(\-)[0-9]{2}$/',
+            'date_of_birth' => 'nullable|date',
             'comment' => 'nullable'
         ];
     }

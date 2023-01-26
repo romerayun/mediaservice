@@ -51,16 +51,16 @@ class ClientController extends Controller
             $search = '%' . $request->input('search') . '%';
         }
 
-        if (Auth::user()->role->level <= 2) {
-            $clients = Client::where(function ($q) use ($search) {
-                    $q->where('name', 'like', $search);
-                    $q->orWhere('phone', 'like', $search);
-                    $q->orWhere('address', 'like', $search);
-                    $q->orWhere('email', 'like', $search);
-                })
-                ->where('isAllow', 1)
-                ->paginate(9);
-        } else {
+//        if (Auth::user()->role->level <= 2) {
+//            $clients = Client::where(function ($q) use ($search) {
+//                    $q->where('name', 'like', $search);
+//                    $q->orWhere('phone', 'like', $search);
+//                    $q->orWhere('address', 'like', $search);
+//                    $q->orWhere('email', 'like', $search);
+//                })
+//                ->where('isAllow', 1)
+//                ->paginate(9);
+//        } else {
             $clients = Client::where('user_id', Auth::user()->id)
                 ->where(function ($q) use ($search) {
                     $q->where('name', 'like', $search);
@@ -70,7 +70,7 @@ class ClientController extends Controller
                 })
                 ->where('isAllow', 1)
                 ->paginate(9);
-        }
+//        }
 
 
         return view('clients.index', compact('clients'));
@@ -115,23 +115,32 @@ class ClientController extends Controller
             ]
         );
 
+
         $inn = $request->input('inn');
 
         $resultInn = RequisiteClient::where('INN', $inn)->first();
+
         if ($resultInn != null) {
-            $request->session()->flash('infoClient', $resultInn->client);
+            $request->session()->flash('error', 'Введенный ИНН занят');
             return back();
         }
+
 
         DB::beginTransaction();
 
         $data = [];
         try {
-            if (Auth::user()->role->level == 1) {
+            if (Auth::user()->role->level == 1 || Auth::user()->role->level == 2) {
                 $request->merge(['isAllow' => 1]);
             }
-            $date = Carbon::createFromFormat('d.m.Y', $request->date_of_birth)->format('Y-m-d');
-            $request->merge(['date_of_birth' => $date]);
+
+            $user_id = Auth::user()->id;
+            $request->merge(['user_id' => $user_id]);
+            if ($request->date_of_birth) {
+                $date = Carbon::createFromFormat('d.m.Y', $request->date_of_birth)->format('Y-m-d');
+                $request->merge(['date_of_birth' => $date]);
+            }
+
 
             $client = Client::create($request->all());
             DB::commit();
@@ -197,9 +206,11 @@ class ClientController extends Controller
         DB::beginTransaction();
 
         try {
-            if (Auth::user()->role->level == 1) {
+            if (Auth::user()->role->level == 1 || Auth::user()->role->level == 2) {
                 $request->merge(['isAllow' => 1]);
             }
+            $request->merge(['user_id' => Auth::user()->id]);
+
             $client = Client::create($request->all());
             DB::commit();
             $idClient = $client->id;
@@ -239,6 +250,10 @@ class ClientController extends Controller
             abort(403);
         }
 
+        $users = Group::with('roles.users')
+            ->where('name', 'Отдел продаж')
+            ->get();
+
         $statusClient = StatusClient::where('isVisible', 1)->get();
         $listStatusesClient = HistoryClient::where('client_id', $id)->orderBy('id', 'desc')->get();
         $groups = Group::all();
@@ -246,8 +261,7 @@ class ClientController extends Controller
 //        $listStatusesClaims = HistoryClaim::where('client_id', $id)->orderBy('id', 'desc')->get();
         $claims = Claim::where('client_id', $id)->with('histories')->orderBy('created_at', 'desc')->get();
 //        $services =
-
-        return view('clients.show', compact('client', 'statusClient', 'listStatusesClient', 'groups', 'claims'));
+        return view('clients.show', compact('client', 'statusClient', 'listStatusesClient', 'groups', 'claims', 'users'));
     }
 
     /**
@@ -258,10 +272,11 @@ class ClientController extends Controller
      */
     public function edit($id)
     {
-        if (Auth::user()->cannot('update', Client::class)) {
-            abort(403);
-        }
         $client = Client::firstWhere('id', $id);
+//        if (Auth::user()->cannot('update', $client)) {
+//            abort(403);
+//        }
+
         return view('clients.edit', compact('client'));
     }
 
@@ -274,16 +289,21 @@ class ClientController extends Controller
      */
     public function update(StoreClients $request, $id)
     {
-        if (Auth::user()->cannot('update', Client::class)) {
-            abort(403);
-        }
+
+//        dd($request);
+        $client = Client::firstWhere('id', $id);
+//        if (Auth::user()->cannot('update', $client)) {
+//            abort(403);
+//        }
+
+
         $inn = $request->input('inn');
 
         $resultInn = RequisiteClient::where('INN', $inn)->first();
 
         if ($resultInn != null) {
             if ($resultInn->client_id != $id) {
-                $request->session()->flash('infoClient', $resultInn->client);
+                $request->session()->flash('danger', 'Введенный ИНН занят');
                 return back();
             }
         }
@@ -291,7 +311,11 @@ class ClientController extends Controller
         DB::beginTransaction();
 
         try {
-            $client = Client::firstWhere('id', $id);
+
+            if ($request->date_of_birth) {
+                $date = Carbon::createFromFormat('d.m.Y', $request->date_of_birth)->format('Y-m-d');
+                $request->merge(['date_of_birth' => $date]);
+            }
 
             $client->update($request->all());
             DB::commit();
@@ -307,8 +331,9 @@ class ClientController extends Controller
             }
 
 
-            $client->requisite->INN = $inn;
-            $client->save();
+            $req = RequisiteClient::firstWhere('client_id', $id);
+            $req->INN = $inn;
+            $req->save();
             DB::commit();
 
             return redirect()->back()->with('success', 'Данные успешно обновлены 👍');
@@ -328,10 +353,11 @@ class ClientController extends Controller
      */
     public function destroy($id)
     {
-        if (Auth::user()->cannot('delete', Client::class)) {
+        $client = Client::find($id);
+        if (Auth::user()->cannot('delete', $client)) {
             abort(403);
         }
-        $client = Client::find($id);
+
         $client->delete();
         return redirect()->route('clients.index')->with('success', 'Данные успешно удалены 👍');
     }
@@ -458,4 +484,23 @@ class ClientController extends Controller
         return view('clients.kanban', compact('allData'));
     }
 
+
+    public function typing(Request $request) {
+
+        $res = '';
+        $clients = Client::where('name', 'LIKE', '%'.$request->client.'%')->get();
+        $res .= '<h5>Результаты поиска:</h5>';
+
+        if (count($clients) == 0) {
+            $res .= '<p class="mt-3">Ничего не найдено</p>';
+        } else {
+            $res .= '<ul>';
+            foreach ($clients as $client) {
+                $res .= '<li><a target="_blank" href="/clients/'.$client->id.'" >'.$client->name.'</a></li>';
+            }
+            $res .= '</ul>';
+        }
+
+        return $res;
+    }
 }

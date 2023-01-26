@@ -25,6 +25,12 @@
 
 @section('content')
 
+    <style>
+        tfoot {
+            display: table-row-group !important;
+        }
+    </style>
+
     <div class="row">
 
         @if($clients->isEmpty())
@@ -38,6 +44,9 @@
                         <th>Клиент</th>
                         <th>Менеджер</th>
                         <th>Последнее взаимодействие</th>
+                        @if(auth()->user()->role->level <= 2)
+                            <th>Взаимодействие</th>
+                        @endif
                     </tr>
                     </thead>
                     <tbody>
@@ -56,7 +65,7 @@
                             <td>{{$item->name}}</td>
                             <td>
                                 @if ($item->user)
-                                    {{$item->user->getFullName()}}
+                                    <span>{{$item->user->getFullName()}}</span>
                                 @else
                                     <span class="text-success">Свободный клиент</span>
                                 @endif
@@ -69,6 +78,29 @@
                                     <span class="text-danger">Взаимодействий не найдено</span>
                                 @endif
                             </td>
+                            @if(auth()->user()->role->level <= 2)
+                                <td>
+                                    <a title="Открыть" href="{{route('clients.show', ['client' => $item->id])}}"
+                                   class="btn btn-sm icon btn-primary me-2 mb-2"><i class="bi bi-eye-fill"></i></a>
+                                    <a title="Управление ЛПР" href="{{route('lpr.createLpr', ['client_id' => $item->id])}}"
+                                       class="btn btn-sm icon btn-success me-2 mb-2"><i class="bi bi-people-fill"></i>
+                                    </a>
+                                    <a title="Управление реквизитами" href="{{route('requisites.edit', ['requisite' => $item->requisite->id])}}"
+                                       class="btn btn-sm icon btn-success me-2 mb-2"><i class="bi bi-file-binary-fill"></i>
+                                        </a>
+                                    <a title="Редактирование клиента" href="{{route('clients.edit', ['client' => $item->id])}}"
+                                       class="btn btn-sm icon btn-primary me-2 mb-2"><i class="bi bi-pencil"></i>
+                                        </a>
+                                    <form action="{{route('clients.destroy', ['client' => $item->id])}}" method="POST" class="d-inline-block">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button title="Удалить" type="submit" class="btn icon btn-danger me-2 mb-2 delete btn-sm"><i
+                                                class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </form>
+                                </td>
+
+                            @endif
                         </tr>
 
                     @endforeach

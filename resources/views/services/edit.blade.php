@@ -98,28 +98,14 @@
                                         <div class="form-group @if($errors->has('user_id')) is-invalid @endif">
                                             <label>Выберите ответственного за распределение заявок: </label>
                                             <select class="js-example-basic-single is-invalid" name="user_id" id="user_id">
-                                                @if(!$users)
-                                                    <option value="0">Не выбрано</option>
-                                                @else
-                                                    <option value="0">Не выбрано</option>
-
-
-                                                    @if (!$users->roles->isEmpty())
-                                                        @foreach ($users->roles as $role)
-
-                                                            @if (!$role->users->isEmpty())
-                                                                @foreach ($role->users as $user)
-                                                                    @if($service->user_id == $user->id)
-                                                                        <option value="{{$user->id}}" selected>{{$user->surname}} {{$user->name}} {{$user->patron}} ({{$user->role->name}})</option>
-                                                                    @else
-                                                                        <option value="{{$user->id}}">{{$user->surname}} {{$user->name}} {{$user->patron}} ({{$user->role->name}})</option>
-                                                                    @endif
-                                                                @endforeach
-                                                            @endif
-                                                        @endforeach
+                                                <option value="0">Не выбрано</option>
+                                                @foreach($users as $user)
+                                                    @if($service->user_id == $user->id)
+                                                        <option value="{{$user->id}}" selected>{{$user->getFullName()}} ({{$user->role->name}})</option>
+                                                    @else
+                                                        <option value="{{$user->id}}">{{$user->getFullName()}} ({{$user->role->name}})</option>
                                                     @endif
-
-                                                @endif
+                                                @endforeach
                                             </select>
                                             @if($errors->has('user_id'))
                                                 <div class="invalid-feedback">

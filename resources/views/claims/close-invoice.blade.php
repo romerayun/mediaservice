@@ -28,9 +28,7 @@
                                     <div class="list-group-item list-group-item-action p-4">
                                         <div class="d-flex w-100 justify-content-between mb-2">
                                             <h5 class="mb-1">Заявка №{{$claim->id}} - {{$claim->service->name}}
-                                                @if($claim->isRead == 0)
-                                                    <span class="badge bg-info ms-2">Новая заявка</span>
-                                                @endif</h5>
+                                               </h5>
 
                                             <small>{{$claim->getCreateDate()}}</small>
                                         </div>
@@ -52,6 +50,9 @@
                                         <hr>
 
                                         <p class="mb-1">
+                                            <b>Клиент - </b> <a href="{{route('clients.show', ['client' => $claim->client_id])}}">{{$claim->client->name}}</a>
+                                        </p>
+                                        <p class="mb-1">
                                             <b>Текущий статус - </b> {{$claim->histories->first()->status->name}}
                                         </p>
                                         <p class="mb-1">
@@ -65,13 +66,13 @@
                                             @csrf
                                             <div class="form-group">
                                                 <label>Прикрепите счет:
-                                                    @if(isset($claim->invoice) && !empty($claim->invoice))
+                                                    @if(isset($claim->invoice) && !empty(trim($claim->invoice)))
                                                         <a href="{{asset("/storage")."/".$claim->invoice}}" class="text-success" download="true">(Скачать счет)</a>
                                                     @else
                                                         <span class="text-danger">Счет не найден</span>
                                                     @endif
                                                 </label>
-                                                <p class="text-danger"><span class="text-opacity-50">Внимание, при прикплении нового счета, информация о старом счете станет не доступной</span></p>
+                                                <p class="text-danger"><span class="text-opacity-50">Внимание, при прикплении нового счета, информация о старом счете станет недоступной</span></p>
                                                 <input type="hidden" name="number" value="{{$loop->index}}">
                                                 <input type="file" id="invoice{{$loop->index}}"
                                                        class="form-control @if($errors->has('invoice'.$loop->index)) is-invalid @endif"

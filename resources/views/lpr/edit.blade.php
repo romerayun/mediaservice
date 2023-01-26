@@ -58,7 +58,7 @@
                                             <input type="text" id="patron"
                                                    class="form-control @if($errors->has('patron')) is-invalid @endif"
                                                    name="patron"
-                                                   placeholder="Введите отчество..." required
+                                                   placeholder="Введите отчество..."
                                                    value="{{$lpr->patron}}">
                                             @if($errors->has('patron'))
                                                 <div class="invalid-feedback">
@@ -78,7 +78,7 @@
                                         <input type="text" id="post"
                                                class="form-control @if($errors->has('post')) is-invalid @endif"
                                                name="post"
-                                               placeholder="Введите должность..." required
+                                               placeholder="Введите должность..."
                                                value="{{$lpr->post}}">
                                         @if($errors->has('post'))
                                             <div class="invalid-feedback">
@@ -98,7 +98,7 @@
                                             <input type="tel" id="phone"
                                                    class="form-control @if($errors->has('phone')) is-invalid @endif"
                                                    name="phone"
-                                                   placeholder="Введите телефон..." required
+                                                   placeholder="Введите телефон..."
                                                    value="{{$lpr->phone}}">
                                             @if($errors->has('phone'))
                                                 <div class="invalid-feedback">
@@ -116,7 +116,7 @@
                                             <input type="text" id="date_of_birth"
                                                    class="form-control @if($errors->has('date_of_birth')) is-invalid @endif"
                                                    name="date_of_birth"
-                                                   placeholder="Введите день рождения ЛПР..." required
+                                                   placeholder="Введите день рождения ЛПР..."
                                                    value="{{$lpr->getDateBirth($lpr->date_of_birth)}}">
                                             @if($errors->has('date_of_birth'))
                                                 <div class="invalid-feedback">

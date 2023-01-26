@@ -30,6 +30,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('claims:debt')->everyMinute();
     }
 
+
     /**
      * Register the commands for the application.
      *

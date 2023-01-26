@@ -320,9 +320,10 @@
                                 <div class="card-body">
                                     <h4 class="card-title">Счет</h4>
                                     @if ($claim->invoice)
-                                        <a href=" {{asset("/storage")."/".$claim->invoice}}"
-                                           class="btn icon icon-left btn-primary me-2 mt-2" download>
-                                            <i class="bi bi-file-arrow-down-fill"></i> Скачать счет</a>
+{{--                                        <a href=" {{asset("/storage")."/".$claim->invoice}}"--}}
+{{--                                           class="btn icon icon-left btn-primary me-2 mt-2" download>--}}
+{{--                                            <i class="bi bi-file-arrow-down-fill"></i> Скачать счет</a>--}}
+                                        <a class='btn btn-success icon icon-left download-zip-invoice mt-2' attr-id='{{$claim->id}}'><i class="bi bi-file-arrow-down-fill"></i> Скачать документы</a>
                                     @else
                                         <p class="text-gray-500 m-0">Счет не готов 😢</p>
                                     @endif
@@ -342,7 +343,7 @@
 
                                         @foreach($claim->files as $file)
                                             <a href=" {{asset("/storage")."/".$file->file}}"
-                                               class="btn icon icon-left btn-primary me-1 mt-2" download="{{$file->file}}">
+                                               class="btn icon icon-left btn-primary me-1 mt-2" download>
                                                 <i class="bi bi-file-arrow-down-fill"></i> Скачать файл</a>
                                         @endforeach
 

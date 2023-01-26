@@ -67,16 +67,18 @@
                                             <div class="form-group">
                                                 <label>Прикрепите счет:
                                                     @if(isset($claim->invoice) && !empty(trim($claim->invoice)))
-                                                        <a href="{{asset("/storage")."/".$claim->invoice}}" class="text-success" download="true">(Скачать счет)</a>
+{{--                                                        <a href="{{asset("/storage")."/".$claim->invoice}}" class="text-success" download>(Скачать счет)</a>--}}
+                                                        <a class='btn btn-success download-zip-invoice mt-2' attr-id='{{$claim->id}}'>Скачать</a>
                                                     @else
                                                         <span class="text-danger">Счет не найден</span>
                                                     @endif
                                                 </label>
-                                                <p class="text-danger"><span class="text-opacity-50">Внимание, при прикплении нового счета, информация о старом счете станет недоступной</span></p>
+                                                <p class="text-danger"><span class="text-opacity-50">Внимание, при прикплении нового файла(ов), информация о старых файлах станет недоступной</span></p>
                                                 <input type="hidden" name="number" value="{{$loop->index}}">
                                                 <input type="file" id="invoice{{$loop->index}}"
-                                                       class="form-control @if($errors->has('invoice'.$loop->index)) is-invalid @endif"
-                                                       name="invoice{{$loop->index}}"
+                                                       class="form-control filepond @if($errors->has('invoice'.$loop->index)) is-invalid @endif"
+                                                       name="invoice{{$loop->index}}[]"
+                                                       multiple
                                                        value="{{old('invoice')}}">
                                                 @if($errors->has('invoice'.$loop->index))
                                                     <div class="invalid-feedback">

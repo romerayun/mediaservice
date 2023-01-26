@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Mediaservice'),
 
     /*
     |--------------------------------------------------------------------------
@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://mediaservice'),
+    'url' => env('APP_URL', 'https://crm-mediaservice.ru'),
 
     'asset_url' => env('ASSET_URL', null),
 

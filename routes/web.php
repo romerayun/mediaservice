@@ -115,6 +115,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/my-claims/{claim}/closed', [ClaimController::class, 'claimsClosed'])->name('claim.claimsClosed');
 
     Route::post('zip-download', [ZipController::class, 'downloadFiles'])->name('zip.downloadFiles');
+    Route::post('zip-download-invoice', [ZipController::class, 'downloadFilesInvoices'])->name('zip.downloadFilesInvoices');
 
     Route::post('invoice/complete', [ClaimController::class, 'completeInvoice'])->name('claim.complete');
     Route::get('invoice', [ClaimController::class, 'createInvoice'])->name('claim.invoice');

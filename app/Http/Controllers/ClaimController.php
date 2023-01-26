@@ -648,6 +648,8 @@ class ClaimController extends Controller
 
     public function storeInvoice($id, Request $request)
     {
+
+
         $name = 'invoice'.$request->number;
         $validatedData = $request->validate(
             [
@@ -665,10 +667,18 @@ class ClaimController extends Controller
 
             $claim = Claim::find($id);
             if ($request->hasFile('invoice'.$request->number)) {
-                $folder = date("Y-m-d");
-                $invoiceFile = $request->file('invoice'.$request->number)->store("invoices/{$folder}");
 
-                $claim->invoice = $invoiceFile;
+                $resStr = '';
+                foreach ($request->file('invoice'.$request->number) as $file) {
+                    $folder = date("Y-m-d");
+//                    $invoiceFile = $request->file('invoice'.$request->number)->store("invoices/{$folder}");
+                    $invoiceFile = $file->store("invoices/{$folder}");
+                    $resStr .= $invoiceFile.'#';
+                }
+                $resStr = substr($resStr, 0, -1);
+
+
+                $claim->invoice = $resStr;
                 $claim->save();
             }
 
@@ -730,12 +740,32 @@ class ClaimController extends Controller
         try {
 
             $claim = Claim::find($id);
+//            if ($request->hasFile('invoice'.$request->number)) {
+//                Storage::delete($claim->invoice);
+//                $folder = date("Y-m-d");
+//                $invoiceFile = $request->file('invoice'.$request->number)->store("invoices/{$folder}");
+//
+//                $claim->invoice = $invoiceFile;
+//                $claim->save();
+//            }
             if ($request->hasFile('invoice'.$request->number)) {
-                Storage::delete($claim->invoice);
-                $folder = date("Y-m-d");
-                $invoiceFile = $request->file('invoice'.$request->number)->store("invoices/{$folder}");
 
-                $claim->invoice = $invoiceFile;
+                $filesAll = explode('#', $claim->invoice);
+                foreach ($filesAll as $file) {
+                    Storage::delete($file);
+                }
+
+                $resStr = '';
+                foreach ($request->file('invoice'.$request->number) as $file) {
+                    $folder = date("Y-m-d");
+//                    $invoiceFile = $request->file('invoice'.$request->number)->store("invoices/{$folder}");
+                    $invoiceFile = $file->store("invoices/{$folder}");
+                    $resStr .= $invoiceFile.'#';
+                }
+                $resStr = substr($resStr, 0, -1);
+
+
+                $claim->invoice = $resStr;
                 $claim->save();
             }
 

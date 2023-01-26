@@ -69,9 +69,9 @@
                                                 <label>Прикрепите счет: </label>
                                                 <input type="hidden" name="number" value="{{$loop->index}}">
                                                 <input type="file" id="invoice{{$loop->index}}"
-                                                       class="form-control @if($errors->has('invoice'.$loop->index)) is-invalid @endif"
-                                                       name="invoice{{$loop->index}}"
-                                                       value="{{old('invoice')}}">
+                                                       class="form-control filepond @if($errors->has('invoice'.$loop->index)) is-invalid @endif"
+                                                       name="invoice{{$loop->index}}[]"
+                                                       value="{{old('invoice')}}" multiple>
                                                 @if($errors->has('invoice'.$loop->index))
                                                     <div class="invalid-feedback">
                                                         <i class="bx bx-radio-circle"></i>

@@ -13,6 +13,7 @@ import th from "air-datepicker/locale/th";
 
 FilePond.registerPlugin(FilePondPluginImagePreview);
 
+
 function showToast(text, color) {
     Toastify({
         text: text,
@@ -23,6 +24,7 @@ function showToast(text, color) {
         backgroundColor: color,
     }).showToast();
 }
+
 
 function getSum() {
     let sum = 0;
@@ -75,6 +77,21 @@ const pond = FilePond.create(inputElement, {
         }
     }
 });
+
+let inputElement2 = document.querySelectorAll('.filepond');
+for (const element of inputElement2) {
+    let pond2 = FilePond.create(element, {
+        'labelIdle': 'Перетащите свои файлы в эту область или <span class="filepond--label-action"> Нажмите сюда </span>',
+        credits: false,
+        storeAsFile: true,
+        server: {
+            // url: '/upload-filepond',
+            // headers: {
+            //     'X-CSRF-TOKEN': $('input[name="_token"]').val()
+            // }
+        }
+    });
+}
 
 
 new AirDatepicker('.datepicker', {
@@ -581,6 +598,26 @@ $(document).on("click", ".download-zip", function (e) {
         },
     });
 });
+
+$(document).on("click", ".download-zip-invoice", function (e) {
+    let value = $(this).attr('attr-id');
+    let _token = $('input[name="_token"]').val();
+
+    $.ajax({
+        url: "/zip-download-invoice",
+        method: "POST",
+        data: {
+            'id': value,
+            '_token': _token,
+        },
+        success: function (result) {
+            e.preventDefault();
+            window.location.href = '/' + result;
+        },
+    });
+});
+
+
 
 
 if (document.getElementById('plan-table')) {

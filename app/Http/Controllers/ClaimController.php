@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ActiveAd;
 use App\Models\Claim;
 use App\Models\ClaimFile;
+use App\Models\ClaimUsers;
 use App\Models\Client;
 use App\Models\Goal;
 use App\Models\Group;
@@ -223,7 +224,23 @@ class ClaimController extends Controller
         $statusesClaim = StatusClaim::where('isVisible', 1)->get();
         $users = UserM::where('isBlocked', 0)->get();
         $activeAd = ActiveAd::firstWhere('claim_id', $id);
-        return view('claims.show', compact('claim', 'countAdds', 'statusesClaim', 'users', 'activeAd'));
+
+        $claimUsers = ClaimUsers::where('claim_id', $id)
+        ->get();
+
+        $ids = array(0);
+        if (count($claimUsers) != 0) {
+            foreach ($claimUsers as $claimUser) {
+                $ids[] = $claimUser->user_id;
+            }
+        }
+
+        $withoutUsers = UserM::where('isBlocked', 0)
+            ->whereNotIn('id', [$claim->creator, $claim->user_id])
+            ->whereNotIn('id', $ids)
+            ->get();
+
+        return view('claims.show', compact('claim', 'countAdds', 'statusesClaim', 'users', 'activeAd', 'withoutUsers', 'claimUsers'));
     }
 
     /**
@@ -571,11 +588,28 @@ class ClaimController extends Controller
 
     public function claimsMy() {
 
-        $claims = Claim::where('user_id', Auth::user()->id)
-            ->where('isClose', 0)
+        $claimUsers = ClaimUsers::where('user_id', Auth::user()->id)
+            ->get();
+
+
+        $ids = array(0);
+        if (count($claimUsers) != 0) {
+            foreach ($claimUsers as $claimUser) {
+                $ids[] = $claimUser->claim_id;
+            }
+        }
+
+
+        $claims = Claim::where('isClose', 0)
+            ->where(function($query) use ($ids) {
+                $query->where('user_id', Auth::user()->id)
+                    ->orWhereIn('id', $ids);
+            })
             ->with('service')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
+
+//        dd($claims);
 
         $users = UserM::where('isBlocked', 0)->get();
 
@@ -931,22 +965,48 @@ class ClaimController extends Controller
 //        $start = '2023-01-00 00:00:00';
 //        $end = '2023-01-32 00:00:00';
 
-
-
         $user_id = $request->user_id;
+        $claimUsers = ClaimUsers::where('user_id', $user_id)
+            ->with('claim')
+            ->whereHas('claim', function ($q) {
+                $q->where('isClose', 1);
+            })
+            ->get();
+
+
+        $ids = array(0);
+        if (count($claimUsers) != 0) {
+            foreach ($claimUsers as $claimUser) {
+                $ids[] = $claimUser->claim_id;
+            }
+        }
+
+
+//        $claims = Claim::where('isClose', 0)
+//            ->where(function($query) use ($ids) {
+//                $query->where('user_id', Auth::user()->id)
+//                    ->orWhereIn('id', $ids);
+//            })
+//            ->with('service')
+//            ->orderBy('created_at', 'desc')
+//            ->paginate(10);
+
+
+
+
 //        $user_id = 3;
         $user = UserM::firstWhere('id', $user_id);
 
         $claims = Claim::with('histories')
             ->whereHas('histories', function ($q) use ($start, $end) {
                 $q->where('created_at', '>=', $start)
-                    ->where('created_at', '<=', $end)
-                    ->with('status')
-                    ->whereHas('status', function ($w) {
-                        $w->where('name', "Выполнено");
-                    });
+                    ->where('created_at', '<=', $end);
             })
-            ->where('user_id', $user_id)
+            ->where(function($query) use ($ids, $user_id) {
+                $query->where('user_id', $user_id)
+                    ->orWhereIn('id', $ids);
+            })
+            ->where('isClose', 1)
             ->get();
 
 
@@ -970,6 +1030,7 @@ class ClaimController extends Controller
                     <th>Категория услуги</th>
                     <th>Наименование услуги</th>
                     <th>Стоимость заявки</th>
+                    <th>Причина закрытия</th>
                 </tr>
             </thead><tbody>';
 
@@ -983,8 +1044,14 @@ class ClaimController extends Controller
                         <td>' . $claim->id . '</td>
                         <td>' . $claim->service->category->name . '</td>
                         <td>' . $claim->service->name . '</td>
-                        <td>' . money($claim->amount) . ' руб.</td>
-                    </tr>';
+                        <td>' . money($claim->amount) . ' руб.</td>';
+                if ($claim->commentClose == null) {
+                    $res .= '<td>' . '-' . '</td>';
+                } else {
+                    $res .= '<td>' . $claim->commentClose . '</td>';
+                }
+
+                $res .= '</tr>';
 
             }
 
@@ -1038,5 +1105,41 @@ class ClaimController extends Controller
             DB::rollback();
             return "error";
         }
+    }
+
+    public function storeUsers($id, Request $request)
+    {
+        if (!isset($request->user_id)) {
+            $request->session()->flash('error', 'Вы не выбрали ни однго сотрудника 😢');
+            return back();
+        } else {
+            DB::beginTransaction();
+
+            try {
+
+                $arr = [
+                    'claim_id' => $id,
+                ];
+                foreach ($request->user_id as $user) {
+                    $arr['user_id'] = $user;
+                    ClaimUsers::create($arr);
+                }
+
+                DB::commit();
+
+                return redirect()->back()->with('success', 'Данные успешно обновлены 👍');
+            } catch (\Exception $exception) {
+                DB::rollback();
+                $request->session()->flash('error', 'При обновлении заявки произошла ошибка 😢' . $exception);
+                return back();
+            }
+        }
+//        dd($id, $request);
+    }
+
+    public function deleteUser($id) {
+        $claimUser = ClaimUsers::find($id);
+        $claimUser->delete();
+        return redirect()->back()->with('success', 'Данные успешно удалены 👍');
     }
 }

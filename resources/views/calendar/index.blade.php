@@ -8,9 +8,7 @@
         </div>
 
         <div class="col-12 col-md-8 text-end">
-            @if (auth()->user()->role->level <= 2)
-                <a href="{{route('goals.reports')}}" class="btn btn-sm btn-primary">Отчеты сотрудников</a>
-            @endif
+
             <a href="{{route('goals.deadline')}}" class="btn btn-sm btn-danger">Просроченные задачи <span
                     class="badge bg-transparent">{{countExpiredGoal()}}</span></a>
             <a href="{{route('goals.send')}}" class="btn btn-sm btn-primary">Отправленные задачи</a>

@@ -28,9 +28,7 @@
                                     <div class="list-group-item list-group-item-action p-4">
                                         <div class="d-flex w-100 justify-content-between mb-2">
                                             <h5 class="mb-1">Заявка №{{$claim->id}} - {{$claim->service->name}}
-                                                @if($claim->isRead == 0)
-                                                    <span class="badge bg-info ms-2">Новая заявка</span>
-                                                @endif</h5>
+                                               </h5>
 
                                             <small>{{$claim->getCreateDate()}}</small>
                                         </div>

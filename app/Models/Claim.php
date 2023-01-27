@@ -72,6 +72,11 @@ class Claim extends Model
         return $this->hasMany(ClaimFile::class);
     }
 
+    public function claimUsers()
+    {
+        return $this->hasMany(ClaimUsers::class);
+    }
+
     public function package()
     {
         return $this->belongsTo(Package::class)->withTrashed();

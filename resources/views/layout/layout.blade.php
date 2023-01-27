@@ -2,6 +2,7 @@
     <script>window.location = "/logout";</script>
 @endif
 
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -209,6 +210,15 @@
                             <span>Выполненные заявки</span>
                         </a>
                     </li>
+
+                    <li
+                        class="sidebar-item">
+                        <a href="{{route('goals.reports')}}" class='sidebar-link'>
+                            <i class="bi bi-list-ol"></i>
+                            <span>Отчеты сотрудников</span></a>
+                    </li>
+
+
 
 
                     <li class="sidebar-title">Статусы</li>

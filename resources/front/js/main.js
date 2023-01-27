@@ -337,7 +337,7 @@ $(document).on("click", ".block", function (event) {
 
 $('.js-example-basic-single').select2();
 
-if (!currentUrl.includes('services') && !currentUrl.includes('edit') && !currentUrl.includes('distribution-claims') && !currentUrl.includes('distribution') && !currentUrl.includes('plan') && !currentUrl.includes('users') && !currentUrl.includes('reports') && !currentUrl.includes('calendar')) {
+if (!currentUrl.includes('services') && !currentUrl.includes('edit') && !currentUrl.includes('distribution-claims') && !currentUrl.includes('distribution') && !currentUrl.includes('plan') && !currentUrl.includes('users') && !currentUrl.includes('reports') && !currentUrl.includes('calendar') && !currentUrl.includes('claims')) {
     $("#user_id").select2({
         'disabled': true,
     });
@@ -921,6 +921,15 @@ $('input[name="close-claim"]').change(function () {
         $('.form-close-claim').slideUp();
     }
 });
+
+$('input[name="store-users"]').change(function () {
+    if ($(this).prop('checked') == true) {
+        $('.form-store-users').slideDown();
+    } else {
+        $('.form-store-users').slideUp();
+    }
+});
+
 
 $(document).on("click", ".delFile", function (event) {
 

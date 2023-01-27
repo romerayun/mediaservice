@@ -14,7 +14,7 @@
 @section('content')
     <div class="row">
 
-        @if (auth()->user()->role->level <= 2 || auth()->user()->role->level == 6 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id)
+        @if (auth()->user()->role->level <= 2 || auth()->user()->role->level == 6 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id || checkUserAccessToClaim($claim->id, auth()->user()->id))
             <div class="col-lg-9 col-md-12">
         @else
             <div class="col-lg-12 col-md-12">
@@ -91,7 +91,8 @@
                             @endif
                         @else
 
-                        @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id)
+                        @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id || checkUserAccessToClaim($claim->id, auth()->user()->id))
+                                @if ($claim->isClose == 0)
                         <div class="form-check form-switch">
                             <label class="form-check-label" for="active-adds">Поставить рекламу на запуск</label>
                             <input class="form-check-input" name="active-adds" type="checkbox"  @if($errors->has('range_date_hidden')) checked @endif>
@@ -127,11 +128,12 @@
                                 <button type="submit" class="btn btn-success mt-3">Запустить</button>
                             </form>
                         </div>
+                                    @endif
                         @endif
 
                         @endif
 
-                        @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id)
+                        @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id || checkUserAccessToClaim($claim->id, auth()->user()->id))
                         @if ($claim->isClose == 0)
                             <hr>
                             <div class="form-check form-switch">
@@ -169,31 +171,53 @@
                         @endif
                         @endif
 
-{{--                        @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id)--}}
-{{--                            <hr>--}}
-{{--                            <div class="form-check form-switch">--}}
-{{--                                <label class="form-check-label" for="send-claim">Отправить заявку</label>--}}
-{{--                                <input class="form-check-input" name="send-claim" type="checkbox" checked>--}}
-{{--                            </div>--}}
+                        @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id || checkUserAccessToClaim($claim->id, auth()->user()->id))
+                            @if ($claim->isClose == 0)
+                            <hr>
+                            <div class="form-check form-switch">
+                                <label class="form-check-label" for="store-users">Назначить дополнительных сотрудников</label>
+                                <input class="form-check-input" name="store-users" type="checkbox" @if (count($claimUsers) != 0) checked @endif>
+                            </div>
+                            <div class="form-store-users mt-4" @if (count($claimUsers) == 0) style="display: none" @endif>
+                                <h4 class="card-title mb-0 mt-2">Добавление сотрудников</h4>
+                                <p class="mb-3 text-warning text-opacity-75"><i>Выберите сотрудников которых Вы хотите подключить к выполнению заявки
+                                    </i></p>
 
-{{--                            <div class="form-active-adds mt-3">--}}
-{{--                                <h4 class="card-title mb-0 mt-2">Перенаправление заявки</h4>--}}
-{{--                                <p class="mb-3 text-warning text-opacity-75"><i>Выберите сотрудника на которого Вы хотите перенаправить заявку--}}
-{{--                                    </i></p>--}}
+                                <form action="{{route('claim.storeUsers', ['claim' => $claim->id])}}" method="POST">
+                                    @csrf
+                                    <div class="form-group">
+                                        <label>Выберите ответственных за данную заявку: </label>
+                                        <select class="js-example-basic-single is-invalid"
+                                                name="user_id[]" id="user_id" multiple="multiple">
+                                            @foreach($withoutUsers as $user)
+                                                <option value="{{$user->id}}">{{$user->getFullName()}} ({{$user->role->name}})</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
 
-{{--                                <form action="{{route('claim.storeAd', ['claim' => $claim->id])}}" method="POST">--}}
-{{--                                    @csrf--}}
+                                    <button type="submit" class="btn btn-success mt-2">Сохранить</button>
+                                </form>
 
+                                @if (count($claimUsers) != 0)
+                                    <h5 class="mt-4 mb-3">Назначенные сотрудники:</h5>
+                                    @foreach($claimUsers as $claimUser)
+                                        <form action="{{route('claim.deleteUser', ['claim' => $claimUser->id])}}" class="mt-2" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <a href="#" class="btn icon btn-danger delete"><i class="bi bi-trash-fill"></i></a>
+                                            <p class="d-inline-block ms-2">{{$claimUser->user->getFullName()}} ({{$claimUser->user->role->name}})</p>
+                                        </form>
+                                    @endforeach
 
-{{--                                    <button type="submit" class="btn btn-success mt-3">Отправить</button>--}}
-{{--                                </form>--}}
-{{--                            </div>--}}
-{{--                        @endif--}}
+                                @endif
+                            </div>
+                            @endif
+                        @endif
 
                     </div>
                 </div>
             </div>
-            @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id)
+            @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id || checkUserAccessToClaim($claim->id, auth()->user()->id))
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
@@ -282,7 +306,7 @@
         </div>
 
         <div class="col-lg-3 col-md-12">
-            @if (auth()->user()->role->level <= 2 || auth()->user()->role->level == 6 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id)
+            @if (auth()->user()->role->level <= 2 || auth()->user()->role->level == 6 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id || checkUserAccessToClaim($claim->id, auth()->user()->id))
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
@@ -312,7 +336,7 @@
             </div>
             @endif
 
-            @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id)
+            @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id || checkUserAccessToClaim($claim->id, auth()->user()->id))
                 @if($claim->isInvoice)
                     <div class="col-12">
                         <div class="card">

@@ -113,6 +113,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/my-claims', [ClaimController::class, 'claimsMy'])->name('claim.claimsMy');
     Route::get('/my-claims/closed', [ClaimController::class, 'getClaimsClosed'])->name('claim.getClaimsClosed');
     Route::post('/my-claims/{claim}/closed', [ClaimController::class, 'claimsClosed'])->name('claim.claimsClosed');
+    Route::post('/my-claims/store-user/{claim}', [ClaimController::class, 'storeUsers'])->name('claim.storeUsers');
+    Route::delete('/my-claims/delete-user/{claim}', [ClaimController::class, 'deleteUser'])->name('claim.deleteUser');
 
     Route::post('zip-download', [ZipController::class, 'downloadFiles'])->name('zip.downloadFiles');
     Route::post('zip-download-invoice', [ZipController::class, 'downloadFilesInvoices'])->name('zip.downloadFilesInvoices');
@@ -130,6 +132,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('claims/{claim}/storeAd', [ClaimController::class, 'storeAd'])->name('claim.storeAd');
     Route::post('claims/{claim}/storeHistory', [ClaimController::class, 'storeHistory'])->name('claim.storeHistory');
     Route::resource('claims', ClaimController::class);
+
 
     Route::get('payments', [PaymentController::class, 'index'])->name('payment.index');
     Route::get('payments/paid', [PaymentController::class, 'paid'])->name('payment.paid');

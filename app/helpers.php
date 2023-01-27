@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Claim;
+use App\Models\ClaimUsers;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -171,8 +172,24 @@ if (!function_exists('myClaimsIsNotClosed')) {
     function myClaimsIsNotClosed()
     {
 
-        return Claim::where('user_id', Auth::user()->id)
-            ->where('isClose', 0)->count();
+        $claimUsers = ClaimUsers::where('user_id', Auth::user()->id)
+            ->get();
+
+
+        $ids = array(0);
+        if (count($claimUsers) != 0) {
+            foreach ($claimUsers as $claimUser) {
+                $ids[] = $claimUser->claim_id;
+            }
+        }
+
+        return Claim::where('isClose', 0)
+            ->where(function($query) use ($ids) {
+                $query->where('user_id', Auth::user()->id)
+                    ->orWhereIn('id', $ids);
+            })
+            ->count();
+
 
 
     }
@@ -345,4 +362,18 @@ if (!function_exists('money')) {
     }
 }
 
+if (!file_exists('checkUserAccessToClaim')) {
+    function checkUserAccessToClaim($claim_id, $user_id) {
 
+        $claimUser = ClaimUsers::where('claim_id', $claim_id)
+            ->where('user_id', $user_id)
+            ->count();
+
+        if ($claimUser == 0) {
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+}

@@ -27,9 +27,7 @@
                                     <div class="list-group-item list-group-item-action p-4">
                                         <div class="d-flex w-100 justify-content-between mb-2">
                                             <h5 class="mb-1">Заявка №{{$claim->id}} - {{$claim->service->name}}
-                                                @if($claim->isRead == 0)
-                                                    <span class="badge bg-info ms-2">Новая заявка</span>
-                                                @endif</h5>
+                                                </h5>
 
                                             <small>{{$claim->getCreateDate()}}</small>
                                         </div>
@@ -64,6 +62,12 @@
                                         <div class="actions">
                                             <p>Взаимодействия</p>
                                             <a href="{{route('claims.show', ['claim' => $claim->id])}}" class="btn icon btn-primary"><i class="bi bi-eye-fill"></i></a>
+
+                                            <form action="{{route('claims.destroy', ['claim' => $claim->id])}}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <a href="#" class="btn icon btn-danger delete"><i class="bi bi-trash-fill"></i></a>
+                                            </form>
                                         </div>
 
                                     </div>

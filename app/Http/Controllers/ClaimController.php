@@ -56,7 +56,22 @@ class ClaimController extends Controller
      */
     public function store(Request $request)
     {
+
+
         $client = Client::find($request->client_id);
+        if ($request->amount == null || trim($request->amount) == '' || $request->amount == '') {
+            $request->merge([
+                'amount' => 0,
+            ]);
+        } else {
+            $amount = str_replace(' ', '', $request->amount);
+            $request->merge([
+                'amount' => $amount,
+            ]);
+        }
+
+
+
 
 //        $this->authorize('check', $client);
 //        if (Auth::user()->cannot('check', $client, Claim::class)) {
@@ -619,7 +634,7 @@ class ClaimController extends Controller
 
     public function getClaimsClosed() {
 
-        $claims = Claim::where('user_id', Auth::user()->id)
+        $claims = Claim::where('creator', Auth::user()->id)
             ->where('isClose', 1)
             ->with('service')
             ->orderBy('created_at', 'desc')
@@ -836,7 +851,7 @@ class ClaimController extends Controller
 
     public function getActiveAd() {
 
-        if (Auth::user()->role->level <= 2) {
+        if (Auth::user()->role->level == 4) {
 
             $activeAds = Claim::whereHas('activeAd', function ($q) {
                 $q->where('end_date', '>=', now()->second(0)->minute(0)->hour(0));
@@ -854,10 +869,10 @@ class ClaimController extends Controller
 
     public function getPastActiveAd() {
 
-        if (Auth::user()->role->level <= 2) {
+        if (Auth::user()->role->level == 4) {
 
             $activeAds = Claim::whereHas('activeAd', function ($q) {
-                $q->where('end_date', '>=', now()->second(0)->minute(0)->hour(0));
+                $q->where('end_date', '<=', now()->second(0)->minute(0)->hour(0));
             })->get();
 
         } else {
@@ -869,6 +884,23 @@ class ClaimController extends Controller
                 ->get();
         }
         return view('activeAd.past', compact('activeAds'));
+    }
+
+    public function getActiveAdAll() {
+        $activeAds = Claim::whereHas('activeAd', function ($q) {
+            $q->where('end_date', '>=', now()->second(0)->minute(0)->hour(0));
+        })->get();
+        return view('activeAd.all', compact('activeAds'));
+    }
+
+    public function getPastActiveAdAll() {
+
+        $activeAds = Claim::whereHas('activeAd', function ($q) {
+            $q->where('end_date', '<=', now()->second(0)->minute(0)->hour(0));
+        })->get();
+
+        return view('activeAd.all-past', compact('activeAds'));
+
     }
 
     public function deleteFile($id) {

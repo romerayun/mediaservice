@@ -195,7 +195,9 @@ class GoalController extends Controller
      */
     public function destroy($id)
     {
-        abort(404);
+        $goal = Goal::find($id);
+        $goal->delete();
+        return redirect()->back()->with('success', 'Данные успешно удалены 👍');
     }
 
     public function deadline()
@@ -214,7 +216,7 @@ class GoalController extends Controller
                 ->orderBy('id', 'desc')
                 ->get();
         } else {
-            $goals = Goal::where('status_id', 2)
+            $goals = Goal::where('status', 2)
                 ->where('user_id', \Illuminate\Support\Facades\Auth::user()->id)
                 ->orderBy('id', 'desc')
                 ->get();

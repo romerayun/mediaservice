@@ -145,6 +145,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('active-ad', [ClaimController::class, 'getActiveAd'])->name('claim.activeAd');
     Route::get('active-ad/past', [ClaimController::class, 'getPastActiveAd'])->name('claim.pastActiveAd');
+    Route::get('active-ad/all', [ClaimController::class, 'getActiveAdAll'])->name('claim.activeAdAll');
+    Route::get('active-ad/all/past', [ClaimController::class, 'getPastActiveAdAll'])->name('claim.pastActiveAdAll');
 
     Route::post('/upload-filepond', [UploadController::class, 'store']);
     Route::post('/upload-files-goal', [UploadController::class, 'goalsStore']);

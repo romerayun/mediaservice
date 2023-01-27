@@ -32,6 +32,7 @@
                                         <th>Выполнить до</th>
                                         <th>Создал задачу</th>
                                         <th>Ответственный</th>
+                                        <th>Удалить</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -64,6 +65,13 @@
                                             </td>
                                             <td>
                                                 {{$item->user->getFullName()}}
+                                            </td>
+                                            <td class="text-center">
+                                                <form action="{{route('goals.destroy', ['goal' => $item->id])}}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <a href="#" class="text-danger ms-2 delete"><i class="bi bi-trash-fill"></i></a>
+                                                </form>
                                             </td>
                                         </tr>
                                     @endforeach

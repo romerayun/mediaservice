@@ -1,13 +1,14 @@
 @extends('layout.layout')
 @section('page-heading')
     <div class="row align-items-center">
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-3">
             <h3>Управление оплатами</h3>
         </div>
-        <div class="col-12 col-md-6 text-end">
-            <a href="{{route('payment.paid')}}" class="btn btn-success">Оплаченные счета <span class="badge bg-transparent">{{getCountCompletePayment()}}</span></a>
-            <a href="{{route('plan.services')}}" class="btn  btn-primary">Продажи (по услугам)</a>
-            <a href="{{route('users.salesCategory')}}" class="btn  btn-primary">Продажи (по менеджерам)</a>
+        <div class="col-12 col-md-9 text-end">
+            <a href="{{route('payment.paid')}}" class="btn btn-sm btn-success">Оплаченные счета <span class="badge bg-transparent">{{getCountCompletePayment()}}</span></a>
+            <a href="{{route('plan.statistics')}}" class="btn btn-sm btn-primary">Продажи (План/Факт)</a>
+            <a href="{{route('plan.services')}}" class="btn btn-sm btn-primary">Продажи (по услугам)</a>
+            <a href="{{route('users.salesCategory')}}" class="btn btn-sm btn-primary">Продажи (по менеджерам)</a>
         </div>
     </div>
 @endsection

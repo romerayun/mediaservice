@@ -193,6 +193,23 @@ if (document.getElementById('phone')) {
     var mask = IMask(elPhone, maskOptions);
 }
 
+if (document.getElementById('amount')) {
+
+    var amountMask = IMask(document.getElementById('amount'), {
+        mask: Number,  // enable number mask
+
+        // other options are optional with defaults below
+        scale: 2,  // digits after point, 0 for integers
+        signed: false,  // disallow negative
+        thousandsSeparator: ' ',  // any single char
+        padFractionalZeros: false,  // if true, then pads zeros at end to the length of scale
+        normalizeZeros: true,  // appends or removes zeros at ends
+        radix: '.',  // fractional delimiter
+        mapToRadix: ['.'],  // symbols to process as radix
+    });
+}
+// amount
+
 if (document.getElementById('date_of_birth')) {
     var dateMask = IMask(
         document.getElementById('date_of_birth'),
@@ -250,12 +267,12 @@ $(document).on("click", ".create-claim", function (event) {
 
     let submit = true;
 
+
     if ($(".service-group").val() == 0) {
         $(".service-group").parents('.form-group').addClass('is-invalid');
         submit = false;
     } else {
         $(".service-group").parents('.form-group').removeClass('is-invalid');
-        submit = true;
     }
 
     if ($("#anotherUserC").prop('checked')) {
@@ -264,7 +281,6 @@ $(document).on("click", ".create-claim", function (event) {
             submit = false;
         } else {
             $("#creator").parents('.form-group').removeClass('is-invalid');
-            submit = true;
         }
     }
 
@@ -274,16 +290,16 @@ $(document).on("click", ".create-claim", function (event) {
         submit = false;
     } else {
         $("#deadlineClaim-datepicker").removeClass('is-invalid');
-        submit = true;
     }
 
-    if ($("#amount").val() == '') {
-        $("#amount").addClass('is-invalid');
-        submit = false;
-    } else {
-        $("#amount").removeClass('is-invalid');
-        submit = true;
-    }
+    // if ($("#amount").val() == '') {
+    //     $("#amount").addClass('is-invalid');
+    //     submit = false;
+    // } else {
+    //     $("#amount").removeClass('is-invalid');
+    // }
+
+
 
     if (submit) {
         form.submit();

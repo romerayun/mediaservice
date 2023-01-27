@@ -16,8 +16,24 @@ if (!function_exists('getAllGoals')) {
 if (!function_exists('getCountGoals')) {
     function getCountGoals()
     {
-        $goals = \App\Models\Goal::where('status', 0)->where('user_id', \Illuminate\Support\Facades\Auth::user()->id)->count();
-        return $goals;
+        $start = date('Y-m-d') . ' 00:00:00';
+        $end = date('Y-m-d') . ' 23:59:59';
+        $goals = \App\Models\Goal::where('status', 0)
+            ->where('user_id', \Illuminate\Support\Facades\Auth::user()->id)
+            ->get();
+
+        $count = 0;
+        foreach ($goals as $goal) {
+            $start_date = Carbon::create($goal->start_date)->format('Y-m-d');
+            $deadline = Carbon::create($goal->deadline)->format('Y-m-d');
+            $today = Carbon::now()->format('Y-m-d');
+
+            if ($today >= $start_date && $today <= $deadline) {
+                $count++;
+            }
+        }
+
+        return $count;
     }
 }
 
@@ -154,8 +170,10 @@ if (!function_exists('claimsGroupIsRead')) {
 if (!function_exists('myClaimsIsNotClosed')) {
     function myClaimsIsNotClosed()
     {
+
         return Claim::where('user_id', Auth::user()->id)
             ->where('isClose', 0)->count();
+
 
     }
 }

@@ -2,15 +2,11 @@
 @section('page-heading')
     <div class="row align-items-center">
         <div class="col-12 col-md-6">
-            <h3>Активная реклама</h3>
+            <h3>Вся активная реклама</h3>
         </div>
         <div class="col-12 col-md-6 text-end">
-            <a href="{{route('claim.pastActiveAd')}}" class="btn btn-sm btn-danger">Законченная рекламная кампания
-                <span class="badge bg-transparent">{{getCountExActiveAds()}}</span></a>
-
-            @if (auth()->user()->role->level <= 2)
-                <a href="{{route('claim.activeAdAll')}}" class="btn btn-sm btn-primary">Вся рекламная кампания</a>
-            @endif
+            <a href="{{route('claim.pastActiveAdAll')}}" class="btn btn-sm btn-danger">Законченная рекламная кампания</a>
+            <a href="{{route('claim.activeAd')}}" class="btn btn-sm btn-primary">Назад</a>
         </div>
     </div>
 @endsection

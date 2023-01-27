@@ -2,15 +2,10 @@
 @section('page-heading')
     <div class="row align-items-center">
         <div class="col-12 col-md-6">
-            <h3>Активная реклама</h3>
+            <h3>Вся активная реклама</h3>
         </div>
         <div class="col-12 col-md-6 text-end">
-            <a href="{{route('claim.pastActiveAd')}}" class="btn btn-sm btn-danger">Законченная рекламная кампания
-                <span class="badge bg-transparent">{{getCountExActiveAds()}}</span></a>
-
-            @if (auth()->user()->role->level <= 2)
-                <a href="{{route('claim.activeAdAll')}}" class="btn btn-sm btn-primary">Вся рекламная кампания</a>
-            @endif
+            <a href="{{route('claim.activeAdAll')}}" class="btn btn-primary">Назад</a>
         </div>
     </div>
 @endsection
@@ -22,10 +17,10 @@
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
-                        <h4 class="card-title mb-4 ">Список активной рекламы</h4>
+                        <h4 class="card-title mb-4 ">Список прошедшей активной рекламы</h4>
 
                         @if($activeAds->isEmpty())
-                            <h5 class="text-gray-500">К сожалению, активной рекламы не найдено 😢</h5>
+                            <h5 class="text-gray-500">К сожалению, прошедшей активной рекламы не найдено 😢</h5>
                         @else
                             <table class="table table-lg table-hover" id="datatables">
                                 <thead>
@@ -65,10 +60,10 @@
                                             </span>
                                         </td>
                                         <td>
-                                            @if($item->activeAd->first()->isRemind == 0)
+                                            @if($item->isRemind == 0)
                                                 <span class="text-primary">Уведомление еще не отправлено</span>
                                             @else
-                                                <span class="text-success">Уведомление отправлено</span>
+                                                <span class="text-success">Уведомление еще не отправлено</span>
                                             @endif
                                         </td>
                                         <td>

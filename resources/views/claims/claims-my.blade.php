@@ -6,7 +6,7 @@
         </div>
         <div class="col-12 col-md-6 text-end">
             <a href="{{route('claim.created')}}" class="btn btn-primary">Созданные заявки <span class="badge bg-transparent">{{getCountCreatedClaims()}}</span></a>
-            <a href="{{route('claim.getClaimsClosed')}}" class="btn btn-danger">Закрытые заявки <span class="badge bg-transparent">{{myClaimsIsClosed()}}</span></a>
+            <a href="{{route('claim.getClaimsClosed')}}" class="btn btn-danger">Закрытые заявки</a>
         </div>
     </div>
 @endsection

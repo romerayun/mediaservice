@@ -566,7 +566,7 @@
                                                 <div class="col-12 ">
                                                     <div class="form-group">
                                                         <label>Загрузите материалы: </label>
-                                                        <input type="file" class="filepond" id="filepond" name="filepond[]"
+                                                        <input type="file" id="filepond" name="filepond[]"
                                                                multiple>
                                                     </div>
                                                 </div>

@@ -33,6 +33,34 @@ class PaymentController extends Controller
     }
 
     public function storeStatus(Request $request) {
+
+        $claim = Claim::find($request->claim_id);
+
+        if ($request->amount == null) {
+            $amount = 0;
+        } else {
+            $amount = str_replace(' ', '', $request->amount);
+            $sum = getPaymentsClaim($request->claim_id);
+            if ($claim->amount == ($sum + $amount)) {
+
+                $status = StatusPayment::where("name", 'Оплачен')->get();
+
+                $request->merge([
+                   'status_id' => $status->first()->id,
+                   'amount' => '0',
+                    'user_id' => Auth::user()->id,
+                ]);
+
+                HistoryPayment::create($request->all());
+                return redirect()->back()->with('success', 'Данные успешно обновлены 👍');
+            }
+
+        }
+
+        $request->merge([
+            'amount' => $amount
+        ]);
+
         $validatedData = $request->validate(
             [
                 'status_id' => 'required|integer',

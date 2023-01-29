@@ -68,7 +68,7 @@ function getSum() {
 
 const inputElement = document.querySelector('#filepond');
 const pond = FilePond.create(inputElement, {
-    'labelIdle': 'Перетащите свои файлы в эту область или <span class="filepond--label-action"> Нажмите сюда </span>',
+    'labelIdle': 'Перетащите 123свои файлы в эту область или <span class="filepond--label-action"> Нажмите сюда </span>',
     credits: false,
     server: {
         url: '/upload-filepond',
@@ -533,7 +533,6 @@ $(".typing-client").keyup(function () {
 });
 
 $(".payment-store select#status_id").change(function () {
-
     if ($("#status_id option:selected").text() == 'Частично оплачен') {
         $(".amount-form").removeClass('d-none');
     } else {
@@ -726,7 +725,16 @@ if (document.getElementById('plan-table')) {
 
 $(document).on("click", ".changeStatus", function (event) {
     let id = $(this).attr('attr-id');
+    let amount = $(this).attr('attr-max-amount');
+
     $('#claim_id').val(id);
+    $('#max-val').html(amount + ' руб.');
+    amountMask.updateOptions({
+        min: 1,
+        max: amount
+    });
+
+    $("#amount").val('');
 });
 
 

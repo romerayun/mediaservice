@@ -86,6 +86,7 @@
                                     <th>Сотрудник</th>
                                     <th>Категория услуги</th>
                                     <th>Наименование услуги</th>
+                                    <th>Дата оплаты</th>
                                     <th>Сумма</th>
                                     <th>Статус</th>
                                     <th class="text-center">Редактирование</th>
@@ -112,6 +113,13 @@
                                         </td>
                                         <td>{{$item->service->category->name}}</td>
                                         <td>{{$item->service->name}}</td>
+                                        <td>
+                                            @if(!$item->historiesPayment->count())
+                                                <span class="text-danger">Статус не найден</span>
+                                            @else
+                                                {{$item->historiesPayment->first()->getDate()}}
+                                            @endif
+                                        </td>
                                         <td>{{money($item->amount)}} руб.</td>
                                         <td>
                                             @if(!$item->historiesPayment->count())

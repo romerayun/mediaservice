@@ -2,6 +2,7 @@
 
 use App\Models\Claim;
 use App\Models\ClaimUsers;
+use App\Models\HistoryPayment;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -362,7 +363,7 @@ if (!function_exists('money')) {
     }
 }
 
-if (!file_exists('checkUserAccessToClaim')) {
+if (!function_exists('checkUserAccessToClaim')) {
     function checkUserAccessToClaim($claim_id, $user_id) {
 
         $claimUser = ClaimUsers::where('claim_id', $claim_id)
@@ -375,5 +376,18 @@ if (!file_exists('checkUserAccessToClaim')) {
             return true;
         }
 
+    }
+}
+
+if (!function_exists('getPaymentsClaim')) {
+    function getPaymentsClaim($claim_id) {
+        $claim = HistoryPayment::with('status')
+            ->whereHas('status', function ($q) {
+                $q->where('name', 'Частично оплачен');
+            })
+            ->where('claim_id', $claim_id)
+            ->sum('amount');
+
+        return $claim;
     }
 }

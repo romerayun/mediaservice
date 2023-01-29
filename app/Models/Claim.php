@@ -64,7 +64,7 @@ class Claim extends Model
 
     public function historiesPayment()
     {
-        return $this->hasMany(HistoryPayment::class)->orderBy('id', 'desc');
+        return $this->hasMany(HistoryPayment::class)->orderBy('created_at', 'desc');
     }
 
     public function files()

@@ -16,6 +16,7 @@ class HistoryPayment extends Model
         'user_id',
         'status_id',
         'comment',
+        'amount',
     ];
 
     public function claim()

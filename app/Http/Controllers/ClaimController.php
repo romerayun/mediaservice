@@ -235,9 +235,11 @@ class ClaimController extends Controller
             }
         }
 
+
         if ($claim->user_id == null) {
             $user_id = 0;
         }
+        $user_id = $claim->user_id;
 
         $withoutUsers = UserM::where('isBlocked', 0)
             ->whereNotIn('id', [$claim->creator, $user_id])

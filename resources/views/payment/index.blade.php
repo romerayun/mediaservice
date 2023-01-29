@@ -27,7 +27,7 @@
                     <div class="form-group @if($errors->has('status_id')) is-invalid @endif">
                         <label>Выберите новый статус: </label>
                         <input type="hidden" name="claim_id" id="claim_id" value="">
-                        <select class="js-example-basic-single is-invalid" name="status_id" id="status_id">
+                        <select class="js-example-basic-single is-invalid" name="status_id" id="status_id" required>
                             @foreach($statusesPayment as $status)
                                 <option value="{{$status->id}}">{{$status->name}}</option>
                             @endforeach
@@ -43,7 +43,9 @@
                     </div>
 
                     <div class="form-group d-none amount-form">
-                        <label>Какая сумма была оплачена? </label>
+                        <label>Какая сумма была оплачена?
+                            <span class="text-primary">(Не более: <b id="max-val"></b>)</span>
+                        </label>
                         <input type="text" id="amount"
                                class="form-control @if($errors->has('amount')) is-invalid @endif"
                                name="amount"
@@ -108,13 +110,15 @@
                                     <th>Наименование услуги</th>
                                     <th>Сумма</th>
                                     <th>Статус</th>
-                                    <th class="text-center">Действие</th>
+                                    <th class="text-center">Действия</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 @foreach($claims as $key => $item)
                                     <tr>
-                                        <td>{{$item->id}}</td>
+                                        <td><a href="{{route('claims.show', ['claim' => $item->id])}}">
+                                                {{$item->id}}
+                                            </a></td>
                                         <td>{{$item->getDate()}}</td>
                                         <td>
                                             <a href="{{route('clients.show', ['client'=>$item->client->id])}}" target="_blank">{{$item->client->name}}
@@ -132,8 +136,16 @@
                                         </td>
                                         <td>{{$item->service->category->name}}</td>
                                         <td>{{$item->service->name}}</td>
-                                        <td>{{money($item->amount)}} руб.</td>
                                         <td>
+                                            <p class="mb-0"><b>Общая сумма:</b> {{money($item->amount)}} руб.</p>
+                                            @if (getPaymentsClaim($item->id) != 0)
+                                                <p class="mb-0 mt-2"><b>Частчино оплачено:</b> {{getPaymentsClaim($item->id)}} руб.</p>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <a href="{{route('payment.list-paid', ['claim' => $item->id])}}" class="btn btn-sm btn-warning icon icon-left me-2">
+                                                <i class="bi bi-pen-fill"></i>
+                                            </a>
                                             @if(!$item->historiesPayment->count())
                                                 <span class="text-danger">Статус не найден</span>
                                             @else
@@ -141,11 +153,14 @@
                                                     {{$item->historiesPayment->first()->status->name}}
                                                 </span>
                                             @endif
+
                                         </td>
                                         <td class="text-center">
-                                            <button type="button" class="btn btn-primary changeStatus" data-bs-toggle="modal" data-bs-target="#changeStatus" attr-id="{{$item->id}}">
+                                            <button type="button" class="btn btn-sm btn-primary changeStatus" data-bs-toggle="modal" data-bs-target="#changeStatus" attr-id="{{$item->id}}"
+                                                    attr-max-amount="{{$item->amount - getPaymentsClaim($item->id)}}">
                                                 Изменить статус оплаты
                                             </button>
+
                                         </td>
                                     </tr>
 

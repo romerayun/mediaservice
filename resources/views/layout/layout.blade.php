@@ -2,7 +2,6 @@
     <script>window.location = "/logout";</script>
 @endif
 
-
 <!DOCTYPE html>
 <html lang="en">
 

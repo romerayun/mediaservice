@@ -56,9 +56,9 @@
                                     {{money($sumClaims->first()->total_amount)}} руб.
                                 @endif</p>
                             <p class="text-gray-500 mb-0"><b class="text-primary">Поступления:</b>            @if($sumPaid->first()->total_amount == null)
-                                    0 руб.
+                                    {{ 0 + $resultSumPartsPaidClaims }} руб.
                                 @else
-                                    {{money($sumPaid->first()->total_amount)}} руб.
+                                    {{money($sumPaid->first()->total_amount + $resultSumPartsPaidClaims)}} руб.
                                 @endif</p>
                             <p class="text-gray-500 mb-4"><b class="text-primary">Процент выполения:</b> {{round($sumPaid->first()->total_amount / $sumPlan * 100, 2)}}%</p>
 
@@ -97,8 +97,13 @@
                                         </td>
                                         <td>
                                             @if(isset($multipliedPaidClaims[$item->user_id]))
-                                                {{money($multipliedPaidClaims[$item->user_id]->total_amount)}} руб.
-                                                @php $fact = $multipliedPaidClaims[$item->user_id]->total_amount @endphp
+                                                @if(isset($usersParts))
+                                                    {{money($multipliedPaidClaims[$item->user_id]->total_amount + $usersParts[$item->user_id])}} руб.
+                                                    @php $fact = $multipliedPaidClaims[$item->user_id]->total_amount + $usersParts[$item->user_id] @endphp
+                                                @else
+                                                    {{money($multipliedPaidClaims[$item->user_id]->total_amount)}} руб.
+                                                    @php $fact = $multipliedPaidClaims[$item->user_id]->total_amount @endphp
+                                                @endif
                                             @else
                                                 <span class="text-danger">0 руб.</span>
                                             @endif

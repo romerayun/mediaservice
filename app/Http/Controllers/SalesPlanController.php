@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Claim;
 use App\Models\Group;
+use App\Models\HistoryPayment;
 use App\Models\SalesPlan;
 use App\Models\Service;
 use App\Models\UserM;
@@ -207,6 +208,52 @@ class SalesPlanController extends Controller
             ->select(DB::raw('SUM(amount) as total_amount'))
             ->get();
 
+//        $sumPartsPaid = Claim::with('historiesPayment')
+//            ->whereHas('historiesPayment', function ($q) use ($start, $end) {
+
+        // Частично оплаченные заявки
+        $sumPartsPaid = HistoryPayment::where('created_at', '>=', $start)
+                    ->where('created_at', '<=', $end)
+                    ->with('status')
+                    ->whereHas('status', function ($w) {
+                        $w->where('name', "Частично оплачен");
+                    })
+            ->groupBy('claim_id')
+            ->select(DB::raw('claim_id, SUM(amount) as total_amount'))
+            ->get();
+
+        /** Удаление оплаченных заявок */
+        $resultSumPartsPaidClaims = 0;
+        if (count($sumPartsPaid) != 0) {
+            foreach ($sumPartsPaid as $key => $part) {
+                foreach ($part->claim->historiesPayment as $history) {
+                    if ($history->status->name == 'Оплачен') {
+                        unset($sumPartsPaid[$key]);
+                    }
+                }
+            }
+        }
+
+        $usersParts = [];
+
+        /** Подсчет общей суммы и распределение по сотрудникам */
+        if (count($sumPartsPaid) != 0) {
+            foreach ($sumPartsPaid as $key => $part) {
+                $resultSumPartsPaidClaims += $part->total_amount;
+                if (isset($usersParts[$part->claim->creator])) {
+                    $usersParts[$part->claim->creator] += $part->total_amount;
+                } else {
+                    $usersParts[$part->claim->creator] = $part->total_amount;
+                }
+
+            }
+        }
+
+
+//        dd($usersParts);
+
+
+
         $usersClaims = DB::table('claims')
             ->select('creator', DB::raw('SUM(amount) as total_amount'))
             ->where('notInclude',0)
@@ -240,13 +287,16 @@ class SalesPlanController extends Controller
             return [$item->creator => $item];
         });
 
+//        dd($multipliedPaidClaims);
+
 
         $salesPlan = SalesPlan::orderBy('month', 'desc')
             ->where('month', $planMonth)
             ->get();
 
 
-        return view('plan.statistics', compact('multiplied', 'salesPlan', 'multipliedPaidClaims', 'sumPlan', 'sumClaims', 'sumPaid'));
+        return view('plan.statistics', compact('multiplied', 'salesPlan', 'multipliedPaidClaims', 'sumPlan', 'sumClaims',
+            'sumPaid', 'resultSumPartsPaidClaims', 'usersParts'));
     }
 
 

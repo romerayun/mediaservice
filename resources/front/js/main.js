@@ -337,7 +337,7 @@ $(document).on("click", ".block", function (event) {
 
 $('.js-example-basic-single').select2();
 
-if (!currentUrl.includes('services') && !currentUrl.includes('edit') && !currentUrl.includes('distribution-claims') && !currentUrl.includes('distribution') && !currentUrl.includes('plan') && !currentUrl.includes('users') && !currentUrl.includes('reports') && !currentUrl.includes('calendar') && !currentUrl.includes('claims')) {
+if (!currentUrl.includes('services') && !currentUrl.includes('edit') && !currentUrl.includes('distribution-claims') && !currentUrl.includes('distribution') && !currentUrl.includes('plan') && !currentUrl.includes('users') && !currentUrl.includes('reports') && !currentUrl.includes('calendar') && !currentUrl.includes('claims') && !currentUrl.includes('payments')) {
     $("#user_id").select2({
         'disabled': true,
     });
@@ -531,6 +531,17 @@ $(".typing-client").keyup(function () {
         }
     });
 });
+
+$(".payment-store select#status_id").change(function () {
+
+    if ($("#status_id option:selected").text() == 'Частично оплачен') {
+        $(".amount-form").removeClass('d-none');
+    } else {
+        $(".amount-form").addClass('d-none');
+        $(".amount-form").find('#amount').val('');
+    }
+});
+
 
 $("input[type=checkbox]").change(function () {
 

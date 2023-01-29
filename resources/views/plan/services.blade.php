@@ -5,7 +5,7 @@
             <h3>Управление планом продаж</h3>
         </div>
         <div class="col-12 col-md-6 text-end">
-            <a href="{{route('plan.index')}}" class="btn btn-primary">Назад</a>
+            <a href="{{url()->previous()}}" class="btn btn-primary">Назад</a>
         </div>
     </div>
 @endsection
@@ -17,7 +17,8 @@
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
-                        <form action="{{route('plan.services')}}" method="GET">
+{{--                        <form action="{{route('plan.services')}}" method="GET">--}}
+                        <form action="{{request()->url()}}" method="GET">
                             <div class="form-group ">
                                 <label>Выберите месяц для фильтрации: </label>
                                 <div class="d-flex">

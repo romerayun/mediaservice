@@ -293,6 +293,7 @@ class SalesPlanController extends Controller
 
     public function services(Request $request)
     {
+
         $start = date('Y-m-01') . ' 00:00:00';
         $end = date('Y-m-31') . ' 23:59:59';
 

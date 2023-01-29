@@ -91,6 +91,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('plan/services', [SalesPlanController::class, 'services'])->name('plan.services');
     Route::get('plan/statistics', [SalesPlanController::class, 'statistics'])->name('plan.statistics');
     Route::get('plan/statistics/remoteData', [SalesPlanController::class, 'remoteData'])->name('plan.remote');
+    Route::get('plan/sales-category', [UserController::class, 'getSalesByCategory'])->name('plan.salesCategory');
+    Route::post('plan/sales-category', [UserController::class, 'getSalesByCategoryAjax']);
     Route::resource('plan', SalesPlanController::class);
 
     Route::post('goals/reports', [CalendarController::class, 'createReport'])->name('goals.create-report');
@@ -133,7 +135,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('claims/{claim}/storeHistory', [ClaimController::class, 'storeHistory'])->name('claim.storeHistory');
     Route::resource('claims', ClaimController::class);
 
-
+    Route::get('payments/sales-category', [UserController::class, 'getSalesByCategory'])->name('payment.salesCategory');
+    Route::post('payments/sales-category', [UserController::class, 'getSalesByCategoryAjax']);
+    Route::get('payments/services', [SalesPlanController::class, 'services'])->name('payment.services');
+    Route::get('payments/statistics', [SalesPlanController::class, 'statistics'])->name('payment.statistics');
     Route::get('payments', [PaymentController::class, 'index'])->name('payment.index');
     Route::get('payments/paid', [PaymentController::class, 'paid'])->name('payment.paid');
     Route::get('payments/paid/{claim}', [PaymentController::class, 'paidListClaims'])->name('payment.list-paid');

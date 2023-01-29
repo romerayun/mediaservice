@@ -235,10 +235,15 @@ class ClaimController extends Controller
             }
         }
 
+        if ($claim->user_id == null) {
+            $user_id = 0;
+        }
+
         $withoutUsers = UserM::where('isBlocked', 0)
-            ->whereNotIn('id', [$claim->creator, $claim->user_id])
+            ->whereNotIn('id', [$claim->creator, $user_id])
             ->whereNotIn('id', $ids)
             ->get();
+
 
         return view('claims.show', compact('claim', 'countAdds', 'statusesClaim', 'users', 'activeAd', 'withoutUsers', 'claimUsers'));
     }

@@ -6,9 +6,9 @@
         </div>
         <div class="col-12 col-md-9 text-end">
             <a href="{{route('payment.paid')}}" class="btn btn-sm btn-success">Оплаченные счета <span class="badge bg-transparent">{{getCountCompletePayment()}}</span></a>
-            <a href="{{route('plan.statistics')}}" class="btn btn-sm btn-primary">Продажи (План/Факт)</a>
-            <a href="{{route('plan.services')}}" class="btn btn-sm btn-primary">Продажи (по услугам)</a>
-            <a href="{{route('users.salesCategory')}}" class="btn btn-sm btn-primary">Продажи (по менеджерам)</a>
+            <a href="{{route('payment.statistics')}}" class="btn btn-sm btn-primary">Продажи (План/Факт)</a>
+            <a href="{{route('payment.services')}}" class="btn btn-sm btn-primary">Продажи (по услугам)</a>
+            <a href="{{route('payment.salesCategory')}}" class="btn btn-sm btn-primary">Продажи (по менеджерам)</a>
         </div>
     </div>
 @endsection
@@ -22,7 +22,7 @@
             </div>
             <div class="modal-body">
                 <span class="text-danger">* </span><p class="text-subtitle text-danger d-inline">При изменении статуса на "Оплачен", заявка будет внесена в общую статистику доходов</p>
-                <form action="{{route('payment.store')}}" method="POST" class="mt-4">
+                <form action="{{route('payment.store')}}" method="POST" class="mt-4 payment-store">
                     @csrf
                     <div class="form-group @if($errors->has('status_id')) is-invalid @endif">
                         <label>Выберите новый статус: </label>
@@ -36,6 +36,23 @@
                             <div class="invalid-feedback">
                                 <i class="bx bx-radio-circle"></i>
                                 @foreach($errors->get('status_id') as $message)
+                                    {{$message}}<br>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="form-group d-none amount-form">
+                        <label>Какая сумма была оплачена? </label>
+                        <input type="text" id="amount"
+                               class="form-control @if($errors->has('amount')) is-invalid @endif"
+                               name="amount"
+                               placeholder="Введите оплаченную сумму..."
+                               value="{{old('amount')}}">
+                        @if($errors->has('amount'))
+                            <div class="invalid-feedback">
+                                <i class="bx bx-radio-circle"></i>
+                                @foreach($errors->get('amount') as $message)
                                     {{$message}}<br>
                                 @endforeach
                             </div>

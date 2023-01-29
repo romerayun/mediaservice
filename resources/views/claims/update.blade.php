@@ -29,6 +29,8 @@
 
                 <input class="form-check-input ms-3" name="notIncludeC" id="notIncludeC" type="checkbox" value="" @if ($claim->notInclude) checked @endif> Не включать в план продаж
                 <input type="hidden" name="notInclude" value="@if ($claim->notInclude) 1 @else 0 @endif">
+
+
             </div>
         </div>
 

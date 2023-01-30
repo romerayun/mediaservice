@@ -139,17 +139,17 @@
                                         <td>
                                             <p class="mb-0"><b>Общая сумма:</b> {{money($item->amount)}} руб.</p>
                                             @if (getPaymentsClaim($item->id) != 0)
-                                                <p class="mb-0 mt-2"><b>Частчино оплачено:</b> {{getPaymentsClaim($item->id)}} руб.</p>
+                                                <p class="mb-0 mt-2"><b>Частчино оплачено:</b> {{money(getPaymentsClaim($item->id))}} руб.</p>
                                             @endif
                                         </td>
                                         <td>
-                                            <a href="{{route('payment.list-paid', ['claim' => $item->id])}}" class="btn btn-sm btn-warning icon icon-left me-2">
+                                            <a href="{{route('payment.list-paid', ['claim' => $item->id])}}" class="btn btn-sm btn-warning icon icon-left me-2 mb-2">
                                                 <i class="bi bi-pen-fill"></i>
                                             </a>
                                             @if(!$item->historiesPayment->count())
-                                                <span class="text-danger">Статус не найден</span>
+                                                <span class="text-danger mb-2">Статус не найден</span>
                                             @else
-                                                <span class="badge custom-bg-{{$item->historiesPayment->first()->status->color}}">
+                                                <span class="badge mb-2 custom-bg-{{$item->historiesPayment->first()->status->color}}">
                                                     {{$item->historiesPayment->first()->status->name}}
                                                 </span>
                                             @endif

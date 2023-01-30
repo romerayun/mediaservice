@@ -38,21 +38,26 @@ class PaymentController extends Controller
 
         if ($request->amount == null) {
             $amount = 0;
+            $status = StatusPayment::where('id', $request->status_id)->get();
+            if ($status->first()->name == 'Оплачен') {
+                $sum = getPaymentsClaim($request->claim_id);
+                $amount = $claim->amount - $sum;
+            }
+
         } else {
             $amount = str_replace(' ', '', $request->amount);
             $sum = getPaymentsClaim($request->claim_id);
             if ($claim->amount == ($sum + $amount)) {
 
                 $status = StatusPayment::where("name", 'Оплачен')->get();
-
                 $request->merge([
-                   'status_id' => $status->first()->id,
-                   'amount' => '0',
+                    'status_id' => $status->first()->id,
+                    'amount' => $amount,
                     'user_id' => Auth::user()->id,
                 ]);
-
                 HistoryPayment::create($request->all());
                 return redirect()->back()->with('success', 'Данные успешно обновлены 👍');
+
             }
 
         }
@@ -60,6 +65,7 @@ class PaymentController extends Controller
         $request->merge([
             'amount' => $amount
         ]);
+
 
         $validatedData = $request->validate(
             [

@@ -812,7 +812,9 @@ if (document.getElementById('plan-statistics')) {
     var url = '/plan/statistics/remoteData';
 
     $.getJSON(url, {month: paramMonth}, function (response) {
-        if (response.data.length === 0) {
+
+
+        if (Object.keys(response.data).length === 0) {
             chart.updateOptions({
                 noData: {
                     text: 'Данные о поступлениях не найдены!',
@@ -823,8 +825,8 @@ if (document.getElementById('plan-statistics')) {
             });
         } else {
             chart.updateOptions({
-                series: response.data,
-                labels: response.labels
+                series:  Object.values(response.data),
+                labels: Object.values(response.labels),
             });
         }
 

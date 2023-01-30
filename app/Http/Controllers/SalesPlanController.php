@@ -194,65 +194,41 @@ class SalesPlanController extends Controller
             ->get();
 
 
-
-        $sumPaid = Claim::with('historiesPayment')
-            ->whereHas('historiesPayment', function ($q) use ($start, $end) {
-                $q->where('created_at', '>=', $start)
+        $sumPaid = HistoryPayment::where('created_at', '>=', $start)
                     ->where('created_at', '<=', $end)
                     ->with('status')
                     ->whereHas('status', function ($w) {
-                        $w->where('name', "Оплачен");
-                    });
-            })
-            ->where('notInclude',0)
-            ->select(DB::raw('SUM(amount) as total_amount'))
+                        $w->where('name', "Частично оплачен")
+                            ->orWhere('name', "Оплачен");
+                    })
+            ->select(DB::raw(' SUM(amount) as total_amount'))
             ->get();
 
-//        $sumPartsPaid = Claim::with('historiesPayment')
-//            ->whereHas('historiesPayment', function ($q) use ($start, $end) {
-
-        // Частично оплаченные заявки
-        $sumPartsPaid = HistoryPayment::where('created_at', '>=', $start)
-                    ->where('created_at', '<=', $end)
-                    ->with('status')
-                    ->whereHas('status', function ($w) {
-                        $w->where('name', "Частично оплачен");
-                    })
+        $paidClaims = HistoryPayment::where('created_at', '>=', $start)
+            ->where('created_at', '<=', $end)
+            ->with('status')
+            ->whereHas('status', function ($w) {
+                $w->where('name', "Частично оплачен")
+                    ->orWhere('name', "Оплачен");
+            })
             ->groupBy('claim_id')
             ->select(DB::raw('claim_id, SUM(amount) as total_amount'))
             ->get();
 
-        /** Удаление оплаченных заявок */
-        $resultSumPartsPaidClaims = 0;
-        if (count($sumPartsPaid) != 0) {
-            foreach ($sumPartsPaid as $key => $part) {
-                foreach ($part->claim->historiesPayment as $history) {
-                    if ($history->status->name == 'Оплачен') {
-                        unset($sumPartsPaid[$key]);
-                    }
-                }
-            }
-        }
 
-        $usersParts = [];
+        $multipliedPaidClaims = [];
 
-        /** Подсчет общей суммы и распределение по сотрудникам */
-        if (count($sumPartsPaid) != 0) {
-            foreach ($sumPartsPaid as $key => $part) {
-                $resultSumPartsPaidClaims += $part->total_amount;
-                if (isset($usersParts[$part->claim->creator])) {
-                    $usersParts[$part->claim->creator] += $part->total_amount;
+
+        if (count($paidClaims) != 0) {
+            foreach ($paidClaims as $key => $part) {
+                if (isset($multipliedPaidClaims[$part->claim->creator])) {
+                    $multipliedPaidClaims[$part->claim->creator] += $part->total_amount;
                 } else {
-                    $usersParts[$part->claim->creator] = $part->total_amount;
+                    $multipliedPaidClaims[$part->claim->creator] = $part->total_amount;
                 }
 
             }
         }
-
-
-//        dd($usersParts);
-
-
 
         $usersClaims = DB::table('claims')
             ->select('creator', DB::raw('SUM(amount) as total_amount'))
@@ -268,35 +244,11 @@ class SalesPlanController extends Controller
         });
 
 
-
-        $paidClaims = Claim::with('historiesPayment')
-            ->whereHas('historiesPayment', function ($q) use ($start, $end) {
-                $q->where('created_at', '>=', $start)
-                    ->where('created_at', '<=', $end)
-                    ->with('status')
-                    ->whereHas('status', function ($w) {
-                        $w->where('name', "Оплачен");
-                    });
-            })
-            ->where('notInclude',0)
-            ->select('creator', DB::raw('SUM(amount) as total_amount'))
-            ->groupBy('creator')
-            ->get();
-
-        $multipliedPaidClaims = $paidClaims->mapWithKeys(function ($item, $key) {
-            return [$item->creator => $item];
-        });
-
-//        dd($multipliedPaidClaims);
-
-
         $salesPlan = SalesPlan::orderBy('month', 'desc')
             ->where('month', $planMonth)
             ->get();
 
-
-        return view('plan.statistics', compact('multiplied', 'salesPlan', 'multipliedPaidClaims', 'sumPlan', 'sumClaims',
-            'sumPaid', 'resultSumPartsPaidClaims', 'usersParts'));
+        return view('plan.statistics', compact('multiplied', 'salesPlan', 'multipliedPaidClaims', 'sumPlan', 'sumClaims', 'sumPaid'));
     }
 
 
@@ -311,27 +263,52 @@ class SalesPlanController extends Controller
         }
 
 
-        $paidClaims = Claim::with('historiesPayment')
-            ->whereHas('historiesPayment', function ($q) use ($start, $end) {
-                $q->where('created_at', '>=', $start)
-                    ->where('created_at', '<=', $end)
-                    ->with('status')
-                    ->whereHas('status', function ($w) {
-                        $w->where('name', "Оплачен");
-                    });
+//        $paidClaims = Claim::with('historiesPayment')
+//            ->whereHas('historiesPayment', function ($q) use ($start, $end) {
+//                $q->where('created_at', '>=', $start)
+//                    ->where('created_at', '<=', $end)
+//                    ->with('status')
+//                    ->whereHas('status', function ($w) {
+//                        $w->where('name', "Частично оплачен")
+//                            ->where('name', "Оплачен");
+//                    });
+//            })
+//            ->where('notInclude',0)
+//            ->select('creator', DB::raw('SUM(amount) as total_amount'))
+//            ->groupBy('creator')
+//            ->get();
+
+        $paidClaims = HistoryPayment::where('created_at', '>=', $start)
+            ->where('created_at', '<=', $end)
+            ->with('status')
+            ->whereHas('status', function ($w) {
+                $w->where('name', "Частично оплачен")
+                    ->orWhere('name', "Оплачен");
             })
-            ->where('notInclude',0)
-            ->select('creator', DB::raw('SUM(amount) as total_amount'))
-            ->groupBy('creator')
+            ->groupBy('claim_id')
+            ->select(DB::raw('claim_id, SUM(amount) as total_amount'))
             ->get();
 
-        $fio = $paidClaims->mapWithKeys(function ($item, $key) {
-            return [$key => $item->creatorUser->getFullName()];
-        });
+        $fio = [];
+        $multipliedPaidClaims = [];
+        if (count($paidClaims) != 0) {
+            foreach ($paidClaims as $key => $part) {
+                if (isset($multipliedPaidClaims[$part->claim->creator])) {
+                    $multipliedPaidClaims[$part->claim->creator] += $part->total_amount;
+                } else {
+                    $multipliedPaidClaims[$part->claim->creator] = $part->total_amount;
+                }
+                $fio[$part->claim->creator] = $part->claim->creatorUser->getFullName();
+            }
+        }
 
-        $multipliedPaidClaims = $paidClaims->mapWithKeys(function ($item, $key) {
-            return [$key => $item->total_amount];
-        });
+//        $fio = $paidClaims->mapWithKeys(function ($item, $key) {
+//            return [$key => $item->creatorUser->getFullName()];
+//        });
+//
+//        $multipliedPaidClaims = $paidClaims->mapWithKeys(function ($item, $key) {
+//            return [$key => $item->total_amount];
+//        });
 
         $res = array(
             'labels' => $fio,

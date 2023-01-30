@@ -41,6 +41,7 @@
     <h4 class="card-title mb-4 ">Статистика продаж по услугам</h4>
     <div class="row">
     @foreach($allData as $item)
+
         <div class="col-12 col-md-6">
             <div class="card">
                 <div class="card-content">
@@ -55,10 +56,12 @@
                                     <th>Ф.И.О.</th>
                                     <th>Продано</th>
                                 </thead>
+
                                 @foreach($item['users'] as $user)
+
                                     <tr>
-                                        <td>{{getUserById($user->creator)}}</td>
-                                        <td>{{money($user->claims_amount)}} руб.</td>
+                                        <td>{{getUserById($user['creator'])}}</td>
+                                        <td>{{money($user['total_amount'])}} руб.</td>
                                     </tr>
                                 @endforeach
                             </table>

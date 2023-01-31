@@ -20,6 +20,7 @@ class CalendarController extends Controller
 {
     public function index()
     {
+
         $groups = Group::all();
         $users = Group::with('roles.users')
 //            ->where('name', 'Отдел продаж')

@@ -42,13 +42,13 @@ class DebtClaimsCommand extends Command
     public function handle()
     {
 
-        $start = date('Y-m-00') . ' 00:00:00';
-        $end = date('Y-m-32') . ' 00:00:00';
+        $start = date('Y-m-01') . ' 00:00:00';
+        $end = date('Y-m-32') . ' 23:59:59';
 
         $date = Carbon::now()->toDateString();
-        $lastDayMonth = Carbon::now()->endOfMonth()->toDateString();
+        $firstDate = Carbon::now()->firstOfMonth()->toDateString();
 
-        if ($date == $lastDayMonth) {
+        if ($date == $firstDate) {
             $claims = Claim::with('historiesPayment')
                 ->whereHas('historiesPayment', function ($q) use ($start, $end) {
                     $q->with('status')

@@ -76,32 +76,39 @@
 
                         <hr>
                         @if($activeAd)
-                            @if($activeAd->end_date < now())
-                                <h4 class="card-title mb-0 mt-2">Рекламная кампания завершена</h4>
-                                <p class="mt-2">
-                                    <b class="text-primary">Период рекламной кампании:</b>
-                                    {{\Illuminate\Support\Carbon::parse($activeAd->start_date)->format('d.m.Y')}}
-                                    -
-                                    {{\Illuminate\Support\Carbon::parse($activeAd->end_date)->format('d.m.Y')}}
-                                </p>
-                            @else
-                                <h4 class="card-title mb-0 mt-2">Рекламная кампания запущена</h4>
-                                <p class="mt-2">
-                                    <b class="text-primary">Период рекламной кампании:</b>
-                                    {{\Illuminate\Support\Carbon::parse($activeAd->start_date)->format('d.m.Y')}}
-                                    -
-                                    {{\Illuminate\Support\Carbon::parse($activeAd->end_date)->format('d.m.Y')}}
-                                </p>
-                                <form action="{{route('claim.deleteAd', ['ad'=>$activeAd->id])}}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger">Удалить рекламную кампанию</button>
-                                </form>
+                            @if (count($activeAd) != 0)
+
+                                @foreach($activeAd as $activeAdItem)
+                                    @if($activeAdItem->end_date < now())
+                                        <h4 class="card-title mb-0 mt-2">Рекламная кампания завершена</h4>
+                                        <p class="mt-2">
+                                            <b class="text-primary">Период рекламной кампании:</b>
+                                            {{\Illuminate\Support\Carbon::parse($activeAdItem->start_date)->format('d.m.Y')}}
+                                            -
+                                            {{\Illuminate\Support\Carbon::parse($activeAdItem->end_date)->format('d.m.Y')}}
+                                        </p>
+                                    @else
+                                        <h4 class="card-title mb-0 mt-2">Рекламная кампания запущена <form action="{{route('claim.deleteAd', ['ad'=>$activeAdItem->id])}}" method="POST" class="ms-2 d-inline-block">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger icon"><i class="bi bi-trash-fill"></i></button>
+                                            </form></h4>
+                                        <p class="mt-2">
+                                            <b class="text-primary">Период рекламной кампании:</b>
+                                            {{\Illuminate\Support\Carbon::parse($activeAdItem->start_date)->format('d.m.Y')}}
+                                            -
+                                            {{\Illuminate\Support\Carbon::parse($activeAdItem->end_date)->format('d.m.Y')}}
+                                        </p>
+
+                                    @endif
+                                        <div class="mb-4"></div>
+                                @endforeach
+
                             @endif
-                        @else
+                        @endif
 
                         @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id || checkUserAccessToClaim($claim->id, auth()->user()->id))
-                                @if ($claim->isClose == 0)
+
                         <div class="form-check form-switch">
                             <label class="form-check-label" for="active-adds">Поставить рекламу на запуск</label>
                             <input class="form-check-input" name="active-adds" type="checkbox"  @if($errors->has('range_date_hidden')) checked @endif>
@@ -137,10 +144,9 @@
                                 <button type="submit" class="btn btn-success mt-3">Запустить</button>
                             </form>
                         </div>
-                                    @endif
-                        @endif
 
                         @endif
+
 
                         @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator || auth()->user()->id == $claim->user_id || checkUserAccessToClaim($claim->id, auth()->user()->id))
                         @if ($claim->isClose == 0)
@@ -161,7 +167,7 @@
                                         <label>Причина закрытия заявки: </label>
                                         <textarea
                                             class="form-control @if($errors->has('commentClose')) is-invalid @endif"
-                                            id="commentClose" name="commentClose" rows="3"
+                                            id="commentClose" name="commentClose" rows="3" required
                                             placeholder="Введите причину закрытия заявки...">{{old('commentClose')}}</textarea>
                                         @if($errors->has('commentClose'))
                                             <div class="invalid-feedback">

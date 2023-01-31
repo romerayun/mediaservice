@@ -277,7 +277,7 @@
                             <p class="fw-bold text-danger mb-2">Загруженные файлы не найдены</p>
                         @endif
                     @endif
-                    <input type="file" class="filepond" id="filepond" name="filepond[]"
+                    <input type="file" id="filepond" name="filepond[]"
                            multiple>
                 </div>
             </div>

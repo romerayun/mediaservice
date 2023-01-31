@@ -223,7 +223,7 @@ class ClaimController extends Controller
         $countAdds = claimsAdds($claim);
         $statusesClaim = StatusClaim::where('isVisible', 1)->get();
         $users = UserM::where('isBlocked', 0)->get();
-        $activeAd = ActiveAd::firstWhere('claim_id', $id);
+        $activeAd = ActiveAd::where('claim_id', $id)->get();
 
         $claimUsers = ClaimUsers::where('claim_id', $id)
         ->get();
@@ -282,6 +282,20 @@ class ClaimController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        if ($request->amount == null || trim($request->amount) == '' || $request->amount == '') {
+            $request->merge([
+                'amount' => 0,
+            ]);
+        } else {
+            $amount = str_replace(' ', '', $request->amount);
+            $request->merge([
+                'amount' => $amount,
+            ]);
+        }
+
+//        dd($request);
+
         $claim = Claim::firstWhere('id', $id);
         $validatedData = $request->validate(
             [
@@ -388,7 +402,7 @@ class ClaimController extends Controller
 
         } catch (\Exception $exception) {
             DB::rollback();
-            $request->session()->flash('error', 'При обновлении заявки произошла ошибка 😢');
+            $request->session()->flash('error', 'При обновлении заявки произошла ошибка 😢' . $exception);
             return back();
         }
 

@@ -71,14 +71,17 @@ class RequisitesClient extends Controller
      */
     public function update(StoreRequisitesClients $request, $id)
     {
-        $inn = $request->input('INN');
 
-        $resultInn = RequisiteClient::where('INN', $inn)->first();
+        if ($request->input('INN') != null) {
+            $inn = $request->input('INN');
 
-        if ($resultInn != null) {
-            if ($resultInn->id != $id) {
-                $request->session()->flash('infoClient', $resultInn->client);
-                return back();
+            $resultInn = RequisiteClient::where('INN', $inn)->first();
+
+            if ($resultInn != null) {
+                if ($resultInn->id != $id) {
+                    $request->session()->flash('infoClient', $resultInn->client);
+                    return back();
+                }
             }
         }
 

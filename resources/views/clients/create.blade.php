@@ -28,7 +28,7 @@
                                         <div class="form-group">
                                             <label>ИНН организации: </label>
                                             <input type="text" id="inn" class="form-control @if($errors->has('inn')) is-invalid @endif" name="inn"
-                                                   placeholder="Введите ИНН..." required
+                                                   placeholder="Введите ИНН..."
                                                    value="{{old('inn')}}">
                                             @if($errors->has('inn'))
                                                 <div class="invalid-feedback">

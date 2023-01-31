@@ -39753,7 +39753,7 @@ function getSum() {
 }
 var inputElement = document.querySelector('#filepond');
 var pond = filepond__WEBPACK_IMPORTED_MODULE_2__.create(inputElement, {
-  'labelIdle': 'Перетащите 123свои файлы в эту область или <span class="filepond--label-action"> Нажмите сюда </span>',
+  'labelIdle': 'Перетащите свои файлы в эту область или <span class="filepond--label-action"> Нажмите сюда </span>',
   credits: false,
   server: {
     url: '/upload-filepond',

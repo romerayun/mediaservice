@@ -103,26 +103,27 @@ class ClientController extends Controller
             abort(403);
         }
 
-        $validatedData = $request->validate(
-            [
-                'inn' => 'required|regex:/^[0-9]+$/|min:10|max:12',
-            ],
-            [
-                'inn.required' => 'Поле ИНН не может быть пустым',
-                'inn.regex' => 'Поле ИНН может состоять только из цифр',
-                'inn.min' => 'Поле ИНН не может быть меньше 10 символов',
-                'inn.max' => 'Поле ИНН не может быть больше 12 символов',
-            ]
-        );
+        $inn = null;
+        if ($request->input('inn') != null) {
+            $validatedData = $request->validate(
+                [
+                    'inn' => 'required|regex:/^[0-9]+$/|min:10|max:12',
+                ],
+                [
+                    'inn.required' => 'Поле ИНН не может быть пустым',
+                    'inn.regex' => 'Поле ИНН может состоять только из цифр',
+                    'inn.min' => 'Поле ИНН не может быть меньше 10 символов',
+                    'inn.max' => 'Поле ИНН не может быть больше 12 символов',
+                ]
+            );
+            $inn = $request->input('inn');
 
+            $resultInn = RequisiteClient::where('INN', $inn)->first();
 
-        $inn = $request->input('inn');
-
-        $resultInn = RequisiteClient::where('INN', $inn)->first();
-
-        if ($resultInn != null) {
-            $request->session()->flash('error', 'Введенный ИНН занят');
-            return back();
+            if ($resultInn != null) {
+                $request->session()->flash('error', 'Введенный ИНН занят');
+                return back();
+            }
         }
 
 
@@ -153,11 +154,13 @@ class ClientController extends Controller
             }
             $idClient = $client->id;
 
+
             $rc = new RequisiteClient;
             $rc->INN = $inn;
             $rc->client_id = $idClient;
             $rc->save();
             DB::commit();
+
 
             $history = new HistoryClient;
             $history->status_id = StatusClient::where('name', 'Создан клиент')->get()->first()->id;
@@ -296,15 +299,28 @@ class ClientController extends Controller
 //            abort(403);
 //        }
 
+        $inn = null;
+        if ($request->input('inn') != null) {
+            $validatedData = $request->validate(
+                [
+                    'inn' => 'required|regex:/^[0-9]+$/|min:10|max:12',
+                ],
+                [
+                    'inn.required' => 'Поле ИНН не может быть пустым',
+                    'inn.regex' => 'Поле ИНН может состоять только из цифр',
+                    'inn.min' => 'Поле ИНН не может быть меньше 10 символов',
+                    'inn.max' => 'Поле ИНН не может быть больше 12 символов',
+                ]
+            );
+            $inn = $request->input('inn');
 
-        $inn = $request->input('inn');
+            $resultInn = RequisiteClient::where('INN', $inn)->first();
 
-        $resultInn = RequisiteClient::where('INN', $inn)->first();
-
-        if ($resultInn != null) {
-            if ($resultInn->client_id != $id) {
-                $request->session()->flash('danger', 'Введенный ИНН занят');
-                return back();
+            if ($resultInn != null) {
+                if ($resultInn->client_id != $id) {
+                    $request->session()->flash('error', 'Введенный ИНН занят');
+                    return back();
+                }
             }
         }
 
@@ -330,11 +346,11 @@ class ClientController extends Controller
                 DB::commit();
             }
 
-
             $req = RequisiteClient::firstWhere('client_id', $id);
             $req->INN = $inn;
             $req->save();
             DB::commit();
+
 
             return redirect()->back()->with('success', 'Данные успешно обновлены 👍');
         } catch (\Exception $exception) {

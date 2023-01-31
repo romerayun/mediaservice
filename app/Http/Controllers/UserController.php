@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Claim;
 use App\Models\Client;
 use App\Models\Group;
+use App\Models\HistoryPayment;
 use App\Models\Role;
 use App\Models\SalesPlan;
 use App\Models\UserM;
@@ -164,19 +165,17 @@ class UserController extends Controller
             ->where('created_at', '<=', $end)
             ->get();
 
-        $sumPaid = Claim::with('historiesPayment')
-            ->whereHas('historiesPayment', function ($q) use ($start, $end) {
-                $q->where('created_at', '>=', $start)
-                    ->where('created_at', '<=', $end)
-                    ->with('status')
-                    ->whereHas('status', function ($w) {
-                        $w->where('name', "Оплачен");
-                    });
-            })
-            ->where('notInclude', 0)
-            ->where('creator', $id)
-            ->where('created_at', '>=', $start)
+        $sumPaid = HistoryPayment::where('created_at', '>=', $start)
             ->where('created_at', '<=', $end)
+            ->with('status')
+            ->whereHas('status', function ($w) {
+                $w->where('name', "Частично оплачен")
+                    ->orWhere('name', "Оплачен");
+            })
+            ->with('claim')
+            ->whereHas('claim', function ($q) use ($id) {
+                $q->where('creator', $id);
+            })
             ->select(DB::raw('SUM(amount) as total_amount'))
             ->get();
 
@@ -303,22 +302,19 @@ class UserController extends Controller
             ->where('created_at', '<=', $end)
             ->get();
 
-        $sumPaid = Claim::with('historiesPayment')
-            ->whereHas('historiesPayment', function ($q) use ($start, $end) {
-                $q->where('created_at', '>=', $start)
-                    ->where('created_at', '<=', $end)
-                    ->with('status')
-                    ->whereHas('status', function ($w) {
-                        $w->where('name', "Оплачен");
-                    });
-            })
-            ->where('notInclude', 0)
-            ->where('creator', $id)
-            ->where('created_at', '>=', $start)
+        $sumPaid = HistoryPayment::where('created_at', '>=', $start)
             ->where('created_at', '<=', $end)
+            ->with('status')
+            ->whereHas('status', function ($w) {
+                $w->where('name', "Частично оплачен")
+                    ->orWhere('name', "Оплачен");
+            })
+            ->with('claim')
+            ->whereHas('claim', function ($q) use ($id) {
+                $q->where('creator', $id);
+            })
             ->select(DB::raw('SUM(amount) as total_amount'))
             ->get();
-
 
 //        $paidClaims = Claim::with('historiesPayment')
 //            ->whereHas('historiesPayment', function ($q) use ($start, $end) {
@@ -380,29 +376,71 @@ class UserController extends Controller
 //        $end = '2022-12-32 00:00:00';
 //        $request->user_id = 1;
 
-        $categoriesAllSum = DB::table('categories')
-            ->leftJoin('services', 'categories.id', '=', 'services.category_id')
-            ->leftJoin('claims', 'services.id', '=', 'claims.service_id')
-            ->leftJoin('history_payments', 'claims.id', '=', 'history_payments.claim_id')
-            ->select('categories.id',
-                'categories.name',
-                DB::raw('sum(claims.amount) as claims_amount'))
-            ->whereNull('categories.deleted_at')
-//            ->where('claims.created_at', '>=', $start)
-//            ->where('claims.created_at', '<=', $end)
-            ->where('claims.notInclude', 0)
-            ->where('claims.creator', '=', $request->user_id)
-            ->where('history_payments.status_id', '=', 4)
-            ->where('history_payments.created_at', '>=', $start)
-            ->where('history_payments.created_at', '<=', $end)
-            ->groupBy('categories.id', 'categories.name')
-            ->get();
-
         $categories = Category::all();
 
-        $categoriesAllSum = $categoriesAllSum->mapWithKeys(function ($item, $key) {
-            return [$item->id => $item];
-        });
+        $categoriesAllSum = [];
+
+        foreach ($categories as $category) {
+            $categoryClaims = DB::table('categories')
+                ->join('services', 'categories.id', '=', 'services.category_id')
+                ->join('claims', 'services.id', '=', 'claims.service_id')
+                ->select('claims.id')
+                ->where('claims.creator', '=', $request->user_id)
+                ->where('categories.id', $category->id)
+                ->whereNull('categories.deleted_at')
+                ->get();
+
+            $claims = $categoryClaims->mapWithKeys(function ($item, $i) {
+                return [$i => $item->id];
+            });
+
+            $paid = HistoryPayment::where('created_at', '>=', $start)
+                ->where('created_at', '<=', $end)
+                ->whereIn('claim_id', $claims)
+                ->with('status')
+                ->whereHas('status', function ($w) {
+                    $w->where('name', "Частично оплачен")
+                        ->orWhere('name', "Оплачен");
+                })
+                ->select(DB::raw('SUM(amount) as total_amount'))
+                ->get();
+
+            if ($paid->first()->total_amount != null) {
+                $categoriesAllSum[$category->id] = [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'claims_amount' => $paid->first()->total_amount,
+                ];
+            }
+
+        }
+//
+//        $categoriesAllSum = DB::table('categories')
+//            ->leftJoin('services', 'categories.id', '=', 'services.category_id')
+//            ->leftJoin('claims', 'services.id', '=', 'claims.service_id')
+//            ->leftJoin('history_payments', 'claims.id', '=', 'history_payments.claim_id')
+//            ->select('categories.id',
+//                'categories.name',
+//                DB::raw('sum(claims.amount) as claims_amount'))
+//            ->whereNull('categories.deleted_at')
+////            ->where('claims.created_at', '>=', $start)
+////            ->where('claims.created_at', '<=', $end)
+//            ->where('claims.notInclude', 0)
+//            ->where('claims.creator', '=', $request->user_id)
+//            ->where('history_payments.status_id', '=', 4)
+//            ->where('history_payments.created_at', '>=', $start)
+//            ->where('history_payments.created_at', '<=', $end)
+//            ->groupBy('categories.id', 'categories.name')
+//            ->get();
+
+//        dd($categoriesAllSum);
+
+
+//        $categories = Category::all();
+//
+//        $categoriesAllSum = $categoriesAllSum->mapWithKeys(function ($item, $key) {
+//            return [$item->id => $item];
+//        });
 
         $allData = array();
         foreach ($categories as $key => $category) {
@@ -410,35 +448,66 @@ class UserController extends Controller
 
             $allData[$i] = array('name' => $category->name);
             if (isset($categoriesAllSum[$category->id])) {
-                $allData[$i]['sum'] = $categoriesAllSum[$category->id]->claims_amount;
+                $allData[$i]['sum'] = $categoriesAllSum[$category->id]["claims_amount"];
             } else {
                 $allData[$i]['sum'] = 0;
             }
 
-            $claims = DB::table('categories')
-                ->leftJoin('services', 'categories.id', '=', 'services.category_id')
-                ->leftJoin('claims', 'services.id', '=', 'claims.service_id')
-                ->leftJoin('history_payments', 'claims.id', '=', 'history_payments.claim_id')
-                ->leftJoin('clients', 'clients.id', '=', 'claims.client_id')
-                ->leftJoin('requisites_clients', 'clients.id', '=', 'requisites_clients.client_id')
-                ->select(
-                    'clients.name',
-                    'requisites_clients.fullName',
-                    'claims.amount',
-                )
-                ->whereNull('categories.deleted_at')
-                ->where('categories.id', $category->id)
-//                ->where('claims.created_at', '>=', $start)
-//                ->where('claims.created_at', '<=', $end)
-                ->where('claims.notInclude', 0)
+            $categoryClaims = DB::table('categories')
+                ->join('services', 'categories.id', '=', 'services.category_id')
+                ->join('claims', 'services.id', '=', 'claims.service_id')
+                ->join('clients', 'clients.id', '=', 'claims.client_id')
+                ->select(DB::raw('clients.id as client_id, claims.id as claim_id'))
                 ->where('claims.creator', '=', $request->user_id)
-                ->where('history_payments.status_id', '=', 4)
-                ->where('history_payments.created_at', '>=', $start)
-                ->where('history_payments.created_at', '<=', $end)
+                ->where('categories.id', $category->id)
+                ->where('claims.notInclude', 0)
+                ->whereNull('categories.deleted_at')
                 ->get();
 
-            $allData[$i]['users'] = $claims;
+            $allData[$i]['users'] = [];
+            foreach($categoryClaims as $user){
+                $paid = HistoryPayment::where('created_at', '>=', $start)
+                    ->where('created_at', '<=', $end)
+                    ->where('claim_id', $user->claim_id)
+                    ->with('status')
+                    ->whereHas('status', function ($w) {
+                        $w->where('name', "Частично оплачен")
+                            ->orWhere('name', "Оплачен");
+                    })
+                    ->groupBy('claim_id')
+                    ->select(DB::raw('claim_id, SUM(amount) as total_amount'))
+                    ->get();
+                $allData[$i]['users'][] = $paid;
+            }
+
+
+
+//            $claims = DB::table('categories')
+//                ->leftJoin('services', 'categories.id', '=', 'services.category_id')
+//                ->leftJoin('claims', 'services.id', '=', 'claims.service_id')
+//                ->leftJoin('history_payments', 'claims.id', '=', 'history_payments.claim_id')
+//                ->leftJoin('clients', 'clients.id', '=', 'claims.client_id')
+//                ->leftJoin('requisites_clients', 'clients.id', '=', 'requisites_clients.client_id')
+//                ->select(
+//                    'clients.name',
+//                    'requisites_clients.fullName',
+//                    'claims.amount',
+//                )
+//                ->whereNull('categories.deleted_at')
+//                ->where('categories.id', $category->id)
+////                ->where('claims.created_at', '>=', $start)
+////                ->where('claims.created_at', '<=', $end)
+//                ->where('claims.notInclude', 0)
+//                ->where('claims.creator', '=', $request->user_id)
+//                ->where('history_payments.status_id', '=', 4)
+//                ->where('history_payments.created_at', '>=', $start)
+//                ->where('history_payments.created_at', '<=', $end)
+//                ->get();
+
+//            $allData[$i]['users'] = $claims;
+
         }
+
 
         $res = '';
         $res .= '<div class="col-12 col-md-12">
@@ -498,15 +567,17 @@ class UserController extends Controller
         </div>';
 
 
-
         foreach($allData as $item) {
+
         $res .= '<div class="col-12 col-md-6">
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
                         <h4 class="card-title">'.$item['name'].'</h4>
                         <p class="text-primary"><b>Общая сумма: </b>'. money($item['sum']) . ' руб.</p>';
-                        if(count($item['users']) == 0) {
+//            {{dd(count($item['users'])); }}
+                        $countI = count($item['users']);
+                        if (count($item['users']) == 0) {
                             $res .= '<p class="text-danger">В данной категории услуг продажи не найдены</p>';
                         }
                         else {
@@ -517,17 +588,20 @@ class UserController extends Controller
                                     <th>Сумма</th>
                                 </thead>';
                             foreach($item['users'] as $user) {
-                                $res .= "<tr>
-                                        <td>" . $user->name ."</td>";
 
-                                if ($user->fullName) {
-                                    $res .= "<td>" . $user->fullName ."</td>";
-                                } else {
-                                    $res .= "<td class='text-danger'>Данные не заполнены</td>";
+                                if(count($user) != 0) {
+                                    $res .= "<tr>
+                                            <td>" . $user->first()->claim->client->name ."</td>";
+
+                                    if ($user->first()->claim->client->requisite->fullName) {
+                                        $res .= "<td>" .  $user->first()->claim->client->requisite->fullName ."</td>";
+                                    } else {
+                                        $res .= "<td class='text-danger'>Данные не заполнены</td>";
+                                    }
+
+                                    $res .= "<td>" . money($user->first()->total_amount) ." руб.</td>
+                                        </tr>";
                                 }
-
-                                $res .= "<td>" . money($user->amount) ." руб.</td>
-                                    </tr>";
                             }
                             $res .= '</table>';
                         }

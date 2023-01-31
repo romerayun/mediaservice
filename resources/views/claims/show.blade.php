@@ -63,6 +63,15 @@
                         @if ($claim->comment)
                             <p class="mt-1"><b class="text-primary">Комментарий:</b> {{$claim->comment}}</p>
                         @endif
+                        @if (auth()->user()->role->level > 2 && auth()->user()->id != $claim->creator && auth()->user()->id != $claim->user_id && !checkUserAccessToClaim($claim->id, auth()->user()->id))
+                            @if($claim->service->isBrif)
+                                @if ($claim->brif)
+                                    <a href=" {{asset("/storage")."/".$claim->brif}}"
+                                       class="btn icon icon-left btn-primary mt-3" download>
+                                        <i class="bi bi-file-arrow-down-fill"></i> Скачать бриф</a>
+                                @endif
+                            @endif
+                        @endif
 
 
                         <hr>

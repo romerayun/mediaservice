@@ -65,7 +65,7 @@
                                         <div class="form-group">
                                             <label>ИНН организации: </label>
                                             <input type="text" id="INN" class="form-control @if($errors->has('INN')) is-invalid @endif" name="INN"
-                                                   placeholder="Введите ИНН организации..." required
+                                                   placeholder="Введите ИНН организации..."
                                                    @if(old('INN')) value="{{old('INN')}}" @else value="{{$requisites->INN}}" @endif>
                                             @if($errors->has('INN'))
                                                 <div class="invalid-feedback">

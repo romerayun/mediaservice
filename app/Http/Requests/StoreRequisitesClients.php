@@ -26,7 +26,7 @@ class StoreRequisitesClients extends FormRequest
         return [
             'fullName' => 'nullable',
             'legalForm' => 'nullable',
-            'INN' => 'required|min:10|max:12|regex:/^[0-9]+$/',
+            'INN' => 'nullable|min:10|max:12|regex:/^[0-9]+$/',
             'OGRN' => 'nullable|min:13|max:15|regex:/^[0-9]+$/',
             'lawAddress' => 'nullable',
             'checkingAccount' => 'nullable|min:20|max:20|regex:/^[0-9]+$/',

@@ -69,6 +69,7 @@
                                                 @method('DELETE')
                                                 <a href="#" class="btn icon btn-danger delete"><i class="bi bi-trash-fill"></i></a>
                                             </form>
+                                            <a href="{{route('claim.repeat', ['claim' => $claim->id])}}" class="btn icon btn-success"><i class="bi bi-repeat"></i></a>
                                         </div>
 
                                     </div>

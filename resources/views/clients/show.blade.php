@@ -589,21 +589,27 @@
 
 
                                             @foreach($claims as $claim)
-                                                <a href="{{route('claims.show', ['claim' => $claim->id])}}" class="list-group-item list-group-item-action p-4">
+                                                <a href="{{route('claims.show', ['claim' => $claim->id])}}" class="list-group-item list-group-item-action p-4" style="margin-bottom: 0 !important">
                                                     <div class="d-flex w-100 justify-content-between">
                                                         <h5 class="mb-1">Заявка №{{$claim->id}} - {{$claim->service->name}}</h5>
+
                                                         <small>{{$claim->getCreateDate()}}</small>
+
                                                     </div>
+
                                                     <p class="mb-1">
                                                         <b>Создал заявку - </b> {{$claim->creatorUser->getFullName()}}
                                                     </p>
                                                     <p class="mb-1">
                                                         <b>Текущий статус - </b> {{$claim->histories->last()->status->name}}
                                                     </p>
-                                                    <p class="mb-1">
+                                                    <p >
                                                         <b>Стоимость - </b> {{money($claim->amount)}}
                                                     </p>
+
+
                                                 </a>
+                                                <a href="{{route('claim.repeat', ['claim' => $claim->id])}}" class="btn icon btn-success mb-4"><i class="bi bi-repeat me-2"></i> Повторить заявку</a>
                                             @endforeach
 
 

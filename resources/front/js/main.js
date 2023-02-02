@@ -130,7 +130,6 @@ if (document.getElementById('datepicker-range')) {
         range: true,
         dynamicRange: true,
         multipleDatesSeparator: ' | ',
-        minDate: $.now(),
         altFieldDateFormat: 'yyyy-MM-dd',
         altField: '#period-range'
     });

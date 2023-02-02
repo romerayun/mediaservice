@@ -1171,4 +1171,154 @@ class ClaimController extends Controller
         $claimUser->delete();
         return redirect()->back()->with('success', 'Данные успешно удалены 👍');
     }
+
+    public function repeatClaim($id)
+    {
+        $claim = Claim::findOrFail($id);
+        $groups = Group::all();
+        $services = Service::where('group_id', $claim->service->group->id)->get();
+        $packages = [];
+        if ($claim->service->isPackage) {
+            $packages = Package::where('service_id', $claim->service_id)->get();
+        }
+        $claimFiles = [];
+        if ($claim->service->isRequiredMaterial) {
+            $claimFiles = ClaimFile::where('claim_id', $claim->id)->get();
+        }
+
+        return view('claims.repeat', compact('groups', 'claim', 'services', 'packages', 'claimFiles'));
+    }
+
+    public function repeatClaimStore($id, Request $request) {
+
+        $client = Client::find($request->client_id);
+        if ($request->amount == null || trim($request->amount) == '' || $request->amount == '') {
+            $request->merge([
+                'amount' => 0,
+            ]);
+        } else {
+            $amount = str_replace(' ', '', $request->amount);
+            $request->merge([
+                'amount' => $amount,
+            ]);
+        }
+
+
+        $validatedData = $request->validate(
+            [
+                'service_id' => 'required|integer',
+                'deadlineClaim' => 'required|date',
+                'amount' => 'numeric',
+            ],
+            [
+                'service_id.integer' => 'Выберите значение из списка',
+                'deadlineClaim.required' => 'Поле срок выполнения не может быть пустым',
+                'deadlineClaim.date' => 'Поле срок выполения должен быть в формате даты',
+                'amount.numeric' => 'Поле стоимость должно быть формате числа',
+            ]
+        );
+
+        DB::beginTransaction();
+        try {
+
+            if ($request->package_id == '0') {
+                $request->merge([
+                    'package_id' => null,
+                ]);
+            }
+
+            $request->merge([
+                'creator' => Auth::user()->id,
+            ]);
+
+
+            $request->merge([
+                'deadline' => $request->deadlineClaim,
+                'user_id' => null,
+            ]);
+
+
+            $claim = Claim::create($request->all());
+
+            if ($request->hasFile('brif')) {
+                $folder = date("Y-m-d");
+                $brifFilepath = $request->file('brif')->store("images/{$folder}");
+
+                $claim->brif = $brifFilepath;
+                $claim->save();
+            }
+
+            $claimId = $claim->id;
+
+            if ($request->filepond) {
+                if (count($request->filepond) != 0) {
+
+                    $folder = uniqid() . '-' . now()->timestamp;
+                    Storage::disk('public')->makeDirectory('materials/' . $folder);
+
+                    $oldFolders = array();
+                    foreach ($request->filepond as $file) {
+                        $claimFile = ClaimFile::create([
+                            'claim_id' => $claimId,
+                        ]);
+
+                        $temporaryFile = TemporaryFile::where('folder', $file)->first();
+                        if ($temporaryFile) {
+
+                            $oldFile = 'materials/tmp/' . $file . '/' . $temporaryFile->filename;
+                            $newFile = 'materials/' . $folder . '/' . $temporaryFile->filename;
+                            Storage::copy($oldFile, $newFile);
+
+                            $claimFile->file = $newFile;
+                            $claimFile->save();
+                        }
+
+                        $temporaryFile->delete();
+
+                        $oldFolders[] = $file;
+                    }
+
+                    foreach ($oldFolders as $folder) {
+                        Storage::deleteDirectory('materials/tmp/' . $folder);
+                    }
+
+                }
+            }
+
+            $statusClaimId = StatusClaim::where('name', '=', 'Заявка создана')->get()->first()->id;
+            HistoryClaim::create([
+                'user_id' => Auth::user()->id,
+                'status_id' => $statusClaimId,
+                'comment' => 'Заявка создана повторно',
+                'claim_id' => $claimId,
+            ]);
+
+            $statusPayment = StatusPayment::where('name', '=', 'Не оплачен')->get()->first()->id;
+            HistoryPayment::create([
+                'user_id' => Auth::user()->id,
+                'status_id' => $statusPayment,
+                'comment' => 'Заявка не оплачена',
+                'claim_id' => $claimId,
+            ]);
+
+            if ($request->isInvoice) {
+                $statusPayment = StatusPayment::where('name', '=', 'Счет не выставлен')->get()->first()->id;
+                HistoryPayment::create([
+                    'user_id' => Auth::user()->id,
+                    'status_id' => $statusPayment,
+                    'comment' => 'Счет не выставлен',
+                    'claim_id' => $claimId,
+                ]);
+            }
+
+            DB::commit();
+            $request->session()->flash('success', 'Заявка успешно повторена 👍');
+            return back();
+
+        } catch (\Exception $exception) {
+            DB::rollback();
+            $request->session()->flash('error', 'При повторе заявки произошла ошибка 😢');
+            return back();
+        }
+    }
 }

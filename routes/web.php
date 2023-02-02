@@ -103,6 +103,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('goals/complete/{goal}', [GoalController::class, 'complete'])->name('goals.complete');
     Route::resource('goals', GoalController::class);
 
+    Route::get('/claims/{claim}/repeat', [ClaimController::class, 'repeatClaim'])->name('claim.repeat');
+    Route::post('/claims/{claim}/repeat', [ClaimController::class, 'repeatClaimStore'])->name('claim.repeatStore');
     Route::get('/created-claims', [ClaimController::class, 'createdClaims'])->name('claim.created');
 
     Route::get('/distribution-claims', [ClaimController::class, 'claimDistribution'])->name('claim.distribution');

@@ -28,13 +28,25 @@ class CalendarController extends Controller
         return view('calendar.index', compact('groups', 'users'));
     }
 
-    public function getGoals()
+    public function getGoals(Request $request)
     {
 
-        $goals = Goal::where('user_id', Auth::user()->id)
-            ->where('status', 0)
-            ->orWhereNotNull('rrule')
-            ->get();
+
+        if ($request->view == null || $request->view == 1) {
+            $goals = Goal::where('user_id', $request->idU)
+                ->orWhereNotNull('rrule')
+                ->get();
+        } else {
+            $goals = Goal::where('user_id', $request->idU)
+                ->where('status', 0)
+                ->orWhereNotNull('rrule')
+                ->get();
+        }
+
+//        $goals = Goal::where('user_id', Auth::user()->id)
+////            ->where('status', 0)
+//            ->orWhereNotNull('rrule')
+//            ->get();
         $events = array();
 
         foreach ($goals as $goal) {

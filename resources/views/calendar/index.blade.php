@@ -5,6 +5,7 @@
     <div class="row align-items-center">
         <div class="col-12 col-md-4">
             <h3>Календарь задач</h3>
+
         </div>
 
         <div class="col-12 col-md-8 text-end">
@@ -512,11 +513,55 @@
 </div>
 
 
+{{--    <div class="row">--}}
+{{--        <div class="col-md-12">--}}
+{{--            <div class="card">--}}
+{{--                <div class="card-body">--}}
+{{--                    --}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--        </div>--}}
+{{--    </div>--}}
+
     <div class="row">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
+                        <div class="row mb-4 align-items-center">
+                            <div class="col-lg-8 col-md-12">
+                                <div class="form-check form-switch " style="font-size: 14px; font-weight: 400;">
+                                    <label class="form-check-label" for="only-not-complete">Показывать только невыполненные задачи</label>
+                                    <input class="form-check-input" name="only-not-complete" id="only-not-complete" type="checkbox">
+                                </div>
+                            </div>
+                            <input type="hidden" id="calendar_user_hidden" value="{{auth()->user()->id}}">
+                            @if (auth()->user()->role->level <= 2)
+                            <div class="col-lg-4 col-md-12 text-end">
+                                <div class="form-group">
+{{--                                    <label>Выберите сотрудника: </label>--}}
+
+                                    <select class="js-example-basic-single is-invalid form-select-sm"
+                                            name="calendar_user" id="calendar_user" >
+                                        @if(count($users) != 0)
+                                            @foreach($users as $group)
+                                                @foreach($group->roles as $role)
+                                                    @foreach($role->users as $user)
+                                                        @if(auth()->user()->id == $user->id)
+                                                            <option value="{{$user->id}}" selected>{{$user->getFullName()}} ({{$user->role->name}})</option>
+                                                        @else
+                                                            <option value="{{$user->id}}">{{$user->getFullName()}} ({{$user->role->name}})</option>
+                                                        @endif
+                                                    @endforeach
+                                                @endforeach
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+
                         <div id="calendar">
 
                         </div>
@@ -525,5 +570,10 @@
             </div>
         </div>
     </div>
+<style>
+    .select2-selection__rendered {
+        padding-right: 28px !important;
+    }
+</style>
 
 @endsection

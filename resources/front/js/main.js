@@ -1174,33 +1174,34 @@ $('#invoice-complete').click(function () {
 
 });
 
+if (document.getElementById('swiper')) {
+    const swiper = new Swiper('.swiper', {
+        direction: 'horizontal',
+        slidesPerView: 4,
+        spaceBetween: 30,
+        grabCursor: true,
 
-const swiper = new Swiper('.swiper', {
-    direction: 'horizontal',
-    slidesPerView: 4,
-    spaceBetween: 30,
-    grabCursor: true,
-
-    breakpoints: {
-        480: {
-            slidesPerView: 1,
+        breakpoints: {
+            480: {
+                slidesPerView: 1,
+            },
+            640: {
+                slidesPerView: 2,
+                spaceBetween: 20,
+            },
+            768: {
+                slidesPerView: 4,
+                spaceBetween: 40,
+            },
+            1280: {
+                slidesPerView: 5,
+                spaceBetween: 50,
+            },
         },
-        640: {
-            slidesPerView: 2,
-            spaceBetween: 20,
+        scrollbar: {
+            el: '.swiper-scrollbar',
         },
-        768: {
-            slidesPerView: 4,
-            spaceBetween: 40,
-        },
-        1280: {
-            slidesPerView: 5,
-            spaceBetween: 50,
-        },
-    },
-    scrollbar: {
-        el: '.swiper-scrollbar',
-    },
-});
+    });
+}
 
 

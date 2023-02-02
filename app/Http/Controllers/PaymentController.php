@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Claim;
 use App\Models\HistoryPayment;
 use App\Models\StatusPayment;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -33,6 +34,16 @@ class PaymentController extends Controller
     }
 
     public function storeStatus(Request $request) {
+
+        if ($request->created_at == null) {
+            $request->merge([
+                'created_at' => Carbon::now()->format('Y-m-d H:i:s')
+            ]);
+        } else {
+            $request->merge([
+                'created_at' => Carbon::createFromDate($request->created_at)->format('Y-m-d H:i:s')
+            ]);
+        }
 
         $claim = Claim::find($request->claim_id);
 

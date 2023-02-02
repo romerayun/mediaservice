@@ -42,6 +42,23 @@
                         @endif
                     </div>
 
+                    <div class="form-group">
+                        <label>Укажите дату:</label>
+                        <input type="text" id="report-datepicker"
+                               class="form-control  @if($errors->has('created_at')) is-invalid @endif"
+                               name="created_at"
+                               placeholder="Выберите дату..."
+                               value="{{\Carbon\Carbon::now()->format('d.m.Y')}}">
+                        @if($errors->has('amount'))
+                            <div class="invalid-feedback">
+                                <i class="bx bx-radio-circle"></i>
+                                @foreach($errors->get('amount') as $message)
+                                    {{$message}}<br>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+
                     <div class="form-group d-none amount-form">
                         <label>Какая сумма была оплачена?
                             <span class="text-primary">(Не более: <b id="max-val"></b>)</span>

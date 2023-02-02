@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use mysql_xdevapi\Exception;
+use function Symfony\Component\VarDumper\Dumper\esc;
 
 class ClaimController extends Controller
 {
@@ -235,11 +236,13 @@ class ClaimController extends Controller
             }
         }
 
+        $user_id = 0;
 
-        if ($claim->user_id == null) {
-            $user_id = 0;
+        if ($claim->user_id != null) {
+            $user_id = $claim->user_id;
         }
-        $user_id = $claim->user_id;
+
+
 
         $withoutUsers = UserM::where('isBlocked', 0)
             ->whereNotIn('id', [$claim->creator, $user_id])
@@ -980,8 +983,8 @@ class ClaimController extends Controller
 
     public function getCompleteClaims(Request $request) {
 
-        $start = $request->month.'-00 00:00:00';
-        $end = $request->month.'-32 00:00:00';
+        $start = $request->month.'-01 00:00:00';
+        $end = $request->month.'-31 23:59:59';
 //
 //        $start = '2023-01-00 00:00:00';
 //        $end = '2023-01-32 00:00:00';
@@ -1022,7 +1025,12 @@ class ClaimController extends Controller
             ->whereHas('histories', function ($q) use ($start, $end) {
                 $q->where('created_at', '>=', $start)
                     ->where('created_at', '<=', $end);
+//                    ->with('status')
+//                    ->whereHas('status', function ($w) {
+//                        $w->where('name', '=', 'Заявка закрыта');
+//                    });
             })
+//            ->where('user_id', $user_id)
             ->where(function($query) use ($ids, $user_id) {
                 $query->where('user_id', $user_id)
                     ->orWhereIn('id', $ids);
@@ -1030,7 +1038,7 @@ class ClaimController extends Controller
             ->where('isClose', 1)
             ->get();
 
-
+//dd($claims);
 
         $res = '';
         $res .= '<div class="col-12 col-md-12">

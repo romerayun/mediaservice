@@ -26,7 +26,8 @@ class Claim extends Model
         'package_id',
         'creator',
         'comment',
-        'notInclude'
+        'notInclude',
+        'number_invoice'
     ];
 
     public function getDate() {
@@ -64,7 +65,7 @@ class Claim extends Model
 
     public function historiesPayment()
     {
-        return $this->hasMany(HistoryPayment::class)->orderBy('created_at', 'desc');
+        return $this->hasMany(HistoryPayment::class)->orderBy('id', 'desc');
     }
 
     public function files()

@@ -40,7 +40,10 @@
     </div>
 
     <div class="row">
-        <div class="col-md-12 col-lg-8">
+
+
+
+        <div class="col-md-12 col-lg-12">
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
@@ -49,19 +52,19 @@
                             <h5 class="text-gray-500">К сожалению, заявок не создано 😢</h5>
                         @else
 
-                            <p class="text-gray-500 mb-0"><b class="text-primary">План сотрудника на месяц:</b> {{money($sumPlan)}} руб.</p>
-                            <p class="text-gray-500 mb-0"><b class="text-primary">Заявок создано на:</b>
+                            <p class="fw-bold mb-0"><b class="text-primary">План сотрудника на месяц:</b> {{money($sumPlan)}} руб.</p>
+                            <p class="fw-bold mb-0"><b class="text-primary">Заявок создано на:</b>
                                 @if($sumClaims->first()->total_amount == null)
                                     0 руб.
                                 @else
                                     {{money($sumClaims->first()->total_amount)}} руб.
                                 @endif</p>
-                            <p class="text-gray-500 mb-0"><b class="text-primary">Поступления:</b>            @if($sumPaid->first()->total_amount == null)
+                            <p class="fw-bold mb-0"><b class="text-primary">Поступления:</b>            @if($sumPaid->first()->total_amount == null)
                                     0 руб.
                                 @else
                                     {{money($sumPaid->first()->total_amount)}} руб.
                                 @endif</p>
-                            <p class="text-gray-500 mb-4"><b class="text-primary">Процент выполения:</b>
+                            <p class="fw-bold mb-4"><b class="text-primary">Процент выполения:</b>
                                 @if ($sumPlan == 0)
                                     0%
                                 @else
@@ -77,7 +80,7 @@
                                     <th>Клиент</th>
                                     <th>Категория услуг</th>
                                     <th>Наименование услуги</th>
-                                    <th>Сумма</th>
+                                    <th style="width: 20% !important">Сумма</th>
                                     <th>Статус оплаты</th>
                                 </tr>
                                 </thead>
@@ -122,17 +125,17 @@
                 </div>
             </div>
         </div>
-
-        <div class="col-lg-4 col-md-12">
+        <div class=" col-lg-12 col-md-12">
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
                         <h4 class="card-title mb-4 ">Диаграмма cтатистики продаж</h4>
-                        <div id="plan-user"></div>
+                        <div id="plan-user" ></div>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 
     <div id="data" class="row">

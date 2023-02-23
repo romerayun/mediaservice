@@ -1,6 +1,6 @@
 @extends('layout.layout')
 @section('page-heading')
-    Управление ЛПР <a href="{{route('clients.index')}}" class="btn btn-sm btn-primary">Назад</a>
+    Управление ЛПР <a href="{{route('clients.show', ['client' => $client_id])}}" class="btn btn-sm btn-primary">Назад</a>
 @endsection
 
 

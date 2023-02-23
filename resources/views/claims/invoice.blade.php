@@ -65,6 +65,11 @@
 
                                         <form action="{{route('claim.storeInvoice', ['claim' => $claim->id])}}" method="POST" enctype="multipart/form-data">
                                             @csrf
+
+                                            <div class="form-group">
+                                                <label>Введите номер счета: </label>
+                                                <input type="text" name="number_invoice" class="form-control" placeholder="Введите номер счета...">
+                                            </div>
                                             <div class="form-group">
                                                 <label>Прикрепите счет: </label>
                                                 <input type="hidden" name="number" value="{{$loop->index}}">

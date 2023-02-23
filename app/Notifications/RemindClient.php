@@ -47,7 +47,7 @@ class RemindClient extends Notification
             ->subject('MediaService - напоминание')
             ->line('С клиентом - ' . $this->client->name . ' нет взаимодействия больше 60 дней')
             ->line("Дата последнего взаимодействия: " . Carbon::parse($this->client->created_at)->format('d.m.Y в H:i'))
-            ->action('Перейти к клиенту', 'http://mediaservice/clients/'.$this->client->id);
+            ->action('Перейти к клиенту', 'https://crm-mediaservice.ru/clients/'.$this->client->id);
     }
 
     /**

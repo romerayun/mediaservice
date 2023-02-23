@@ -50,12 +50,22 @@ class DebtClaimsCommand extends Command
 
         if ($date == $firstDate) {
             $claims = Claim::with('historiesPayment')
-                ->whereHas('historiesPayment', function ($q) use ($start, $end) {
+                ->whereHas('historiesPayment', function ($q)  {
                     $q->with('status')
-                        ->whereDoesntHave('status', function ($w) {
+                        ->whereHas('status', function ($w) {
                             $w->where('name', "Оплачен");
                         });
                 })
+                ->get();
+
+
+            $ids = [];
+            foreach ($claims as $claim) {
+                $ids[] = $claim->id;
+            }
+
+            $claims = Claim::whereNotIn('id', $ids)
+                ->where('notInclude', 0)
                 ->get();
 
             $statusPayment = StatusPayment::where('name', 'Долг')->get();

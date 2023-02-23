@@ -65,6 +65,10 @@
                                         <form action="{{route('claim.updateInvoice', ['claim' => $claim->id])}}" method="POST" enctype="multipart/form-data">
                                             @csrf
                                             <div class="form-group">
+                                                <label>Введите номер счета: </label>
+                                                <input type="text" name="number_invoice" class="form-control" placeholder="Введите номер счета..." value="{{$claim->number_invoice}}">
+                                            </div>
+                                            <div class="form-group">
                                                 <label>Прикрепите счет:
                                                     @if(isset($claim->invoice) && !empty(trim($claim->invoice)))
 {{--                                                        <a href="{{asset("/storage")."/".$claim->invoice}}" class="text-success" download>(Скачать счет)</a>--}}

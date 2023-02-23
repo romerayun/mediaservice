@@ -2,26 +2,26 @@
 
 namespace App\Notifications;
 
-use App\Models\Goal;
+use App\Models\ActiveAd;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class GoalRemiderNotification extends Notification
+class RemindActiveAd extends Notification
 {
     use Queueable;
-    private $goal;
+    private $activeAd;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(Goal $goal)
+    public function __construct(ActiveAd $activeAd)
     {
-        $this->goal = $goal;
+        $this->activeAd = $activeAd;
     }
 
     /**
@@ -44,10 +44,10 @@ class GoalRemiderNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject('MediaService - задачи')
-                    ->line('У вас запланировано мероприятие: ' . $this->goal->text)
-                    ->line("Дата: " . Carbon::parse($this->goal->start_date)->format('d.m.Y в H:i'))
-                    ->action('Перейти в календарь', 'https://crm-mediaservice.ru/calendar');
+            ->subject('MediaService - активная реклама')
+            ->line('Заканчивается рекламная кампания, у клиента - ' . $this->activeAd->claim->client->name)
+            ->line("Дата окончания: " . Carbon::parse($this->activeAd->end_date)->format('d.m.Y'))
+            ->action('Перейти в активную рекламу', 'https://crm-mediaservice.ru/active-ad');
     }
 
     /**

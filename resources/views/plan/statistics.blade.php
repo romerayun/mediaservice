@@ -39,28 +39,28 @@
     </div>
 
     <div class="row">
-        <div class="col-md-12 col-lg-8">
+        <div class="col-md-12 col-lg-12">
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
                         <h4 class="card-title mb-4 ">Статистика продаж</h4>
                         @if($salesPlan->isEmpty())
-                            <h5 class="text-gray-500">К сожалению, план не был установлен 😢</h5>
+                            <h5 class="fw-bold">К сожалению, план не был установлен 😢</h5>
                         @else
 
-                            <p class="text-gray-500 mb-0"><b class="text-primary">Общий план всех сотрудников:</b> {{money($sumPlan)}} руб.</p>
-                            <p class="text-gray-500 mb-0"><b class="text-primary">Заявок создано на:</b>
+                            <p class="fw-bold mb-0"><b class="text-primary">Общий план всех сотрудников:</b> {{money($sumPlan)}} руб.</p>
+                            <p class="fw-bold mb-0"><b class="text-primary">Заявок создано на:</b>
                                 @if($sumClaims->first()->total_amount == null)
                                     0 руб.
                                 @else
                                     {{money($sumClaims->first()->total_amount)}} руб.
                                 @endif</p>
-                            <p class="text-gray-500 mb-0"><b class="text-primary">Поступления:</b>            @if($sumPaid->first()->total_amount == null)
+                            <p class="fw-bold mb-0"><b class="text-primary">Поступления:</b>            @if($sumPaid->first()->total_amount == null)
                                     0 руб.
                                 @else
                                     {{money($sumPaid->first()->total_amount)}} руб.
                                 @endif</p>
-                            <p class="text-gray-500 mb-4"><b class="text-primary">Процент выполения:</b> {{round($sumPaid->first()->total_amount / $sumPlan * 100, 2)}}%</p>
+                            <p class="fw-bold mb-4"><b class="text-primary">Процент выполения:</b> {{round($sumPaid->first()->total_amount / $sumPlan * 100, 2)}}%</p>
 
                             <table class="table table-lg table-hover" id="datatables">
                                 <thead>
@@ -138,7 +138,7 @@
             </div>
         </div>
 
-        <div class="col-lg-4 col-md-12">
+        <div class="col-lg-12 col-md-12">
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">

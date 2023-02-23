@@ -27,6 +27,7 @@
                                     <th>Заявка №</th>
                                     <th>Дата</th>
                                     <th>Статус</th>
+                                    <th>Сумма оплаты</th>
                                     <th class="text-center">Удалить</th>
                                 </tr>
                                 </thead>
@@ -36,6 +37,11 @@
                                         <td>{{$item->claim_id}}</td>
                                         <td>{{$item->getDate()}}</td>
                                         <td>{{$item->status->name}}</td>
+                                        @if($item->status->name == 'Оплачен' || $item->status->name == 'Частично оплачен')
+                                            <td>{{money($item->amount)}} руб.</td>
+                                        @else
+                                            <td>-</td>
+                                        @endif
                                         <td class="text-center">
                                             <form action="{{route('payment.del-paid', ['id' => $item->id])}}" method="POST" class="d-inline">
                                                 @csrf

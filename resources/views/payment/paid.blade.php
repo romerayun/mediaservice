@@ -86,9 +86,10 @@
                                     <th>Сотрудник</th>
                                     <th>Категория услуги</th>
                                     <th>Наименование услуги</th>
+                                    <th>Номер счета</th>
                                     <th>Дата оплаты</th>
                                     <th>Сумма</th>
-                                    <th>Статус</th>
+{{--                                    <th>Статус</th>--}}
                                     <th class="text-center">Редактирование</th>
                                 </tr>
                                 </thead>
@@ -113,6 +114,11 @@
                                         </td>
                                         <td>{{$item->service->category->name}}</td>
                                         <td>{{$item->service->name}}</td>
+                                        @if ($item->number_invoice)
+                                            <td>{{$item->number_invoice}}</td>
+                                        @else
+                                            <td class="text-danger">Номер счета не найден</td>
+                                        @endif
                                         <td>
                                             @if(!$item->historiesPayment->count())
                                                 <span class="text-danger">Статус не найден</span>
@@ -121,15 +127,15 @@
                                             @endif
                                         </td>
                                         <td>{{money($item->amount)}} руб.</td>
-                                        <td>
-                                            @if(!$item->historiesPayment->count())
-                                                <span class="text-danger">Статус не найден</span>
-                                            @else
-                                                <span class="badge custom-bg-{{$item->historiesPayment->first()->status->color}}">
-                                                    {{$item->historiesPayment->first()->status->name}}
-                                                </span>
-                                            @endif
-                                        </td>
+{{--                                        <td>--}}
+{{--                                            @if(!$item->historiesPayment->count())--}}
+{{--                                                <span class="text-danger">Статус не найден</span>--}}
+{{--                                            @else--}}
+{{--                                                <span class="badge custom-bg-{{$item->historiesPayment->first()->status->color}}">--}}
+{{--                                                    {{$item->historiesPayment->first()->status->name}}--}}
+{{--                                                </span>--}}
+{{--                                            @endif--}}
+{{--                                        </td>--}}
                                         <td class="text-center">
                                             <a href="{{route('payment.list-paid', ['claim' => $item->id])}}">
                                                 <i class="bi bi-pen-fill"></i>

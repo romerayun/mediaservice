@@ -5,7 +5,7 @@
             <h3>Распределение клиентов</h3>
         </div>
         <div class="col-12 col-md-6 text-end">
-            <a href="{{route('clients.showAll')}}" class="btn btn-sm btn-primary">Назад</a>
+            <a href="{{URL::previous()}}" class="btn btn-sm btn-primary">Назад</a>
         </div>
     </div>
 @endsection

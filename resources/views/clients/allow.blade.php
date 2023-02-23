@@ -58,10 +58,17 @@
                             @endif
                         </td>
                         <td>
-                            <form action="{{route('clients.allowUpdate', ['client' => $item->id])}}" method="POST">
+                            <form action="{{route('clients.allowUpdate', ['client' => $item->id])}}" method="POST" class="d-inline-block">
                                 @csrf
                                 @method('PATCH')
                                 <button type="submit" class="btn btn-success">Подтвердить</button>
+                            </form>
+                            <form action="{{route('clients.destroy', ['client' => $item->id])}}" method="POST" class="d-inline-block">
+                                @csrf
+                                @method('DELETE')
+                                <button title="Удалить" type="submit" class="btn icon btn-danger me-2 delete btn-sm"><i
+                                        class="bi bi-trash-fill"></i>
+                                </button>
                             </form>
                         </td>
                     </tr>

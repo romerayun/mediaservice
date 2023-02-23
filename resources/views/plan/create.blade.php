@@ -98,9 +98,9 @@
                                     <div class="col-12 ">
                                         <div class="form-group">
                                             <label>План продаж: </label>
-                                            <input type="number" id="plan"
+                                            <input type="text" id="amount"
                                                    class="form-control @if($errors->has('plan')) is-invalid @endif"
-                                                   name="plan" step="0.1"
+                                                   name="plan"
                                                    placeholder="Введите план продаж..."
                                                    value="{{old('plan')}}">
                                             @if($errors->has('plan'))

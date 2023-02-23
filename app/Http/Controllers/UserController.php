@@ -179,11 +179,38 @@ class UserController extends Controller
             ->select(DB::raw('SUM(amount) as total_amount'))
             ->get();
 
+        $claimsNotPaid = HistoryPayment::with('status')
+            ->whereHas('status', function ($w) {
+                $w->where('name', "Оплачен");
+            })
+            ->with('claim')
+            ->whereHas('claim', function ($q) use ($id, $start) {
+                $q->where('creator', $id)
+                    ->where('created_at', '<', $start)
+                    ->where('notInclude', 0);
+            })
+//            ->groupBy('claim_id')
+            ->select(DB::raw('claim_id'))
+            ->get();
+
+//        dd($claimsNotPaid);
+        $ids = [];
+        if ($claimsNotPaid) {
+            foreach ($claimsNotPaid as $claim2) {
+                $ids[] = $claim2->claim_id;
+            }
+        }
+
+//        dd($ids);
+
         $userClaims = Claim::where('creator', $id)
-            ->where('created_at', '>=', $start)
+//            ->where('created_at', '>=', $start)
             ->where('created_at', '<=', $end)
+            ->whereNotIn('id', $ids)
             ->where('notInclude', 0)
             ->get();
+
+//        dd($userClaims);
 
         $user = UserM::firstWhere('id', $id);
 
@@ -566,6 +593,7 @@ class UserController extends Controller
             </div>
         </div>';
 
+//dd($allData);
 
         foreach($allData as $item) {
 

@@ -115,6 +115,10 @@ if (document.getElementById('calendar')) {
         }
     });
 
+    $("input[name='color']").change(function () {
+        $("#hidden-color").val($(this).val());
+    });
+
 
     document.addEventListener('DOMContentLoaded', function () {
 
@@ -258,7 +262,7 @@ if (document.getElementById('calendar')) {
 
                     let isMySelf = $("input[name='isMySelf']").val();
                     let user_id = $("#user_id").val();
-                    let color = $("#color").val();
+                    let color = $("#hidden-color").val();
                     let rrule = $("#rrule").val();
 
                     if (isMySelf == 0 && user_id == 0) {

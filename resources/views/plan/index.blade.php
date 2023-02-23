@@ -16,7 +16,7 @@
 
 @section('content')
     <div class="row">
-        <div class="col-lg-9 col-md-12">
+        <div class="col-lg-12 col-md-12">
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
@@ -27,7 +27,7 @@
                             <h5 class="text-gray-500">К сожалению, план не был установлен 😢</h5>
                         @else
 
-                            <p class="text-gray-500 mb-4"><b class="text-primary">Общий план всех сотрудников:</b> <span id="sum">0</span> руб.</p>
+                            <p class="mb-4 fw-bold"><b class="text-primary">Общий план всех сотрудников:</b> <span id="sum">0</span> руб.</p>
 
                             <div class="row mt-3 mb-4">
                                 <div class="col-12">
@@ -37,7 +37,7 @@
                                                class="form-control filter-month"
                                                name="filter-month"
                                                placeholder="Выберите месяц..." required
-                                               value="">
+                                               value="{{getMonths()[\Carbon\Carbon::now()->format('n')]}} {{   \Carbon\Carbon::now()->format('Y')}}">
                                     </div>
                                 </div>
                             </div>
@@ -83,7 +83,7 @@
             </div>
         </div>
 
-        <div class="col-lg-3 col-md-12">
+        <div class="col-lg-12 col-md-12">
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">

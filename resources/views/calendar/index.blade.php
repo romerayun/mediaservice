@@ -38,9 +38,32 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="form-group">
-                                        <label>Выберите цвет отображения задачи: </label>
-                                        <input type="color" class="form-control"
-                                               name="color" id="color" value="#3a87ad">
+{{--                                        <label>Выберите цвет отображения задачи: </label>--}}
+                                        <input type="hidden"
+                                               name="hidden-color" id="hidden-color" value="#1572e8">
+                                        <div class="form-group">
+                                            <p>Выберите цвет отображения задачи:</p>
+                                            <div class="flex">
+                                                <div class="form-check form-check-primary">
+                                                    <input class="form-check-input" type="radio" name="color" id="color" checked="" value="#1572e8">
+                                                </div>
+                                                <div class="form-check form-check-secondary">
+                                                    <input class="form-check-input" type="radio" name="color" id="color" value="#6861ce">
+                                                </div>
+                                                <div class="form-check form-check-info">
+                                                    <input class="form-check-input" type="radio" name="color" id="color" value="#48abf7">
+                                                </div>
+                                                <div class="form-check form-check-warning">
+                                                    <input class="form-check-input" type="radio" name="color" id="color" value="#ffad46">
+                                                </div>
+                                                <div class="form-check form-check-danger">
+                                                    <input class="form-check-input" type="radio" name="color" id="color" value="#f25961">
+                                                </div>
+                                                <div class="form-check form-check-success">
+                                                    <input class="form-check-input" type="radio" name="color" id="color" value="#31ce36">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

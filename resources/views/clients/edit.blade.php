@@ -1,6 +1,6 @@
 @extends('layout.layout')
 @section('page-heading')
-    Управление клиентом &laquo;{{$client->name}}&raquo; <a href="{{route('clients.index')}}" class="btn btn-sm btn-primary">Назад</a>
+    Управление клиентом &laquo;{{$client->name}}&raquo; <a href="{{route('clients.show', ['client' => $client->id])}}" class="btn btn-sm btn-primary">Назад</a>
 @endsection
 
 
@@ -147,6 +147,15 @@
                                                     @endforeach
                                                 </div>
                                             @endif
+                                        </div>
+
+                                        <div class="row mt-3 mb-3">
+                                            <div class="col-12">
+                                                <div class="form-group">
+                                                    <label>Дополнительный комментарий: </label>
+                                                    <textarea class="form-control " id="comment" name="comment" rows="3" placeholder="Например, дополнительные реквизиты...">{{$client->comment}}</textarea>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <button type="submit" class="btn btn-success">Сохранить</button>

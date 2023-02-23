@@ -125,6 +125,7 @@
                                     <th>Сотрудник</th>
                                     <th>Категория услуги</th>
                                     <th>Наименование услуги</th>
+                                    <th>Номер счета</th>
                                     <th>Сумма</th>
                                     <th>Статус</th>
                                     <th class="text-center">Действия</th>
@@ -153,10 +154,15 @@
                                         </td>
                                         <td>{{$item->service->category->name}}</td>
                                         <td>{{$item->service->name}}</td>
+                                        @if ($item->number_invoice)
+                                            <td>{{$item->number_invoice}}</td>
+                                        @else
+                                            <td class="text-danger">Номер счета не найден</td>
+                                        @endif
                                         <td>
                                             <p class="mb-0"><b>Общая сумма:</b> {{money($item->amount)}} руб.</p>
                                             @if (getPaymentsClaim($item->id) != 0)
-                                                <p class="mb-0 mt-2"><b>Частчино оплачено:</b> {{money(getPaymentsClaim($item->id))}} руб.</p>
+                                                <p class="mb-0 mt-2"><b>Частично оплачено:</b> {{money(getPaymentsClaim($item->id))}} руб.</p>
                                             @endif
                                         </td>
                                         <td>

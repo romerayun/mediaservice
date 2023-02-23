@@ -34,6 +34,7 @@
                                     <thead>
                                     <tr>
                                         <th>Статус</th>
+                                        <th>Клиент</th>
                                         <th>Задача</th>
                                         <th>Создана</th>
                                         <th>Выполнить до</th>
@@ -51,6 +52,13 @@
                                                 <span class="badge bg-danger ">
                                                     Просрочена
                                                 </span>
+                                            </td>
+                                            <td>
+                                                @if($item->client_id == null)
+                                                    <span class="text-danger">Клиент не найден</span>
+                                                @else
+                                                    <a href="{{route('clients.show', ['client'=>$item->client_id])}}" target="_blankj">{{$item->client->name}}</a>
+                                                @endif
                                             </td>
                                             <td style="width: 30%">{{$item->text}}</td>
                                             <td><span class="badge bg-success ">{{$item->getDateCreate()}}</span></td>

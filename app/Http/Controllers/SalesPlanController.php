@@ -55,6 +55,12 @@ class SalesPlanController extends Controller
      */
     public function store(Request $request)
     {
+        $amount = str_replace(' ', '', $request->plan);
+
+        $request->merge([
+            'plan' => $amount,
+        ]);
+
         $validatedData = $request->validate(
             [
                 'user_id' => 'required|integer',
@@ -294,13 +300,14 @@ class SalesPlanController extends Controller
         if (count($paidClaims) != 0) {
             foreach ($paidClaims as $key => $part) {
                 if (isset($multipliedPaidClaims[$part->claim->creator])) {
-                    $multipliedPaidClaims[$part->claim->creator] += $part->total_amount;
+                    $multipliedPaidClaims[$part->claim->creator] += floatval($part->total_amount);
                 } else {
-                    $multipliedPaidClaims[$part->claim->creator] = $part->total_amount;
+                    $multipliedPaidClaims[$part->claim->creator] = floatval($part->total_amount);
                 }
                 $fio[$part->claim->creator] = $part->claim->creatorUser->getFullName();
             }
         }
+
 
 //        $fio = $paidClaims->mapWithKeys(function ($item, $key) {
 //            return [$key => $item->creatorUser->getFullName()];

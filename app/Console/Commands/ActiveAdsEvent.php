@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\ActiveAd;
 use App\Models\Goal;
+use App\Notifications\RemindActiveAd;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
@@ -58,16 +59,19 @@ class ActiveAdsEvent extends Command
                 $goal->user_id = $activeAd->user_id;
                 $goal->client_id = $activeAd->claim->client_id;
                 $goal->text = "Заканчивается рекламная кампания - " . $activeAd->claim->service->name . "";
-                $goal->start_date = Carbon::parse($endDate)->format('Y-m-d 00:00:00');
-                $goal->deadline = Carbon::parse($endDate)->addDay()->format('Y-m-d 00:00:00');
+                $goal->start_date = \Carbon\Carbon::parse($endDate)->format('Y-m-d 00:00:00');
+                $goal->deadline = \Illuminate\Support\Carbon::parse($endDate)->addDay()->format('Y-m-d 00:00:00');
                 $goal->allDay = 1;
                 $goal->save();
+                $activeAd->user->notify(new RemindActiveAd($activeAd));
+
 
                 if ($activeAd->user_id != $activeAd->claim->creator) {
                     $newGoal = $goal->replicate();
                     $newGoal->exposed = $activeAd->claim->creator;
                     $newGoal->user_id = $activeAd->claim->creator;
                     $newGoal->save();
+                    $activeAd->claim->creatorUser->notify(new RemindActiveAd($activeAd));
                 }
 
                 $activeAd->isRemind = 1;

@@ -30,7 +30,7 @@
 
 @section('content')
     <div class="swiper" id="swiper">
-        <div class="swiper-wrapper">
+        <div class="swiper-wrapper" style="overflow-y: scroll">
 
             @foreach($allData as $item)
                 <div class="swiper-slide">

@@ -17,6 +17,7 @@ use App\Models\StatusClaim;
 use App\Models\StatusPayment;
 use App\Models\TemporaryFile;
 use App\Models\UserM;
+use App\Notifications\NotifyUser;
 use App\Policies\ClaimPolicy;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -198,7 +199,17 @@ class ClaimController extends Controller
                     'comment' => 'Счет не выставлен',
                     'claim_id' => $claimId,
                 ]);
+
+                $usersInvoice = UserM::where('userInvoice', 1)->get();
+                if ($usersInvoice) {
+                    foreach ($usersInvoice as $item) {
+                        $item->notify(new NotifyUser('Создана новая заявка, необходимо подгрузить счет на оплату', 'https://crm-mediaservice.ru/invoice'));
+                    }
+                }
+
             }
+
+//            Auth::user()->notify(new NotifyUser('Создана новая заявка', 'https://crm-mediaservice.ru/claims/'.$claimId));
 
             DB::commit();
             $request->session()->flash('success', 'Заявка успешно создана 👍');
@@ -206,7 +217,7 @@ class ClaimController extends Controller
 
         } catch (\Exception $exception) {
             DB::rollback();
-            $request->session()->flash('error', 'При создании заявки произошла ошибка 😢');
+            $request->session()->flash('error', 'При создании заявки произошла ошибка 😢' . $exception);
             return back();
         }
 //        dd($request);
@@ -397,6 +408,12 @@ class ClaimController extends Controller
                     'comment' => 'Счет не выставлен',
                     'claim_id' => $claimId,
                 ]);
+                $usersInvoice = UserM::where('userInvoice', 1)->get();
+                if ($usersInvoice) {
+                    foreach ($usersInvoice as $item) {
+                        $item->notify(new NotifyUser('Обновлена заявка №'. $claimId .', необходимо подгрузить счет на оплату', 'https://crm-mediaservice.ru/invoice'));
+                    }
+                }
             }
 
             DB::commit();
@@ -420,8 +437,9 @@ class ClaimController extends Controller
     public function destroy($id)
     {
         $claim = Claim::find($id);
+        HistoryPayment::where('claim_id', $id);
         $claim->delete();
-        return redirect()->back()->with('success', 'Данные успешно удалены 👍');
+        return redirect()->route('claim.claimsMy')->with('success', 'Данные успешно удалены 👍');
     }
 
     public function claimInputs()
@@ -504,13 +522,16 @@ class ClaimController extends Controller
             $goal->allDay = 1;
             $goal->save();
 
+            $cliam->user->notify(new NotifyUser('Вас назначили ответственным за выполенение заявки №'. $cliam->id, 'https://crm-mediaservice.ru/claims/'. $cliam->id, $cliam->client));
+            $cliam->creatorUser->notify(new NotifyUser('Назначен ответственный за выполенение заявки №'. $cliam->id, 'https://crm-mediaservice.ru/claims/'. $cliam->id, $cliam->client));
+
 
             DB::commit();
 
             return redirect()->back()->with('success', 'Данные успешно обновлены 👍');
         } catch (\Exception $exception) {
             DB::rollback();
-            $request->session()->flash('error', 'При обновлении заявки произошла ошибка 😢' . $exception);
+            $request->session()->flash('error', 'При обновлении заявки произошла ошибка 😢');
             return back();
         }
     }
@@ -549,6 +570,7 @@ class ClaimController extends Controller
             $goal->allDay = 1;
             $goal->save();
 
+            $cliam->creatorUser->notify(new NotifyUser('Назначен ответственный за выполенение заявки №'. $cliam->id, 'https://crm-mediaservice.ru/claims/'. $cliam->id, $cliam->client));
 
             DB::commit();
 
@@ -577,11 +599,16 @@ class ClaimController extends Controller
             'user_id' => Auth::user()->id,
         ]);
 
+        $claim = Claim::find($id);
+
         DB::beginTransaction();
 
         try {
             HistoryClaim::create($request->all());
             DB::commit();
+
+            $claim->creatorUser->notify(new NotifyUser('Изменен статус заявки №'. $claim->id, 'https://crm-mediaservice.ru/claims/'. $claim->id, $claim->client));
+
             $request->session()->flash('success', 'Данные успешно добавлены 👍');
             return back();
         } catch (\Exception $exception) {
@@ -630,10 +657,11 @@ class ClaimController extends Controller
                     ->orWhereIn('id', $ids);
             })
             ->with('service')
+            ->with('client')
             ->orderBy('created_at', 'desc')
+//            ->get();
             ->paginate(10);
 
-//        dd($claims);
 
         $users = UserM::where('isBlocked', 0)->get();
 
@@ -667,6 +695,8 @@ class ClaimController extends Controller
             ]);
 
             DB::commit();
+
+            $cliam->creatorUser->notify(new NotifyUser('Заявка №'. $cliam->id . ' закрыта', 'https://crm-mediaservice.ru/claims/'. $cliam->id, $cliam->client));
 
             return redirect()->back()->with('success', 'Заявка успешно закрыта 👍');
         } catch (\Exception $exception) {
@@ -721,8 +751,6 @@ class ClaimController extends Controller
 
     public function storeInvoice($id, Request $request)
     {
-
-
         $name = 'invoice'.$request->number;
         $validatedData = $request->validate(
             [
@@ -752,9 +780,12 @@ class ClaimController extends Controller
 
 
                 $claim->invoice = $resStr;
+
                 $claim->save();
             }
 
+            $claim->number_invoice = $request->number_invoice;
+            $claim->save();
 
             $statusClaimId = StatusClaim::where('name', '=', 'Счет выставлен')->get()->first()->id;
             HistoryClaim::create([
@@ -772,6 +803,7 @@ class ClaimController extends Controller
                 'claim_id' => $claim->id,
             ]);
 
+            $claim->creatorUser->notify(new NotifyUser('Выставлен счет для заявки №'. $claim->id, 'https://crm-mediaservice.ru/claims/'. $claim->id, $claim->client));
 
             DB::commit();
 
@@ -798,14 +830,14 @@ class ClaimController extends Controller
     public function updateInvoice($id, Request $request)
     {
         $name = 'invoice'.$request->number;
-        $validatedData = $request->validate(
-            [
-                $name => 'required',
-            ],
-            [
-                "$name.required" => 'Поле обязательно для заполнения',
-            ]
-        );
+//        $validatedData = $request->validate(
+//            [
+//                $name => 'required',
+//            ],
+//            [
+//                "$name.required" => 'Поле обязательно для заполнения',
+//            ]
+//        );
 
 
         DB::beginTransaction();
@@ -841,6 +873,8 @@ class ClaimController extends Controller
                 $claim->invoice = $resStr;
                 $claim->save();
             }
+            $claim->number_invoice = $request->number_invoice;
+            $claim->save();
 
 
             $statusClaimId = StatusClaim::where('name', '=', 'Счет выставлен')->get()->first()->id;
@@ -850,6 +884,8 @@ class ClaimController extends Controller
                 'comment' => "Обновлен счет на оплату",
                 'claim_id' => $claim->id,
             ]);
+
+            $claim->creatorUser->notify(new NotifyUser('Обновлен счет на оплату для заявки №'. $claim->id, 'https://crm-mediaservice.ru/claims/'. $claim->id, $claim->client));
 
             DB::commit();
 
@@ -877,6 +913,8 @@ class ClaimController extends Controller
         $startDate = trim($date[0]) . " 00-00-00";
         $endDate = trim($date[1]) . " 00-00-00";
 
+        $claim = Claim::find($id);
+
         DB::beginTransaction();
 
         try {
@@ -889,6 +927,8 @@ class ClaimController extends Controller
             ]);
 
             ActiveAd::create($request->all());
+
+            $claim->creatorUser->notify(new NotifyUser('Запущена рекламная кампания для заявки №'. $claim->id, 'https://crm-mediaservice.ru/active-ad', $claim->client));
 
             DB::commit();
 
@@ -981,6 +1021,12 @@ class ClaimController extends Controller
         return view('claims.complete', compact('groups'));
     }
 
+    public function myComplete() {
+//        $groups = Group::all();
+        return view('claims.my-complete');
+    }
+
+
     public function getCompleteClaims(Request $request) {
 
         $start = $request->month.'-01 00:00:00';
@@ -1056,6 +1102,7 @@ class ClaimController extends Controller
             $res .= '<thead>
                 <tr>
                     <th>№ заявки</th>
+                    <th>Клиент</th>
                     <th>Категория услуги</th>
                     <th>Наименование услуги</th>
                     <th>Стоимость заявки</th>
@@ -1070,8 +1117,16 @@ class ClaimController extends Controller
                 $amount += $claim->amount;
 
                 $res .= '<tr>
-                        <td>' . $claim->id . '</td>
-                        <td>' . $claim->service->category->name . '</td>
+                        <td>' . $claim->id . '</td>';
+
+                if ($claim->client) {
+                    $res .= '<td><a target="_blank" href="/clients/'.$claim->client->id .'">' . $claim->client->name . '</a></td>';
+                } else {
+
+                    $res .= '<td>Клиент не был выбран</td>';
+                }
+
+                $res .= '<td>' . $claim->service->category->name . '</td>
                         <td>' . $claim->service->name . '</td>
                         <td>' . money($claim->amount) . ' руб.</td>';
                 if ($claim->commentClose == null) {
@@ -1102,6 +1157,7 @@ class ClaimController extends Controller
     {
 
         $id = $request->id;
+        $number_invoice = $request->number_invoice;
 
         DB::beginTransaction();
 
@@ -1109,12 +1165,13 @@ class ClaimController extends Controller
 
             $claim = Claim::find($id);
             $claim->invoice = ' ';
+            $claim->number_invoice = $number_invoice;
             $claim->save();
             $statusClaimId = StatusClaim::where('name', '=', 'Счет выставлен')->get()->first()->id;
             HistoryClaim::create([
                 'user_id' => Auth::user()->id,
                 'status_id' => $statusClaimId,
-                'comment' => "Выставлен счет",
+                'comment' => "Выставлен счет (без загрузки файла)",
                 'claim_id' => $claim->id,
             ]);
 
@@ -1122,10 +1179,11 @@ class ClaimController extends Controller
             HistoryPayment::create([
                 'user_id' => Auth::user()->id,
                 'status_id' => $statusPayment,
-                'comment' => 'Выставлен счет',
+                'comment' => 'Выставлен счет (без загрузки файла)',
                 'claim_id' => $claim->id,
             ]);
 
+            $claim->creatorUser->notify(new NotifyUser('Для заявки №'. $claim->id . ' был отмечен статус - Счет выставлен (без загрузки файла)', 'https://crm-mediaservice.ru/claims/' . $claim->id, $claim->client));
 
             DB::commit();
 

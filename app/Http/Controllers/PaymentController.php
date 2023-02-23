@@ -14,7 +14,7 @@ class PaymentController extends Controller
 {
     public function index() {
 
-        if (Auth::user()->role->level <= 2 || Auth::user()->role->level == 6) {
+        if (Auth::user()->role->level <= 2 || Auth::user()->role->level == 5) {
 
             $claims = Claim::with('historiesPayment.status')
                 ->whereDoesntHave('historiesPayment.status', function ($q) {

@@ -647,36 +647,8 @@ $(document).on("click", ".download-zip-invoice", function (e) {
 
 if (document.getElementById('plan-table')) {
 
-    var options = {
-        series: getSum()[0],
-        chart: {
-            width: '100%',
-            type: 'pie',
-        },
-        legend: {
-            position: 'top',
-            horizontalAlign: 'center',
-        },
-        dataLabels: {
-            enabled: false
-        },
-        stroke: {
-            width: 1,
-            colors: ["#35354f"]
-        },
-        toolbar: {
-            show: true,
-        },
-        fill: {
-            type: 'gradient',
-        },
-        labels: getSum()[3],
-    };
-    var chart = new ApexCharts(document.querySelector("#bar"), options);
-    chart.render();
-
     let planTable = new simpleDatatables.DataTable("#plan-table", {
-        searchable: true,
+        searchable: false,
         fixedHeight: false,
         labels: {
             placeholder: "Поиск...",
@@ -685,7 +657,6 @@ if (document.getElementById('plan-table')) {
             info: "Показано с {start} по {end} из {rows} записей",
         },
     });
-
 
     planTable.on("datatable.init", function () {
         adaptPageDropdown(planTable)
@@ -713,7 +684,41 @@ if (document.getElementById('plan-table')) {
                 });
             }
         });
+
+        // console.log($(".filter-month").val());
+        planTable.search($(".filter-month").val());
+        planTable.draw;
     }
+
+    var options = {
+        series: getSum()[0],
+        chart: {
+            width: '100%',
+            height: 350,
+            type: 'pie',
+        },
+        legend: {
+            position: 'top',
+            horizontalAlign: 'center',
+        },
+        dataLabels: {
+            enabled: false
+        },
+        stroke: {
+            width: 1,
+            colors: ["#35354f"]
+        },
+        toolbar: {
+            show: true,
+        },
+        fill: {
+            type: 'gradient',
+        },
+        labels: getSum()[3],
+    };
+
+    var chart = new ApexCharts(document.querySelector("#bar"), options);
+    chart.render();
 
     let amount = new Intl.NumberFormat('ru-RU').format(getSum()[2]);
     $("#sum").text(amount);
@@ -772,6 +777,7 @@ if (document.getElementById('plan-statistics')) {
     var options = {
         chart: {
             width: '100%',
+            height: 300,
             type: 'pie',
         },
         series: [],
@@ -865,6 +871,7 @@ if (document.getElementById('plan-user')) {
     var options = {
         chart: {
             width: '100%',
+            height: '250px',
             type: 'bar',
         },
         series: [],
@@ -1147,6 +1154,11 @@ $('#create-report').click(function () {
 $('#invoice-complete').click(function () {
 
     let id = $(this).attr('attr-id');
+    let number_invoice = null;
+    if ($('input[name="number_invoice"]').val()) {
+        number_invoice = $('input[name="number_invoice"]').val();
+    }
+    $(".overlay-spinner").addClass('show');
 
         $.ajaxSetup({
             headers: {
@@ -1159,6 +1171,7 @@ $('#invoice-complete').click(function () {
             type: "POST",
             data: {
                 'id': id,
+                'number_invoice' : number_invoice
             },
             success: function (response) {
                 if (response == 'success') location.reload();

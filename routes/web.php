@@ -95,6 +95,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('plan/sales-category', [UserController::class, 'getSalesByCategoryAjax']);
     Route::resource('plan', SalesPlanController::class);
 
+    Route::get('goals/my-report', [CalendarController::class, 'myReport'])->name('goals.my-report');
+
     Route::post('goals/reports', [CalendarController::class, 'createReport'])->name('goals.create-report');
     Route::get('goals/reports', [CalendarController::class, 'reports'])->name('goals.reports');
     Route::get('goals/deadline', [GoalController::class, 'deadline'])->name('goals.deadline');
@@ -129,6 +131,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('invoice/{claim}', [ClaimController::class, 'storeInvoice'])->name('claim.storeInvoice');
     Route::post('invoice/closed/{claim}', [ClaimController::class, 'updateInvoice'])->name('claim.updateInvoice');
 
+    Route::get('claims/my-complete', [ClaimController::class, 'myComplete'])->name('claim.myComplete');
 
     Route::post('claims/complete', [ClaimController::class, 'getCompleteClaims']);
     Route::get('claims/complete', [ClaimController::class, 'complete'])->name('claim.complete');

@@ -9,6 +9,7 @@ use App\Models\Client;
 use App\Models\Group;
 use App\Models\HistoryClaim;
 use App\Models\HistoryClient;
+use App\Models\HistoryPayment;
 use App\Models\LprClient;
 use App\Models\RequisiteClient;
 use App\Models\StatusClient;
@@ -374,8 +375,16 @@ class ClientController extends Controller
             abort(403);
         }
 
+        $claims = Claim::where('client_id', $id)->get();
+        if ($claims) {
+            foreach ($claims as $claim) {
+                HistoryPayment::where('claim_id', $claim->id)->delete();
+                $claim->delete();
+            }
+        }
+
         $client->delete();
-        return redirect()->route('clients.index')->with('success', 'Данные успешно удалены 👍');
+        return redirect()->back()->with('success', 'Данные успешно удалены 👍');
     }
 
     public function showAll()

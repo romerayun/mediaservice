@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActiveAd;
 use App\Models\Claim;
 use App\Models\Client;
 use App\Models\Goal;
@@ -10,6 +11,7 @@ use App\Models\HistoryClient;
 use App\Models\HistoryPayment;
 use App\Models\StatusPayment;
 use App\Models\UserM;
+use App\Notifications\RemindActiveAd;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -21,6 +23,7 @@ class CalendarController extends Controller
     public function index()
     {
 
+
         $groups = Group::all();
         $users = Group::with('roles.users')
 //            ->where('name', 'Отдел продаж')
@@ -31,17 +34,19 @@ class CalendarController extends Controller
     public function getGoals(Request $request)
     {
 
-
+//    dd($request);
         if ($request->view == null || $request->view == 1) {
             $goals = Goal::where('user_id', $request->idU)
-                ->orWhereNotNull('rrule')
+//                ->orWhereNotNull('rrule')
                 ->get();
         } else {
             $goals = Goal::where('user_id', $request->idU)
                 ->where('status', 0)
-                ->orWhereNotNull('rrule')
+//                ->orWhereNotNull('rrule')
                 ->get();
         }
+
+//        dd($goals);
 
 //        $goals = Goal::where('user_id', Auth::user()->id)
 ////            ->where('status', 0)
@@ -170,6 +175,12 @@ class CalendarController extends Controller
 
         return view('goals.report', compact('users'));
     }
+
+    public function myReport(Request $request) {
+
+        return view('goals.my-report');
+    }
+
 
 
     public function createReport(Request $request) {

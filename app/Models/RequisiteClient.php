@@ -21,6 +21,7 @@ class RequisiteClient extends Model
         'BIC',
         'nameBank',
         'KPP',
+        'KPP_C',
         'KBK',
         'buhName',
         'phone',

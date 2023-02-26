@@ -237,7 +237,7 @@
                         </li>
                         @endif
 
-                        @if (auth()->user()->role->level <= 2 || Auth::user()->role->level == 5)
+                        @if (auth()->user()->role->level <= 2 || Auth::user()->role->level == 5 || auth()->user()->userInvoice != 0)
                         <li
                             class="sidebar-item">
                             <a href="{{route('payment.index')}}" class='sidebar-link'>

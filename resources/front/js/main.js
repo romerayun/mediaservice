@@ -67,6 +67,8 @@ function getSum() {
 
 
 const inputElement = document.querySelector('#filepond');
+
+
 const pond = FilePond.create(inputElement, {
     'labelIdle': 'Перетащите свои файлы в эту область или <span class="filepond--label-action"> Нажмите сюда </span>',
     credits: false,

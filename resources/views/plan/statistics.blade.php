@@ -13,6 +13,8 @@
 
 @section('content')
 
+
+
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -55,6 +57,7 @@
                                 @else
                                     {{money($sumClaims->first()->total_amount)}} руб.
                                 @endif</p>
+                            @php echo getDebtSum() @endphp
                             <p class="fw-bold mb-0"><b class="text-primary">Поступления:</b>            @if($sumPaid->first()->total_amount == null)
                                     0 руб.
                                 @else

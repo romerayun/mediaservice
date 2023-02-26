@@ -51,8 +51,13 @@
                                             <a class="btn btn-sm btn-primary collapsed ms-2" data-bs-toggle="collapse" href="#info-level" role="button" aria-expanded="false" aria-controls="info-level">
                                                 <i class="bi bi-info-circle"></i>
                                             </a>
-                                            <div class="collapse mb-3" id="info-level">
-                                                <p><b class="text-info">1 уровень</b> - Административная роль</p>
+                                            <div class="collapse mb-3 mt-2" id="info-level">
+                                                <p><b class="text-primary">1 уровень</b> - Администратор (Директор)</p>
+                                                <p><b class="text-primary">2 уровень</b> - РОП</p>
+                                                <p><b class="text-primary">3 уровень</b> - Менеджер продаж</p>
+                                                <p><b class="text-primary">4 уровень</b> - Офис-менеджер</p>
+                                                <p><b class="text-primary">5 уровень</b> - Бухгалтерия</p>
+                                                <p><b class="text-primary">6 уровень</b> - Остальные (ОАП, ОВП, SMM, Радио и т.д.)</p>
                                             </div>
                                             <select class="js-example-basic-single is-invalid" name="level" id="level">
                                                 @for($i = 1; $i <= 6; $i++)

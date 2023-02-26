@@ -6,7 +6,7 @@
         </div>
         <div class="col-12 col-md-6 text-end">
 
-            <a href="{{url()->previous()}}" class="btn btn-sm btn-primary">Назад</a>
+            <a href="{{route('claims.show', ['claim'=>$claim->id])}}" class="btn btn-sm btn-primary">Назад</a>
 
         </div>
     </div>

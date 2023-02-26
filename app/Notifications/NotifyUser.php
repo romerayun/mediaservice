@@ -58,6 +58,7 @@ class NotifyUser extends Notification
 
         if ($this->claim != null) {
             $mail->line('Заявка №' . $this->claim->id);
+//            $mail->line('Услуга - ' . $this->claim->service->name);
         }
 
         $mail->action('Посмотреть', $this->link);

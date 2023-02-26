@@ -5,6 +5,7 @@ use App\Models\ClaimUsers;
 use App\Models\HistoryPayment;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 if (!function_exists('getAllGoals')) {
@@ -100,6 +101,7 @@ if (!function_exists('getCountClaimsResponsibleIsNotRead')) {
     function getCountClaimsResponsibleIsNotRead()
     {
         return \App\Models\Claim::whereNull('user_id')
+            ->where('isClose', 0)
             ->with('service')
             ->whereHas('service', function ($q) {
                 $q->where('user_id', \Illuminate\Support\Facades\Auth::user()->id);
@@ -389,5 +391,164 @@ if (!function_exists('getPaymentsClaim')) {
             ->sum('amount');
 
         return $claim;
+    }
+}
+
+if (!function_exists('getDebtSum')) {
+    function getDebtSum() {
+
+        $res = '';
+
+        $debtClaims = Claim::with('historiesPayment')
+            ->whereHas('historiesPayment', function ($q)  {
+                $q->with('status')
+                    ->whereHas('status', function ($w) {
+                        $w->where('name', "Долг");
+                    });
+            })
+            ->where('notInclude',0)
+            ->select(DB::raw('id'))
+            ->get();
+
+        $paidClaims = Claim::with('historiesPayment')
+            ->whereHas('historiesPayment', function ($q)  {
+                $q->with('status')
+                    ->whereHas('status', function ($w) {
+                        $w->where('name', "Оплачен");
+                    });
+            })
+            ->where('notInclude',0)
+            ->select(DB::raw('id'))
+            ->get();
+
+        $idPaidClaims = $paidClaims->mapWithKeys(function ($item, $i) {
+            return [$i => $item->id];
+        });
+
+        $idDebtClaims = $debtClaims->mapWithKeys(function ($item, $i) {
+            return [$i => $item->id];
+        });
+
+        $sumDebtClaims = Claim::with('historiesPayment')
+            ->whereHas('historiesPayment', function ($q)  {
+                $q->with('status')
+                    ->whereHas('status', function ($w) {
+                        $w->where('name', "Долг");
+                    });
+            })
+            ->where('notInclude',0)
+            ->whereNotIn('id', $idPaidClaims)
+            ->select(DB::raw('SUM(amount) as total_amount'))
+            ->get();
+
+        $sumPartPaid = HistoryPayment::with('status')
+            ->whereHas('status', function ($w) {
+                $w->where('name', "Частично оплачен");
+            })
+            ->whereNotIn('claim_id', $idPaidClaims)
+            ->whereIn('claim_id', $idDebtClaims)
+            ->select(DB::raw(' SUM(amount) as total_amount'))
+            ->get();
+
+
+        $res .= '<p class="fw-bold mb-0"><b class="text-primary">Долг: </b>';
+        if($sumDebtClaims->first()->total_amount == null)
+            $res .= '0 руб';
+        else {
+            $res .= money($sumDebtClaims->first()->total_amount) . ' руб.';
+            if ($sumPartPaid->first()->total_amount != null) {
+                $res .= ' (из них частично оплачено: '. money($sumPartPaid->first()->total_amount) . ' руб.)';
+                $res .= ' = Итого: '. money($sumDebtClaims->first()->total_amount - $sumPartPaid->first()->total_amount) . ' руб.';
+            }
+        }
+
+
+        $res .= '</p>';
+
+        return $res;
+
+    }
+}
+
+if (!function_exists('getDebtSumByUser')) {
+    function getDebtSumByUser($user_id) {
+
+        $res = '';
+
+        $debtClaims = Claim::with('historiesPayment')
+            ->whereHas('historiesPayment', function ($q)  {
+                $q->with('status')
+                    ->whereHas('status', function ($w) {
+                        $w->where('name', "Долг");
+                    });
+            })
+            ->where('creator', $user_id)
+            ->where('notInclude',0)
+            ->select(DB::raw('id'))
+            ->get();
+
+        $paidClaims = Claim::with('historiesPayment')
+            ->whereHas('historiesPayment', function ($q)  {
+                $q->with('status')
+                    ->whereHas('status', function ($w) {
+                        $w->where('name', "Оплачен");
+                    });
+            })
+            ->where('creator', $user_id)
+            ->where('notInclude',0)
+            ->select(DB::raw('id'))
+            ->get();
+
+        $idDebtClaims = $debtClaims->mapWithKeys(function ($item, $i) {
+            return [$i => $item->id];
+        });
+
+        $idPaidClaims = $paidClaims->mapWithKeys(function ($item, $i) {
+            return [$i => $item->id];
+        });
+
+        $sumDebtClaims = Claim::with('historiesPayment')
+            ->whereHas('historiesPayment', function ($q)  {
+                $q->with('status')
+                    ->whereHas('status', function ($w) {
+                        $w->where('name', "Долг");
+                    });
+            })
+            ->whereNotIn('id', $idPaidClaims)
+            ->where('creator', $user_id)
+            ->where('notInclude',0)
+            ->select(DB::raw('SUM(amount) as total_amount'))
+            ->get();
+
+        $sumPartPaid = HistoryPayment::with('status')
+            ->whereHas('status', function ($w) {
+                $w->where('name', "Частично оплачен");
+            })
+            ->with('claim')
+            ->whereHas('claim', function ($q) use ($user_id) {
+                $q->where('creator', $user_id);
+            })
+            ->whereNotIn('claim_id', $idPaidClaims)
+            ->whereIn('claim_id', $idDebtClaims)
+            ->select(DB::raw(' SUM(amount) as total_amount'))
+            ->get();
+
+
+        $res .= '<p class="fw-bold mb-0"><b class="text-primary">Долг: </b>';
+        if($sumDebtClaims->first()->total_amount == null)
+            $res .= '0 руб';
+        else {
+            $res .= money($sumDebtClaims->first()->total_amount) . ' руб.';
+            if ($sumPartPaid->first()->total_amount != null) {
+                $res .= ' (из них частично оплачено: '. money($sumPartPaid->first()->total_amount) . ' руб.)';
+                $res .= ' = Итого: '. money($sumDebtClaims->first()->total_amount - $sumPartPaid->first()->total_amount) . ' руб.';
+            }
+        }
+
+
+        $res .= '</p>';
+
+        return $res;
+
     }
 }

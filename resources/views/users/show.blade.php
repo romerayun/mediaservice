@@ -59,6 +59,7 @@
                                 @else
                                     {{money($sumClaims->first()->total_amount)}} руб.
                                 @endif</p>
+                            @php echo getDebtSumByUser($id) @endphp
                             <p class="fw-bold mb-0"><b class="text-primary">Поступления:</b>            @if($sumPaid->first()->total_amount == null)
                                     0 руб.
                                 @else

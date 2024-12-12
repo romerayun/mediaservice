@@ -110,6 +110,8 @@
                                 <span class="text-danger">Не заполнено</span> @endif</p>
                         <p class="mb-1"><b>ИНН: </b>@if($client->requisite->INN){{$client->requisite->INN}} @else <span
                                 class="text-danger">Не заполнено</span> @endif</p>
+                        <p class="mb-1"><b>КПП: </b>@if($client->requisite->KPP_C){{$client->requisite->KPP_C}} @else <span
+                                class="text-danger">Не заполнено</span> @endif</p>
                         <p class="mb-1">
                             <b>ОГРН(ОРГНИП): </b>@if($client->requisite->OGRN){{$client->requisite->OGRN}} @else <span
                                 class="text-danger">Не заполнено</span> @endif </p>

@@ -51181,6 +51181,7 @@ module.exports = function (list, options) {
   };
 
 
+
   // Assign instance methods from src/instanceMethods/*.js to prototype
   Object.assign(SweetAlert.prototype, instanceMethods);
 

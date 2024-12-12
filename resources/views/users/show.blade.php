@@ -41,7 +41,11 @@
 
     <div class="row">
 
-
+        <style>
+            table th, table td {
+                padding: 0.3rem !important;
+            }
+        </style>
 
         <div class="col-md-12 col-lg-12">
             <div class="card">
@@ -52,13 +56,43 @@
                             <h5 class="text-gray-500">К сожалению, заявок не создано 😢</h5>
                         @else
 
-                            <p class="fw-bold mb-0"><b class="text-primary">План сотрудника на месяц:</b> {{money($sumPlan)}} руб.</p>
+                            <p class="fw-bold mb-3"><b class="text-primary">План сотрудника на месяц:</b> {{money($sumPlan)}} руб.</p>
+                            <hr>
+                            <p class="fw-bold mb-0">
+                                <b class="text-primary">Количество рабочих дней:</b>
+                                @if(count(getWorkingDays($planMonth)) == 0)
+                                    <span class="text-danger">График работы не установлен</span>
+                                @else
+                                    <span id="countDays">{{count(getWorkingDays($planMonth))}}</span>
+                                @endif
+                            </p>
+
+
+                            <p class="mb-0 fw-bold">
+                                <b class="text-primary">Ежедневный план:</b>
+                                @if(count(getWorkingDays($planMonth)) == 0)
+                                    <span class="text-danger">График работы не установлен</span>
+                                @else
+                                    <span id="everyDayPlan">{{ money($sumPlan/ count(getWorkingDays($planMonth))) }} руб.</span>
+                                @endif
+                            </p>
+                            <p class="mb-3 fw-bold">
+                                <b class="text-primary">Сумма на сегодня ({{\Carbon\Carbon::now()->format('d.m.Y')}}): </b>
+                                @if(count(getWorkingDays($planMonth)) == 0)
+                                    <span class="text-danger">График работы не установлен</span>
+                                @else
+                                    <span id="everyDayPlan">{{money(($sumPlan / count(getWorkingDays($planMonth))) * getCountPastDays($planMonth))}} руб.</span>
+                                @endif
+                            </p>
+
+                            <hr>
                             <p class="fw-bold mb-0"><b class="text-primary">Заявок создано на:</b>
                                 @if($sumClaims->first()->total_amount == null)
                                     0 руб.
                                 @else
                                     {{money($sumClaims->first()->total_amount)}} руб.
                                 @endif</p>
+                            @php echo getDebtSumByUser($id) @endphp
                             <p class="fw-bold mb-0"><b class="text-primary">Поступления:</b>            @if($sumPaid->first()->total_amount == null)
                                     0 руб.
                                 @else
@@ -87,6 +121,8 @@
                                 <tbody>
 
                                 @foreach($userClaims as $key => $item)
+
+                                    @if($item->client == null) continue; @endif
                                     <tr>
                                         <td>{{$item->getDate()}}</td>
                                         <td>

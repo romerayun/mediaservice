@@ -22,14 +22,13 @@ class Kernel extends ConsoleKernel
 //        $schedule->command('client:lprBirthday')->daily()->runInBackground();
 
         $schedule->command('goal_reminder:send')->everyMinute();
-        $schedule->command('goals:deadline')->everyMinute();
-        $schedule->command('client:birthday')->everyMinute();
-        $schedule->command('client:lprBirthday')->everyMinute();
-        $schedule->command('goals:active_ad')->everyMinute();
-        $schedule->command('client:interaction')->everyMinute();
-        $schedule->command('claims:debt')->everyMinute();
+        $schedule->command('goals:deadline')->daily();
+        $schedule->command('client:birthday')->daily();
+        $schedule->command('client:lprBirthday')->daily();
+        $schedule->command('goals:active_ad')->daily();
+        $schedule->command('client:interaction')->daily();
+        $schedule->command('claims:debt')->daily();
     }
-
 
     /**
      * Register the commands for the application.

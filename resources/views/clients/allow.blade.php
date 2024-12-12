@@ -31,7 +31,7 @@
                 <tbody>
                 @foreach($clients as $key => $item)
                     <tr>
-                        <td>{{$key+1}}</td>
+                        <td>{{$item->id}}</td>
                         <td width="200px">
                             <div class="avatar avatar-lg">
                                 @if(empty($item->logo))

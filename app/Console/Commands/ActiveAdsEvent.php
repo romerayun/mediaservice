@@ -46,13 +46,16 @@ class ActiveAdsEvent extends Command
 
         foreach ($activeAds as $activeAd) {
             $endDate = \Carbon\Carbon::make($activeAd->end_date);
-            $endDate->setYear(now()->year);
+//            $endDate->setYear(now()->year);
 
             if ($endDate->isPast()) {
-                $endDate->addYear();
+//                $endDate->addYear();
+                 continue;
             }
 
             if ($endDate->diff(now())->days <= 7) {
+
+                if ($activeAd->claim == null) continue;
 
                 $goal = new Goal;
                 $goal->exposed = $activeAd->user_id;

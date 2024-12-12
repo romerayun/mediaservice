@@ -32,8 +32,14 @@
 
                                 @endif
                                 <h4 class="ms-lg-3 mb-0 text-start">{{$user->getFullName()}}</h4>
+
                             </div>
+
                         </div>
+                        @if ($user->isBlocked == 1)
+                            <span class="badge bg-danger mb-3 d-block">Заблокирован</span>
+                        @endif
+
                         <div class="card-body">
                             <div class="divider divider-left mt-0">
                                 <div class="divider-text">Дополнительная информация</div>
@@ -43,7 +49,7 @@
                             <p class="mb-1"><b>E-Mail: </b><a href="mailto:{{$user->email}}">{{$user->email}}</a></p>
 
 
-                            @if (auth()->user()->role->level <= 2)
+                            @if (auth()->user()->role->level <= 2 || auth()->user()->role->level == 5)
                             <div class="divider divider-left">
                                 <div class="divider-text">Действия</div>
 
@@ -53,11 +59,14 @@
 
                             </div>
                             <div class="d-inline-block w-100">
+                                @if (auth()->user()->role->level <= 2)
                                 <a href="{{route('users.repeat-password', ['user' => $user->id])}}"
                                    class="btn btn-sm icon btn-success me-2 mb-2"><i class="bi bi-arrow-repeat"></i> Повторить пароль</a>
-
+                                @endif
                                 <a href="{{route('users.show', ['user' => $user->id])}}"
                                    class="btn btn-sm icon btn-primary me-2 mb-2"><i class="bi bi-eye-fill"></i> Открыть</a>
+
+                                    @if (auth()->user()->role->level <= 2)
                                 <a href="{{route('users.edit', ['user' => $user->id])}}"
                                    class="btn btn-sm icon btn-primary me-2 mb-2"><i class="bi bi-pencil"></i>
                                     Редактировать</a>
@@ -65,10 +74,18 @@
                                       class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn icon btn-danger mb-2 block btn-sm"><i
-                                            class="bi bi-lock-fill"></i> Заблокировать
-                                    </button>
+                                    @if ($user->isBlocked == 1)
+                                        <button type="submit" class="btn icon btn-success mb-2 block btn-sm" attr-block="1"><i
+                                                class="bi bi-unlock-fill"></i> Разблокировать
+                                        </button>
+                                    @else
+                                        <button type="submit" class="btn icon btn-danger mb-2 block btn-sm" attr-block="0"><i
+                                                class="bi bi-lock-fill"></i> Заблокировать
+                                        </button>
+                                    @endif
+
                                 </form>
+                                    @endif
                             </div>
                             @endif
                         </div>

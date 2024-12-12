@@ -23,6 +23,7 @@ class LprClient extends Model
     ];
 
     public function getDateBirth($date): string {
+        if ($date == null) return '';
         return Carbon::parse($date)->format('d.m.Y');
     }
 

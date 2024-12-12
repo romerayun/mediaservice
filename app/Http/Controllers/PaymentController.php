@@ -14,7 +14,7 @@ class PaymentController extends Controller
 {
     public function index() {
 
-        if (Auth::user()->role->level <= 2 || Auth::user()->role->level == 5) {
+        if (Auth::user()->role->level <= 2 || Auth::user()->role->level == 5 || auth()->user()->userInvoice != 0) {
 
             $claims = Claim::with('historiesPayment.status')
                 ->whereDoesntHave('historiesPayment.status', function ($q) {
@@ -25,6 +25,7 @@ class PaymentController extends Controller
                 ->get();
 
 
+            session(['previous_url' => url()->current()]);
             $statusesPayment = StatusPayment::all();
 
             return view('payment.index', compact('claims', 'statusesPayment'));
@@ -117,6 +118,7 @@ class PaymentController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        session(['previous_url' => url()->current()]);
         $statusesPayment = StatusPayment::all();
 
         return view('payment.paid', compact('claims', 'statusesPayment'));
@@ -127,6 +129,8 @@ class PaymentController extends Controller
         $historiesPaidClaims = HistoryPayment::where('claim_id', $id)
             ->orderBy('created_at', 'desc')
             ->get();
+
+        session(['previous_url' => url()->current()]);
 
         return view('payment.paid-claims', compact('historiesPaidClaims'));
     }

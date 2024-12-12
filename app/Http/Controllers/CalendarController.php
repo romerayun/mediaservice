@@ -2,27 +2,71 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ClaimCreated;
 use App\Models\ActiveAd;
 use App\Models\Claim;
+use App\Models\ClaimUsers;
 use App\Models\Client;
 use App\Models\Goal;
 use App\Models\Group;
 use App\Models\HistoryClient;
 use App\Models\HistoryPayment;
+use App\Models\Role;
 use App\Models\StatusPayment;
+use App\Models\User;
 use App\Models\UserM;
 use App\Notifications\RemindActiveAd;
+use App\Notifications\RemindClient;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class CalendarController extends Controller
 {
     public function index()
     {
 
+
+//        dd(DB::table('users')->where('id', '=', '16')->update([
+//            'password' => Hash::make('1111'),
+//        ]));
+
+
+
+//        dd(Hash::make('1111'));
+//        $users = DB::table('users')
+//            ->join('roles', 'users.role_id', '=', 'roles.id')
+//            ->join('groups', 'roles.group_id', '=', 'groups.id')
+//            ->select('users.id')
+//            ->where('groups.id','=', 5)
+//            ->whereNull('users.deleted_at')
+//            ->get();
+//
+//        $users = $users->mapWithKeys(function ($item, $i) {
+//            return [$i => $item->id];
+//        });
+//
+//        dump($users);
+//
+//        $users = User::whereIn('id', $users)->where('userLeader', 1)->get();
+//        dd($users);
+//
+//        if ($users->count()) {
+//            event(new ClaimCreated('Привет, это массовое уведомление!', $users->first()->id));
+//        } else {
+//            $users = User::whereIn('id', $users)->get();
+//            foreach ($users as $user) {
+//                event(new ClaimCreated('Привет, это массовое уведомление!', $user->id));
+//            }
+//        }
+
+
+
+
+//        return response()->json(['status' => 'Уведомления отправлены!']);
 
         $groups = Group::all();
         $users = Group::with('roles.users')

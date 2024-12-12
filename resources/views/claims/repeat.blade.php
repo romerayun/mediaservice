@@ -6,7 +6,7 @@
         </div>
         <div class="col-12 col-md-6 text-end">
 
-            <a href="{{url()->previous()}}" class="btn btn-sm btn-primary">Назад</a>
+            <a href="{{$url ?? old('url') ?? url()->previous()}}" class="btn btn-sm btn-primary">Назад</a>
 
         </div>
     </div>
@@ -28,10 +28,44 @@
                 <input class="form-check-input ms-3" name="notIncludeC" id="notIncludeC" type="checkbox" value="" @if ($claim->notInclude) checked @endif> Не включать в план продаж
                 <input type="hidden" name="notInclude" value="@if ($claim->notInclude) 1 @else 0 @endif">
 
+                <input class="form-check-input ms-3" name="anotherUserC" id="anotherUserC" type="checkbox" value="" @if ($claim->anotherUser) checked @endif> Внештатный сотрудник
+                <input type="hidden" name="anotherUser" id="anotherUser" value="@if ($claim->anotherUser) 1 @else 0 @endif">
 
             </div>
         </div>
-
+        <div class="row mt-3 d-none users-form">
+            <div class="col-lg-12">
+                <input type="hidden" name="url" value="{{$url ?? old('url') ?? url()->previous()}}">
+                <div class="form-group @if($errors->has('creator')) is-invalid @endif">
+                    <label>Выберите сотрудника: </label>
+                    <select class="js-example-basic-single is-invalid" name="creator"
+                            id="creator">
+                        <option value="">Не выбрано</option>
+                        @if(count($users) != 0)
+                            @foreach($users as $group)
+                                @foreach($group->roles as $role)
+                                    @foreach($role->users as $user)
+                                        @if ($claim->creator == $user->id)
+                                            <option value="{{$user->id}}" selected>{{$user->getFullName()}}</option>
+                                        @else
+                                            <option value="{{$user->id}}">{{$user->getFullName()}}</option>
+                                        @endif
+                                    @endforeach
+                                @endforeach
+                            @endforeach
+                        @endif
+                    </select>
+                    @if($errors->has('creator'))
+                        <div class="invalid-feedback">
+                            <i class="bx bx-radio-circle"></i>
+                            @foreach($errors->get('creator') as $message)
+                                {{$message}}<br>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
 
         <div class="row mt-3">
             <div class="col-lg-6 col-md-12">

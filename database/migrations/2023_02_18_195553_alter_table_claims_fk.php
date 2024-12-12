@@ -14,13 +14,13 @@ class AlterTableClaimsFk extends Migration
     public function up()
     {
         Schema::table('claims', function (Blueprint $table) {
-            $table->dropForeign(['client_id']);
+//            $table->dropForeign(['client_id']);
 
-            $table->foreign('client_id')
-                ->references('id')
-                ->on('clients')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
+//            $table->foreign('client_id')
+//                ->references('id')
+//                ->on('clients')
+//                ->onUpdate('cascade')
+//                ->onDelete('cascade');
         });
     }
 
@@ -32,11 +32,11 @@ class AlterTableClaimsFk extends Migration
     public function down()
     {
         Schema::table('claims', function (Blueprint $table) {
-            $table->dropForeign(['client_id']);
-            $table->foreign('client_id')
-                ->references('id')
-                ->on('clients')
-                ->onUpdate('cascade');
+//            $table->dropForeign(['client_id']);
+//            $table->foreign('client_id')
+//                ->references('id')
+//                ->on('clients')
+//                ->onUpdate('cascade');
         });
     }
 }

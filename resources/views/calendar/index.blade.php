@@ -559,7 +559,7 @@
                                 </div>
                             </div>
                             <input type="hidden" id="calendar_user_hidden" value="{{auth()->user()->id}}">
-                            @if (auth()->user()->role->level <= 2)
+{{--                            @if (auth()->user()->role->level <= 2)--}}
                             <div class="col-lg-4 col-md-12 text-end">
                                 <div class="form-group">
 {{--                                    <label>Выберите сотрудника: </label>--}}
@@ -582,7 +582,7 @@
                                     </select>
                                 </div>
                             </div>
-                            @endif
+{{--                            @endif--}}
                         </div>
 
                         <div id="calendar">

@@ -11,6 +11,65 @@ import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 import {DataTable} from "../extensions/simple-datatables";
 import th from "air-datepicker/locale/th";
 
+
+import Echo from 'laravel-echo';
+import {wind} from "../extensions/feather-icons/feather";
+import Pusher from 'pusher-js';
+window.Pusher = Pusher;
+window.axios = require('axios');
+window.axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+import Toastify from 'toastify-js';
+import "toastify-js/src/toastify.css";
+
+// Toastify({
+//     text: "<h5>Title toast</h5><p>Создана новая заявка №76236, фыолра ло флдыов лдфоывдл</p>",
+//     className: "customToast",
+//     duration: -1,
+//     close: true,
+//     escapeMarkup: false,
+//
+// }).showToast();
+
+// Toaster('This is a blank toast!');
+
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: process.env.MIX_PUSHER_APP_KEY,
+    cluster: process.env.MIX_PUSHER_APP_CLUSTER,
+    forceTLS: true,
+    encrypted: true,
+    auth: {
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        }
+    }
+});
+
+// console.log(window.location.origin);
+
+let userId = window.Laravel.userId;
+
+window.Echo.private(`claimInfo.${userId}`)
+    .listen('.updated-claim', (e) => {
+        // console.log(e);
+        Toastify({
+            text: "<h5>Новое уведомление 🔔</h5>" +
+                "<p>" + e.claim.text + "</p>",
+            className: "customToast",
+            duration: -1,
+            destination: window.location.origin + e.claim.url,
+            close: true,
+            escapeMarkup: false,
+        }).showToast();
+    });
+
+
+// window.Echo.channel("my-channel").listen("form-submitted", (event) => {
+//     console.log(event);
+// });
+
+
 FilePond.registerPlugin(FilePondPluginImagePreview);
 
 
@@ -67,6 +126,8 @@ function getSum() {
 
 
 const inputElement = document.querySelector('#filepond');
+
+
 const pond = FilePond.create(inputElement, {
     'labelIdle': 'Перетащите свои файлы в эту область или <span class="filepond--label-action"> Нажмите сюда </span>',
     credits: false,
@@ -103,6 +164,18 @@ new AirDatepicker('.datepicker', {
     altField: '#deadline'
 });
 
+if (document.getElementById('updated_at-datepicker')) {
+    new AirDatepicker('.updated_at-datepicker', {
+        isMobile: true,
+        autoClose: true,
+        timepicker: true,
+        selectedDates: [new Date()],
+        // minDate: $.now(),
+        altFieldDateFormat: 'yyyy-MM-dd HH:mm:00',
+        altField: '#updated_at'
+    });
+}
+
 if (document.getElementById('report-datepicker')) {
     new AirDatepicker('#report-datepicker', {
         isMobile: true,
@@ -117,9 +190,19 @@ if (document.getElementById('deadlineClaim-datepicker')) {
         isMobile: true,
         autoClose: true,
         timepicker: true,
-        minDate: $.now(),
+        // minDate: $.now(),
         altFieldDateFormat: 'yyyy-MM-dd HH:mm:00',
         altField: '#deadlineClaim'
+    });
+}
+
+if (document.getElementById('created_at-datepicker')) {
+    new AirDatepicker('#created_at-datepicker', {
+        isMobile: true,
+        autoClose: true,
+        timepicker: true,
+        altFieldDateFormat: 'yyyy-MM-dd HH:mm:00',
+        altField: '#created_at'
     });
 }
 
@@ -148,6 +231,10 @@ if (document.getElementById('range-ad-datepicker')) {
 }
 
 
+
+let datesPicker;
+
+
 if (document.getElementById('month-datepicker')) {
     let monthDatepicker = new AirDatepicker('.month-datepicker', {
         isMobile: true,
@@ -156,9 +243,63 @@ if (document.getElementById('month-datepicker')) {
         minView: 'months',
         dateFormat: 'MMMM yyyy',
         altFieldDateFormat: 'yyyy-MM-01',
-        altField: '#month'
+        altField: '#month',
+        onSelect: function onSelect(fd, date, inst) {
+
+
+            if (document.getElementById('dates-datepicker')) {
+
+
+                console.log(datesPicker);
+                if (datesPicker) {
+                    try {
+                        datesPicker.destroy();
+                    } catch ($e) {
+                        // $('#dates-datepicker').addAttr('disabled');
+                        // console.log('error');
+                    }
+                }
+                console.log(datesPicker);
+                $('#dates-datepicker').val('');
+                $('#dates-datepicker').removeAttr('disabled');
+
+
+                var url = '/api/get-working-days/' + $("#month").val();
+                $.getJSON(url, function (response) {
+
+                    let dates = [];
+                    response.forEach((res) => {
+                        dates.push(new Date(res));
+
+                    });
+
+
+                    datesPicker = new AirDatepicker('#dates-datepicker', {
+                        isMobile: true,
+                        autoClose: true,
+                        altFieldDateFormat: 'yyyy-MM-dd',
+                        multipleDates: true,
+                        multipleDatesSeparator: ' | ',
+                        startDate: fd.date,
+                        altField: '#countDays',
+                        selectedDates: dates,
+                    });
+                    datesPicker.minDate = fd.date;
+                    datesPicker.maxDate = new Date(fd.date.getFullYear(), fd.date.getMonth() + 1, 0);
+                });
+
+                // localStorage.setItem("datesPicker", datesPicker);
+            }
+
+
+        },
+        unselectDate: function unselectDate(fd, date, inst) {
+            console.log('unselect' + fd.date);
+        }
     });
 }
+
+
 
 
 let selector = '.sidebar-menu ul.menu .sidebar-item';
@@ -284,6 +425,16 @@ $(document).on("click", ".create-claim", function (event) {
     }
 
 
+
+    if ($("#anotherCreatedAt").prop('checked')) {
+        if ($("#created_at").val() == 0) {
+            $("#created_at").parents('.form-group').addClass('is-invalid');
+            submit = false;
+        } else {
+            $("#created_at").parents('.form-group').removeClass('is-invalid');
+        }
+    }
+
     if ($("#deadlineClaim").val() == '') {
         $("#deadlineClaim-datepicker").addClass('is-invalid');
         submit = false;
@@ -351,7 +502,7 @@ if (currentUrl.includes('distribution')) {
     });
 
     $(document).on( "change", ".user_id", function() {
-    // $(".user_id").change(function () {
+        // $(".user_id").change(function () {
         let item = $(this);
         let user = $(this).val();
         let client_id = $(this).attr('attr-id');
@@ -404,6 +555,19 @@ if (!currentUrl.includes('services')) {
 
             });
         }
+
+    });
+}
+
+if (document.getElementById('month-f')) {
+    let monthDatepicker = new AirDatepicker('.month-f', {
+        isMobile: true,
+        autoClose: true,
+        view: 'months',
+        minView: 'months',
+        dateFormat: 'MMMM yyyy',
+        altFieldDateFormat: 'yyyy-MM',
+        altField: '#month',
 
     });
 }
@@ -560,6 +724,18 @@ $("#anotherUserC").change( function() {
     }
 });
 
+$("#anotherCreatedAt").change( function() {
+
+    if ($(this).prop("checked")) {
+        $(".created-at-block").removeClass('d-none');
+
+    } else {
+        $(".created-at-block").addClass('d-none');
+        $("#created_at").val(new Date().toISOString().slice(0, 19).replace('T', ' '));
+    }
+});
+
+
 $("#goal").change(function () {
     let goalS = $('.goal-section');
     if (goalS.hasClass('show')) {
@@ -673,7 +849,11 @@ if (document.getElementById('plan-table')) {
             view: 'months',
             minView: 'months',
             dateFormat: 'MMMM yyyy',
+            altFieldDateFormat: 'yyyy-MM-01',
+            altField: '#month',
             onSelect: function onSelect(fd, date, inst) {
+
+                let fullYear = fd.date.getFullYear();
                 planTable.search(fd.formattedDate);
                 planTable.draw;
                 $("#sum").text(getSum()[2]);
@@ -681,6 +861,26 @@ if (document.getElementById('plan-table')) {
                 chart.updateOptions({
                     series: getSum()[0],
                     labels: getSum()[1],
+                });
+
+                var url = '/api/get-statistics-by-year/' + fullYear
+
+                $.getJSON(url, function (response) {
+                    chart2.updateSeries(response)
+                });
+
+                url = '/api/get-working-days/' + $("#month").val();
+                $.getJSON(url, function (response) {
+
+                    if (response.length == 0) {
+                        $("#countDays").html("<span class='text-danger'>График работы не установлен</span>");
+                        $("#everyDayPlan").html("<span class='text-danger'>Невозможно рассчитать, график работы не установлен</span>");
+                    } else {
+                        $("#countDays").html(response.length);
+                        $("#everyDayPlan").html((+getSum()[2] / response.length) + ' руб.');
+                    }
+
+
                 });
             }
         });
@@ -714,6 +914,7 @@ if (document.getElementById('plan-table')) {
         fill: {
             type: 'gradient',
         },
+
         labels: getSum()[3],
     };
 
@@ -724,7 +925,91 @@ if (document.getElementById('plan-table')) {
     $("#sum").text(amount);
 
 
+    let RUMoneyFormat = new Intl.NumberFormat('ru-RU');
+
+    var options = {
+        series: [
+        ],
+        chart: {
+            height: 350,
+            type: 'line',
+            dropShadow: {
+                enabled: true,
+                color: '#000',
+                top: 18,
+                left: 7,
+                blur: 10,
+                opacity: 0.2
+            },
+            toolbar: {
+                show: false
+            }
+        },
+        colors: ['#2ecc71', '#34495e'],
+        dataLabels: {
+            enabled: true,
+        },
+        stroke: {
+            curve: 'smooth'
+        },
+        grid: {
+            borderColor: '#e7e7e7',
+            row: {
+                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                opacity: 0.5
+            },
+        },
+        markers: {
+            size: 1
+        },
+        xaxis: {
+            categories: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+            title: {
+                text: 'Месяца'
+            }
+        },
+        yaxis: {
+            labels: {
+                formatter: function(val, index) {
+                    return RUMoneyFormat.format(val.toFixed(2)) + ' р.';
+                }
+            }
+        },
+        noData: {
+            text: 'Загружаем данные...'
+        },
+        legend: {
+            position: 'top',
+            horizontalAlign: 'right',
+            floating: true,
+            offsetY: -25,
+            offsetX: -5
+        }
+    };
+
+    var chart2 = new ApexCharts(document.querySelector("#statistics-bar"), options);
+    chart2.render();
+
+    let year = 0;
+    if (document.getElementById('filter-month')) {
+        year = +String($('#filter-month').val()).substr(-4, 4);
+    }
+
+    if (document.getElementById('month-f')) {
+        year = +String($('#month-f').val()).substr(-4, 4);
+    }
+
+    var url = '/api/get-statistics-by-year/' + year;
+
+    $.getJSON(url, function (response) {
+
+        chart2.updateSeries(response)
+
+    });
+
 }
+
+
 
 
 $(document).on("click", ".changeStatus", function (event) {
@@ -830,35 +1115,140 @@ if (document.getElementById('plan-statistics')) {
             });
         } else {
             chart.updateOptions({
-                series:  Object.values(response.data),
+                series: Object.values(response.data),
                 labels: Object.values(response.labels),
             });
         }
 
 
     });
-}
 
-if (document.getElementById('month-f')) {
-    let monthDatepicker = new AirDatepicker('.month-f', {
-        isMobile: true,
-        autoClose: true,
-        view: 'months',
-        minView: 'months',
-        dateFormat: 'MMMM yyyy',
-        altFieldDateFormat: 'yyyy-MM',
-        altField: '#month',
-        onSelect: function onSelect(fd, date, inst) {
-            planTable.search(fd.formattedDate);
-            planTable.draw;
-            $("#sum").text(getSum()[2]);
+    let RUMoneyFormat = new Intl.NumberFormat('ru-RU');
 
-            chart.updateOptions({
-                series: getSum()[0],
-                labels: getSum()[1],
-            });
+    var options = {
+        series: [],
+        chart: {
+            height: 350,
+            type: 'line',
+            dropShadow: {
+                enabled: true,
+                color: '#000',
+                top: 18,
+                left: 7,
+                blur: 10,
+                opacity: 0.2
+            },
+            toolbar: {
+                show: false
+            }
+        },
+        colors: ['#2ecc71', '#34495e'],
+        dataLabels: {
+            enabled: true,
+        },
+        stroke: {
+            curve: 'smooth'
+        },
+        grid: {
+            borderColor: '#e7e7e7',
+            row: {
+                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                opacity: 0.5
+            },
+        },
+        markers: {
+            size: 1
+        },
+        xaxis: {
+            categories: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+            title: {
+                text: 'Месяца'
+            }
+        },
+        yaxis: {
+            labels: {
+                formatter: function (val, index) {
+                    return RUMoneyFormat.format(val.toFixed(2)) + ' р.';
+                }
+            }
+        },
+        noData: {
+            text: 'Загружаем данные...'
+        },
+        legend: {
+            position: 'top',
+            horizontalAlign: 'right',
+            floating: true,
+            offsetY: -25,
+            offsetX: -5
         }
+    };
+
+    var chart2 = new ApexCharts(document.querySelector("#statistics-bar"), options);
+    chart2.render();
+
+    let year = 0;
+    if (document.getElementById('filter-month')) {
+        year = +String($('#filter-month').val()).substr(-4, 4);
+    }
+
+    if (document.getElementById('month-f')) {
+        year = +String($('#month-f').val()).substr(-4, 4);
+    }
+
+    var url = '/api/get-statistics-by-year/' + year;
+
+    $.getJSON(url, function (response) {
+
+        chart2.updateSeries(response)
+
     });
+
+
+    if (document.getElementById('month-f')) {
+        let monthDatepicker = new AirDatepicker('.month-f', {
+            isMobile: true,
+            autoClose: true,
+            view: 'months',
+            minView: 'months',
+            dateFormat: 'MMMM yyyy',
+            altFieldDateFormat: 'yyyy-MM',
+            altField: '#month',
+            onSelect: function onSelect(fd, date, inst) {
+                planTable.search(fd.formattedDate);
+                planTable.draw;
+                $("#sum").text(new Intl.NumberFormat('ru-RU').format(getSum()[2]));
+
+                chart.updateOptions({
+                    series: getSum()[0],
+                    labels: getSum()[1],
+                });
+
+                let fullYear = fd.date.getFullYear();
+
+                var url = '/api/get-statistics-by-year/' + fullYear
+
+                $.getJSON(url, function (response) {
+                    chart2.updateSeries(response)
+                });
+
+                // url = '/api/get-working-days/' + $("#month").val();
+                // $.getJSON(url, function (response) {
+                //
+                //     if (response.length == 0) {
+                //         $("#countDays").html("<span class='text-danger'>График работы не установлен</span>");
+                //         $("#everyDayPlan").html("<span class='text-danger'>Невозможно рассчитать, график работы не установлен</span>");
+                //     } else {
+                //         $("#countDays").html(response.length);
+                //         $("#everyDayPlan").html((+getSum()[2] / response.length) + ' руб.');
+                //     }
+                //
+                //
+                // });
+
+            }
+        });
+    }
 }
 
 if (document.getElementById('plan-user')) {
@@ -1160,28 +1550,28 @@ $('#invoice-complete').click(function () {
     }
     $(".overlay-spinner").addClass('show');
 
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('input[name="_token"]').val()
-            }
-        });
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('input[name="_token"]').val()
+        }
+    });
 
-        $.ajax({
-            url: '/invoice/complete',
-            type: "POST",
-            data: {
-                'id': id,
-                'number_invoice' : number_invoice
-            },
-            success: function (response) {
-                if (response == 'success') location.reload();
-                else showToast("Произошла ошибка 😢", "linear-gradient(to right, #ED213A, #93291E)");
-            },
-            error: function (error) {
-                showToast("Произошла ошибка 😢", "linear-gradient(to right, #ED213A, #93291E)");
-            },
+    $.ajax({
+        url: '/invoice/complete',
+        type: "POST",
+        data: {
+            'id': id,
+            'number_invoice' : number_invoice
+        },
+        success: function (response) {
+            if (response == 'success') location.reload();
+            else showToast("Произошла ошибка 😢", "linear-gradient(to right, #ED213A, #93291E)");
+        },
+        error: function (error) {
+            showToast("Произошла ошибка 😢", "linear-gradient(to right, #ED213A, #93291E)");
+        },
 
-        });
+    });
 
 
 });
@@ -1215,5 +1605,3 @@ if (document.getElementById('swiper')) {
         },
     });
 }
-
-

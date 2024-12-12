@@ -3,8 +3,11 @@
     <div class="row align-items-center">
         <div class="col-12 col-md-6">
             <h3>Клиент №{{$client->id}} - {{$client->name}}</h3>
-            <span
-                class="badge custom-bg-{{$listStatusesClient->first()->status->color}} fs-6"><b>Текущий статус клиента</b> - {{$listStatusesClient->first()->status->name}}</span>
+            @if($listStatusesClient->first()->status == null)
+                <span class="badge custom-bg-danger fs-6"><b>Текущий статус клиента</b> - Неизвестно</span>
+            @else
+            <span class="badge custom-bg-{{$listStatusesClient->first()->status->color}} fs-6"><b>Текущий статус клиента</b> - {{$listStatusesClient->first()->status->name}}</span>
+            @endif
         </div>
         <div class="col-12 col-md-6 text-end">
             <a href="{{route('lpr.createLpr', ['client_id' => $client->id])}}"
@@ -49,7 +52,7 @@
                     <p class="mb-1 mt-4"><b>Адрес: </b>@if($client->address){{$client->address}} @else <span
                             class="text-danger">Не заполнено</span> @endif</p>
                     <p class="mb-1"><b>Телефон: </b><a href="tel:{{$client->phone}}">{{$client->phone}}</a></p>
-                    <p class="mb-1"><b>E-Mail: </b>@if($client->address)<a
+                    <p class="mb-1"><b>E-Mail: </b>@if($client->email)<a
                             href="mailto:{{$client->email}}">{{$client->email}}</a> @else <span class="text-danger">Не заполнено</span> @endif
                     </p>
                     <p class="mb-1"><b>Сайт: </b>@if($client->website)<a target="_blank"
@@ -123,9 +126,7 @@
                         <p class="mb-1"><b>Корреспондентский
                                 счет: </b>@if($client->requisite->correspondentAccount){{$client->requisite->correspondentAccount}} @else
                                 <span class="text-danger">Не заполнено</span> @endif </p>
-                        <p class="mb-1"><b>Корреспондентский
-                                счет: </b>@if($client->requisite->correspondentAccount){{$client->requisite->correspondentAccount}} @else
-                                <span class="text-danger">Не заполнено</span> @endif </p>
+
                         <p class="mb-1"><b>БИК: </b>@if($client->requisite->BIC){{$client->requisite->BIC}} @else <span
                                 class="text-danger">Не заполнено</span> @endif </p>
                         <p class="mb-1"><b>Наименование
@@ -304,10 +305,18 @@
                                          aria-labelledby="historyClient-tab">
                                         <ol class="activity-feed">
                                             @foreach($listStatusesClient as $currentStatus)
-                                                <li class="feed-item feed-item-{{$currentStatus->status->color}}">
+                                                @if ($currentStatus->status == null)
+                                                    <li class="feed-item feed-item-primary">
+                                                @else
+                                                    <li class="feed-item feed-item-{{$currentStatus->status->color}}">
+                                                        @endif
 
                                                     <time class="date" datetime="9-25">{{$currentStatus->getDate()}}</time>
-                                                    <p class="fs-6"><b>Статус: </b> {{$currentStatus->status->name}}</p>
+                                                        @if ($currentStatus->status == null)
+                                                            <p class="fs-6"><b>Статус: </b> Неизвестно</p>
+                                                        @else
+                                                            <p class="fs-6"><b>Статус: </b> {{$currentStatus->status->name}}</p>
+                                                        @endif
                                                     <span
                                                         class="text"><b>Комментарий: </b> {{$currentStatus->comment}}</span>
                                                     <p class="text mt-3">
@@ -336,6 +345,9 @@
 
                                                     <input class="form-check-input ms-3" name="anotherUserC" id="anotherUserC" type="checkbox" value=""> Внештатный сотрудник
                                                     <input type="hidden" name="anotherUser" id="anotherUser" value="0">
+
+                                                    <input class="form-check-input ms-3" name="anotherCreatedAt" id="anotherCreatedAt" type="checkbox" value=""> Выбрать дату создания
+                                                    <input type="hidden" name="anotherCreatedAt" id="anotherCreatedAt" value="0">
                                                 </div>
                                             </div>
 
@@ -432,6 +444,29 @@
                                                 </div>
                                             </div>
 
+                                            <div class="row mt-3 created-at-block d-none">
+                                                <div class="col-12">
+                                                    <div class="form-group">
+                                                        <label>Выберите дату создания: </label>
+                                                        <input type="hidden" name="created_at" id="created_at" value="{{\Illuminate\Support\Carbon::now()}}">
+                                                        <input type="text" id="created_at-datepicker"
+                                                               class="form-control created_at @if($errors->has('created_at')) is-invalid @endif"
+                                                               name="created_at-datepicker"
+                                                               placeholder="Выберите дату создания задачи..." required
+                                                               value="{{old('created_at')}}">
+                                                        @if($errors->has('created_at'))
+                                                            <div class="invalid-feedback">
+                                                                <i class="bx bx-radio-circle"></i>
+                                                                @foreach($errors->get('created_at') as $message)
+                                                                    {{$message}}<br>
+                                                                @endforeach
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
                                             <div class="row mt-3">
                                                 <div class="col-12">
                                                     <div class="form-group">
@@ -453,6 +488,8 @@
                                                     </div>
                                                 </div>
                                             </div>
+
+
 
                                             <div class="row mt-3">
                                                 <div class="col-12 ">
@@ -601,7 +638,7 @@
                                                         <b>Создал заявку - </b> {{$claim->creatorUser->getFullName()}}
                                                     </p>
                                                     <p class="mb-1">
-                                                        <b>Текущий статус - </b> {{$claim->histories->last()->status->name}}
+                                                        <b>Текущий статус - </b> {{$claim->histories->first()->status->name}}
                                                     </p>
                                                     <p >
                                                         <b>Стоимость - </b> {{money($claim->amount)}}

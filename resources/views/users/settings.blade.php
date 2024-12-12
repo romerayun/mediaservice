@@ -19,7 +19,13 @@
                             @csrf
                             <div class="form-body">
 
-                                <div class="row mt-1">
+
+                                <div class="form-check form-switch fs-6">
+                                    <input class="form-check-input  me-0" type="checkbox" id="toggle-notification">
+                                    <label class="form-check-label">Включить уведомления</label>
+                                </div>
+
+                                <div class="row mt-3">
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label>Фотография пользователя:
@@ -45,6 +51,9 @@
                                         </div>
                                     </div>
                                 </div>
+
+
+
 
 
                                 <div class="col-12 mt-4">

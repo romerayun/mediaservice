@@ -10,10 +10,11 @@
                 <form action="{{route('claims.destroy', ['claim' => $claim->id])}}" method="POST" class="d-inline">
                     @csrf
                     @method('DELETE')
+                    <input type="hidden" name="url" value="{{$url ?? old('url') ?? url()->previous()}}">
                     <a href="#" class="btn icon btn-sm btn-danger delete"><i class="bi bi-trash-fill"></i></a>
                 </form>
             @endif
-                <a href="{{url()->previous()}}" class="btn btn-sm btn-primary">Вернуться назад</a>
+                <a href="{{session('previous_url') ?? old('url') ?? url()->previous()}}" class="btn btn-sm btn-primary">Вернуться назад</a>
             </div>
         </div>
     @endsection
@@ -68,7 +69,7 @@
                             <p class="mt-1 mb-0"><b class="text-primary">Стоимость:</b> {{money($claim->amount)}} р.</p>
                             <p class="mt-1 mb-0"><b class="text-primary">Выполнить до:</b> {{$claim->getDeadline()}}</p>
                             @if ($claim->comment)
-                                <p class="mt-1"><b class="text-primary">Комментарий:</b> {{$claim->comment}}</p>
+                                <p class="mt-1"><b class="text-primary">Комментарий:</b><br> {!! nl2br($claim->comment) !!}</p>
                             @endif
                             @if (auth()->user()->role->level > 2 && auth()->user()->id != $claim->creator && auth()->user()->id != $claim->user_id && !checkUserAccessToClaim($claim->id, auth()->user()->id))
                                 @if($claim->service->isBrif)
@@ -98,6 +99,7 @@
                                             <h4 class="card-title mb-0 mt-2">Рекламная кампания запущена <form action="{{route('claim.deleteAd', ['ad'=>$activeAdItem->id])}}" method="POST" class="ms-2 d-inline-block">
                                                     @csrf
                                                     @method('DELETE')
+                                                    <input type="hidden" name="url" value="{{$url ?? old('url') ?? url()->previous()}}">
                                                     <button type="submit" class="btn btn-sm btn-danger icon"><i class="bi bi-trash-fill"></i></button>
                                                 </form></h4>
                                             <p class="mt-2">
@@ -129,6 +131,7 @@
 
                                 <form action="{{route('claim.storeAd', ['claim' => $claim->id])}}" method="POST">
                                     @csrf
+                                    <input type="hidden" name="url" value="{{$url ?? old('url') ?? url()->previous()}}">
                                     <div class="row">
                                         <div class="col-lg-12 col-md-12">
                                             <div class="form-group">
@@ -170,6 +173,26 @@
                                             невозможно</i></p>
                                     <form action="{{route('claim.claimsClosed', ['claim' => $claim->id])}}" method="POST">
                                         @csrf
+                                        <input type="hidden" name="url" value="{{$url ?? old('url') ?? url()->previous()}}">
+
+                                        <div class="form-group">
+                                            <label>Выберите дату закрытия заявки: </label>
+                                            <input type="hidden" name="updated_at" id="updated_at" value="{{\Illuminate\Support\Carbon::now()}}">
+                                            <input type="text" id="updated_at-datepicker"
+                                                   class="form-control updated_at-datepicker @if($errors->has('updated_at')) is-invalid @endif"
+                                                   name="updated_at-datepicker"
+                                                   placeholder="Выберите дату создания задачи..." required
+                                                   value="{{old('updated_at')}}">
+                                            @if($errors->has('updated_at'))
+                                                <div class="invalid-feedback">
+                                                    <i class="bx bx-radio-circle"></i>
+                                                    @foreach($errors->get('updated_at') as $message)
+                                                        {{$message}}<br>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+
                                         <div class="form-group">
                                             <label>Причина закрытия заявки: </label>
                                             <textarea
@@ -207,6 +230,7 @@
 
                                     <form action="{{route('claim.storeUsers', ['claim' => $claim->id])}}" method="POST">
                                         @csrf
+                                        <input type="hidden" name="url" value="{{$url ?? old('url') ?? url()->previous()}}">
                                         <div class="form-group">
                                             <label>Выберите ответственных за данную заявку: </label>
                                             <select class="js-example-basic-single is-invalid"
@@ -226,6 +250,7 @@
                                             <form action="{{route('claim.deleteUser', ['claim' => $claimUser->id])}}" class="mt-2" method="POST">
                                                 @csrf
                                                 @method('DELETE')
+                                                <input type="hidden" name="url" value="{{$url ?? old('url') ?? url()->previous()}}">
                                                 <a href="#" class="btn icon btn-danger delete"><i class="bi bi-trash-fill"></i></a>
                                                 <p class="d-inline-block ms-2">{{$claimUser->user->getFullName()}} ({{$claimUser->user->role->name}})</p>
                                             </form>
@@ -274,6 +299,7 @@
                                               method="POST"
                                               class="mt-3">
                                             @csrf
+                                            <input type="hidden" name="url" value="{{$url ?? old('url') ?? url()->previous()}}">
                                             <div class="col-md-12">
                                                 <div
                                                     class="form-group @if($errors->has('status_id')) is-invalid @endif">

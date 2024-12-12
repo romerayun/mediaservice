@@ -89,6 +89,15 @@ class UserM extends Authenticatable
         return $this->hasMany(ClaimUsers::class);
     }
 
+    public function pusherNotofications()
+    {
+        return $this->hasMany(PusherNotification::class);
+    }
+
+    public function dynamicsTable()
+    {
+        return $this->hasMany(DynamicTable::class);
+    }
 
     public function getFullName() {
         return $this->surname . " " . $this->name . " " . $this->patron;

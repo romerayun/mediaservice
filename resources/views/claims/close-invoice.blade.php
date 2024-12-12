@@ -70,11 +70,11 @@
                                             </div>
                                             <div class="form-group">
                                                 <label>Прикрепите счет:
-                                                    @if(isset($claim->invoice) && !empty(trim($claim->invoice)))
+                                                    @if(isset($claim->invoice) && !empty(trim($claim->invoice)) && $claim->invoice != 'empty')
 {{--                                                        <a href="{{asset("/storage")."/".$claim->invoice}}" class="text-success" download>(Скачать счет)</a>--}}
                                                         <a class='btn btn-success download-zip-invoice mt-2' attr-id='{{$claim->id}}'>Скачать</a>
                                                     @else
-                                                        <span class="text-danger">Счет не найден</span>
+                                                        <span class="text-danger">(Счет не был добавлен)</span>
                                                     @endif
                                                 </label>
                                                 <p class="text-danger"><span class="text-opacity-50">Внимание, при прикплении нового файла(ов), информация о старых файлах станет недоступной</span></p>

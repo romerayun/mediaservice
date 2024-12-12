@@ -47,6 +47,7 @@ class RemindActiveAd extends Notification
             ->subject('MediaService - активная реклама')
             ->line('Заканчивается рекламная кампания, у клиента - ' . $this->activeAd->claim->client->name)
             ->line("Дата окончания: " . Carbon::parse($this->activeAd->end_date)->format('d.m.Y'))
+            ->line("Услуга: " . $this->activeAd->claim->service->name)
             ->action('Перейти в активную рекламу', 'https://crm-mediaservice.ru/active-ad');
     }
 

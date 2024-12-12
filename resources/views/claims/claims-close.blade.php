@@ -63,13 +63,17 @@
                                             <p>Взаимодействия</p>
                                             <a href="{{route('claims.show', ['claim' => $claim->id])}}" class="btn icon btn-primary"><i class="bi bi-eye-fill"></i></a>
 
+                                            @if (auth()->user()->role->level <= 2 || auth()->user()->role->level == 5 || auth()->user()->id == $claim->creator)
                                             <form action="{{route('claims.destroy', ['claim' => $claim->id])}}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <a href="#" class="btn icon btn-danger delete"><i class="bi bi-trash-fill"></i></a>
                                             </form>
+                                            @endif
 
-                                            <a href="{{route('claim.repeat', ['claim' => $claim->id])}}" class="btn icon btn-success"><i class="bi bi-repeat"></i></a>
+                                            @if (auth()->user()->role->level <= 2 || auth()->user()->id == $claim->creator)
+                                                <a href="{{route('claim.repeat', ['claim' => $claim->id])}}" class="btn icon btn-success"><i class="bi bi-repeat"></i></a>
+                                            @endif
                                         </div>
 
                                     </div>

@@ -1,3 +1,6 @@
+
+
+
 @if(auth()->user()->isBlocked)
     <script>window.location = "/logout";</script>
 @endif
@@ -8,6 +11,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>CRM MediaService</title>
 
     <link rel="stylesheet" href="{{@asset('css/toastify.css')}}">
@@ -50,13 +55,13 @@
                             <g fill="none" fill-rule="evenodd" stroke="currentColor" stroke-linecap="round"
                                stroke-linejoin="round">
                                 <path
-                                    d="M10.5 14.5c2.219 0 4-1.763 4-3.982a4.003 4.003 0 0 0-4-4.018c-2.219 0-4 1.781-4 4c0 2.219 1.781 4 4 4zM4.136 4.136L5.55 5.55m9.9 9.9l1.414 1.414M1.5 10.5h2m14 0h2M4.135 16.863L5.55 15.45m9.899-9.9l1.414-1.415M10.5 19.5v-2m0-14v-2"
-                                    opacity=".3"></path>
+                                        d="M10.5 14.5c2.219 0 4-1.763 4-3.982a4.003 4.003 0 0 0-4-4.018c-2.219 0-4 1.781-4 4c0 2.219 1.781 4 4 4zM4.136 4.136L5.55 5.55m9.9 9.9l1.414 1.414M1.5 10.5h2m14 0h2M4.135 16.863L5.55 15.45m9.899-9.9l1.414-1.415M10.5 19.5v-2m0-14v-2"
+                                        opacity=".3"></path>
                                 <g transform="translate(-210 -1)">
                                     <path d="M220.5 2.5v2m6.5.5l-1.5 1.5"></path>
                                     <circle cx="220.5" cy="11.5" r="4"></circle>
                                     <path
-                                        d="m214 5l1.5 1.5m5 14v-2m6.5-.5l-1.5-1.5M214 18l1.5-1.5m-4-5h2m14 0h2"></path>
+                                            d="m214 5l1.5 1.5m5 14v-2m6.5-.5l-1.5-1.5M214 18l1.5-1.5m-4-5h2m14 0h2"></path>
                                 </g>
                             </g>
                         </svg>
@@ -79,16 +84,16 @@
             <div class="sidebar-menu">
                 <ul class="menu">
 
-{{--                    <li--}}
-{{--                        class="sidebar-item">--}}
-{{--                        <a href="{{route('home')}}" class='sidebar-link'>--}}
-{{--                            <i class="bi bi-house-fill"></i>--}}
-{{--                            <span>Главная</span>--}}
-{{--                        </a>--}}
-{{--                    </li>--}}
+                    {{--                    <li--}}
+                    {{--                        class="sidebar-item">--}}
+                    {{--                        <a href="{{route('home')}}" class='sidebar-link'>--}}
+                    {{--                            <i class="bi bi-house-fill"></i>--}}
+                    {{--                            <span>Главная</span>--}}
+                    {{--                        </a>--}}
+                    {{--                    </li>--}}
 
                     <li
-                        class="sidebar-item  ">
+                            class="sidebar-item  ">
                         <a href="{{route('calendar.index')}}" class='sidebar-link'>
                             <i class="bi bi-calendar-date-fill"></i>
 
@@ -101,9 +106,18 @@
                         </a>
                     </li>
 
+                    <li
+                        class="sidebar-item  ">
+                        <a href="{{route('special-event.index')}}" class='sidebar-link'>
+                            <i class="bi bi-calendar2-check-fill"></i>
+                            <span>Мероприятия</span>
+                        </a>
+                    </li>
+
+
                     @if (auth()->user()->role->level <= 3)
                         <li
-                            class="sidebar-item  ">
+                                class="sidebar-item  ">
                             <a href="{{route('clients.index')}}" class='sidebar-link'>
                                 <i class="bi bi-people-fill"></i>
                                 <span>Мои клиенты</span>
@@ -114,7 +128,7 @@
 
                     @if (auth()->user()->role->level <= 3)
                         <li
-                            class="sidebar-item  ">
+                                class="sidebar-item  ">
                             <a href="{{route('users.show', ['user' => auth()->user()->id])}}" class='sidebar-link'>
                                 <i class="bi bi-piggy-bank-fill"></i>
                                 <span>Мои продажи</span>
@@ -123,7 +137,7 @@
 
 
                         <li
-                            class="sidebar-item  ">
+                                class="sidebar-item  ">
                             <a href="{{route('goals.my-report')}}" class='sidebar-link'>
                                 <i class="bi bi-list-ol"></i>
                                 <span>Мой отчет
@@ -133,7 +147,7 @@
                     @endif
                     @if (auth()->user()->can('viewAny', \App\Models\Client::class))
                         <li
-                            class="sidebar-item  ">
+                                class="sidebar-item  ">
                             <a href="{{route('clients.showAll')}}" class='sidebar-link'>
                                 <i class="bi bi-person-lines-fill"></i>
                                 <span>Все клиенты</span>
@@ -142,19 +156,17 @@
                     @endif
 
                     <li
-                        class="sidebar-item  ">
+                            class="sidebar-item  ">
                         <a href="{{route('users.index')}}" class='sidebar-link'>
                             <i class="bi bi-people-fill"></i>
                             <span>Пользователи</span>
                         </a>
                     </li>
 
-
-
                     <li class="sidebar-title">Заявки</li>
 
                     <li
-                        class="sidebar-item  ">
+                            class="sidebar-item  ">
                         <a href="{{route('claim.claimsMy')}}" class='sidebar-link'>
                             <i class="bi bi-clipboard-check-fill"></i>
                             <span>Мои заявки
@@ -166,7 +178,7 @@
                     </li>
 
                     <li
-                        class="sidebar-item  ">
+                            class="sidebar-item  ">
                         <a href="{{route('claim.myComplete')}}" class='sidebar-link'>
                             <i class="bi bi-check-circle-fill"></i>
                             <span>Мои выполненные заявки
@@ -176,7 +188,7 @@
 
                     @if (auth()->user()->role->level <= 5)
                         <li
-                            class="sidebar-item  ">
+                                class="sidebar-item  ">
                             <a href="{{route('claim.activeAd')}}" class='sidebar-link align-items-center'>
                                 <i class="bi bi-badge-ad-fill"></i>
                                 <span>Активная @if (getCountActiveAds() != 0)<br>@endif реклама </span>
@@ -190,12 +202,12 @@
 
                     @if(getCountClaimsResponsible() != 0)
                         <li
-                            class="sidebar-item  ">
+                                class="sidebar-item  ">
                             <a href="{{route('claim.distribution')}}" class='sidebar-link'>
                                 <i class="bi bi-clipboard-plus-fill"></i>
                                 <span>Распределение заявок
                                     @if (getCountClaimsResponsibleIsNotRead() != 0)
-                                    <span class="badge bg-primary">{{getCountClaimsResponsibleIsNotRead()}}</span>
+                                        <span class="badge bg-primary">{{getCountClaimsResponsibleIsNotRead()}}</span>
                                     @endif
                                 </span>
                             </a>
@@ -204,12 +216,12 @@
 
                     @if(getCountClaimsWithoutUser() != 0)
                         <li
-                            class="sidebar-item  ">
+                                class="sidebar-item  ">
                             <a href="{{route('claim.claimGroups')}}" class='sidebar-link'>
                                 <i class="bi bi-clipboard-fill"></i>
                                 <span>Заявки отдела
                                     @if (getCountClaimsGroupIsNotRead() != 0)
-                                    <span class="badge bg-primary">{{getCountClaimsGroupIsNotRead()}}</span>
+                                        <span class="badge bg-primary">{{getCountClaimsGroupIsNotRead()}}</span>
                                     @endif
                                 </span>
                             </a>
@@ -222,153 +234,151 @@
 
                     @if (auth()->user()->role->level <= 2 || auth()->user()->userInvoice != 0 || Auth::user()->role->level == 5)
 
-                    <li class="sidebar-title">Бухгалетрия</li>
+                        <li class="sidebar-title">Бухгалетрия</li>
                         @if (auth()->user()->role->level <= 2 || auth()->user()->userInvoice != 0)
-                        <li
-                            class="sidebar-item  ">
-                            <a href="{{route('claim.invoice')}}" class='sidebar-link'>
-                                <i class="bi bi-receipt"></i>
-                                <span>Счета
+                            <li
+                                    class="sidebar-item  ">
+                                <a href="{{route('claim.invoice')}}" class='sidebar-link'>
+                                    <i class="bi bi-receipt"></i>
+                                    <span>Счета
                                     @if (getCountNotCompleteInvoice() != 0)
-                                    <span class="badge bg-primary">{{getCountNotCompleteInvoice()}}</span>
-                                    @endif
+                                            <span class="badge bg-primary">{{getCountNotCompleteInvoice()}}</span>
+                                        @endif
                                 </span>
-                            </a>
-                        </li>
+                                </a>
+                            </li>
                         @endif
 
-                        @if (auth()->user()->role->level <= 2 || Auth::user()->role->level == 5)
-                        <li
-                            class="sidebar-item">
-                            <a href="{{route('payment.index')}}" class='sidebar-link'>
-                                <i class="bi bi-wallet-fill"></i>
-                                <span>Оплаты{{--<span class="badge bg-primary">{{myClaimsIsNotClosed()}}</span>--}}</span>
-                            </a>
-                        </li>
+                        @if (auth()->user()->role->level <= 2 || Auth::user()->role->level == 5 || auth()->user()->userInvoice != 0)
+                            <li
+                                    class="sidebar-item">
+                                <a href="{{route('payment.index')}}" class='sidebar-link'>
+                                    <i class="bi bi-wallet-fill"></i>
+                                    <span>Оплаты{{--<span class="badge bg-primary">{{myClaimsIsNotClosed()}}</span>--}}</span>
+                                </a>
+                            </li>
                         @endif
                     @endif
 
 
 
+                    {{--                    <li class="sidebar-title">Профиль</li>--}}
 
+                    {{--                    @if (auth()->user()->role->level <= 3)--}}
+                    {{--                    <li--}}
+                    {{--                        class="sidebar-item  ">--}}
+                    {{--                        <a href="{{route('users.show', ['user' => auth()->user()->id])}}" class='sidebar-link'>--}}
+                    {{--                            <i class="bi bi-piggy-bank-fill"></i>--}}
+                    {{--                            <span>Мои продажи</span>--}}
+                    {{--                        </a>--}}
+                    {{--                    </li>--}}
+                    {{--                    @endif--}}
 
-{{--                    <li class="sidebar-title">Профиль</li>--}}
+                    {{--                    <li--}}
+                    {{--                        class="sidebar-item  ">--}}
+                    {{--                        <a href="{{route('users.settings')}}" class='sidebar-link'>--}}
+                    {{--                            <i class="bi bi-gear-wide-connected"></i>--}}
+                    {{--                            <span>Настройки</span>--}}
+                    {{--                        </a>--}}
+                    {{--                    </li>--}}
 
-{{--                    @if (auth()->user()->role->level <= 3)--}}
-{{--                    <li--}}
-{{--                        class="sidebar-item  ">--}}
-{{--                        <a href="{{route('users.show', ['user' => auth()->user()->id])}}" class='sidebar-link'>--}}
-{{--                            <i class="bi bi-piggy-bank-fill"></i>--}}
-{{--                            <span>Мои продажи</span>--}}
-{{--                        </a>--}}
-{{--                    </li>--}}
-{{--                    @endif--}}
-
-{{--                    <li--}}
-{{--                        class="sidebar-item  ">--}}
-{{--                        <a href="{{route('users.settings')}}" class='sidebar-link'>--}}
-{{--                            <i class="bi bi-gear-wide-connected"></i>--}}
-{{--                            <span>Настройки</span>--}}
-{{--                        </a>--}}
-{{--                    </li>--}}
-
-{{--                    <li--}}
-{{--                        class="sidebar-item  ">--}}
-{{--                        <a href="{{route('users.logout')}}" class='sidebar-link'>--}}
-{{--                            <i class="bi bi-door-open-fill"></i>--}}
-{{--                            <span>Выйти</span>--}}
-{{--                        </a>--}}
-{{--                    </li>--}}
+                    {{--                    <li--}}
+                    {{--                        class="sidebar-item  ">--}}
+                    {{--                        <a href="{{route('users.logout')}}" class='sidebar-link'>--}}
+                    {{--                            <i class="bi bi-door-open-fill"></i>--}}
+                    {{--                            <span>Выйти</span>--}}
+                    {{--                        </a>--}}
+                    {{--                    </li>--}}
                     @if (auth()->user()->role->level <= 2)
-                    <li class="sidebar-title">Администрирование</li>
+                        <li class="sidebar-title">Администрирование</li>
 
-                    <li
-                        class="sidebar-item  ">
-                        <a href="{{route('plan.index')}}" class='sidebar-link'>
-                            <i class="bi bi-piggy-bank-fill"></i>
-                            <span>План продаж</span>
-                        </a>
-                    </li>
+                        <li
+                                class="sidebar-item  ">
+                            <a href="{{route('plan.index')}}" class='sidebar-link'>
+                                <i class="bi bi-piggy-bank-fill"></i>
+                                <span>План продаж</span>
+                            </a>
+                        </li>
 
-                    <li
-                        class="sidebar-item">
-                        <a href="{{route('claim.complete')}}" class='sidebar-link'>
-                            <i class="bi bi-check-circle-fill"></i>
-                            <span>Выполненные заявки</span>
-                        </a>
-                    </li>
+                        <li
+                                class="sidebar-item">
+                            <a href="{{route('claim.complete')}}" class='sidebar-link'>
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span>Выполненные заявки</span>
+                            </a>
+                        </li>
 
-                    <li
-                        class="sidebar-item">
-                        <a href="{{route('goals.reports')}}" class='sidebar-link'>
-                            <i class="bi bi-list-ol"></i>
-                            <span>Отчеты сотрудников</span></a>
-                    </li>
+                        <li
+                                class="sidebar-item">
+                            <a href="{{route('goals.reports')}}" class='sidebar-link'>
+                                <i class="bi bi-list-ol"></i>
+                                <span>Отчеты сотрудников</span></a>
+                        </li>
 
-                    <li
-                        class="sidebar-item has-sub">
-                        <a href="#" class='sidebar-link'>
-                            <i class="bi bi-info-circle-fill"></i>
-                            <span>Статусы</span>
-                        </a>
+                        <li
+                                class="sidebar-item has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-info-circle-fill"></i>
+                                <span>Статусы</span>
+                            </a>
 
-                        <ul class="submenu" style="display: none;">
-                            <li class="submenu-item">
-                                <a href="{{route('status-client.index')}}">Статус клиента</a>
-                            </li>
-                            <li class="submenu-item ">
-                                <a href="{{route('status-claim.index')}}">Статус заявок</a>
-                            </li>
-                            <li class="submenu-item ">
-                                <a href="{{route('status-payment.index')}}">Статус оплаты</a>
-                            </li>
+                            <ul class="submenu" style="display: none;">
+                                <li class="submenu-item">
+                                    <a href="{{route('status-client.index')}}">Статус клиента</a>
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{route('status-claim.index')}}">Статус заявок</a>
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{route('status-payment.index')}}">Статус оплаты</a>
+                                </li>
 
-                        </ul>
-                    </li>
+                            </ul>
+                        </li>
 
 
-                    <li
-                        class="sidebar-item has-sub">
-                        <a href="#" class='sidebar-link'>
-                            <i class="bi bi-person-workspace"></i>
-                            <span>Структура</span>
-                        </a>
+                        <li
+                                class="sidebar-item has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-person-workspace"></i>
+                                <span>Структура</span>
+                            </a>
 
-                        <ul class="submenu">
-                            <li class="submenu-item">
-                                <a href="{{route('groups.index')}}">Отделы</a>
-                            </li>
-                            <li class="submenu-item ">
-                                <a href="{{route('roles.index')}}">Должности</a>
-                            </li>
-                            <li class="submenu-item ">
-                                <a href="{{route('users.index')}}">Пользователи</a>
-                            </li>
+                            <ul class="submenu">
+                                <li class="submenu-item">
+                                    <a href="{{route('groups.index')}}">Отделы</a>
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{route('roles.index')}}">Должности</a>
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{route('users.index')}}">Пользователи</a>
+                                </li>
 
-                        </ul>
-                    </li>
+                            </ul>
+                        </li>
 
-                    <li
-                        class="sidebar-item has-sub">
-                        <a href="#" class='sidebar-link'>
-                            <i class="bi bi-box-seam-fill"></i>
-                            <span>Услуги</span>
-                        </a>
+                        <li
+                                class="sidebar-item has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-box-seam-fill"></i>
+                                <span>Услуги</span>
+                            </a>
 
-                        <ul class="submenu">
-                            <li class="submenu-item">
-                                <a href="{{route('category.index')}}">Категории услуг</a>
-                            </li>
-                            <li class="submenu-item ">
-                                <a href="{{route('services.index')}}">Услуги</a>
-                            </li>
-                            <li class="submenu-item ">
-                                <a href="{{route('packages.index')}}">Пакеты услуг</a>
-                            </li>
+                            <ul class="submenu">
+                                <li class="submenu-item">
+                                    <a href="{{route('category.index')}}">Категории услуг</a>
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{route('services.index')}}">Услуги</a>
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{route('packages.index')}}">Пакеты услуг</a>
+                                </li>
 
-                        </ul>
+                            </ul>
 
-                    </li>
+                        </li>
                 </ul>
                 @endif
             </div>
@@ -384,6 +394,49 @@
                         </a>
                     </div>
                     <div class="col-6 d-flex justify-content-end">
+{{--                        <ul class="navbar-nav flex-row align-items-center ms-auto me-2">--}}
+{{--                            <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-2">--}}
+{{--                                <a class="nav-link dropdown-toggle hide-arrow show" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">--}}
+{{--                                  <span class="position-relative">--}}
+{{--                                    <i class="bi bi-bell"></i>--}}
+{{--                                    <span class="badge rounded-pill bg-danger badge-dot badge-notifications border"></span>--}}
+{{--                                  </span>--}}
+{{--                                </a>--}}
+{{--                                <ul class="dropdown-menu dropdown-menu-end p-0" data-bs-popper="static">--}}
+{{--                                    <li class="dropdown-menu-header border-bottom">--}}
+{{--                                        <div class="dropdown-header d-flex align-items-center py-3">--}}
+{{--                                            <h6 class="mb-0 me-auto">Уведомления</h6>--}}
+{{--                                        </div>--}}
+{{--                                    </li>--}}
+{{--                                    <li class="dropdown-notifications-list scrollable-container ps ps--active-y">--}}
+{{--                                        <ul class="list-group list-group-flush">--}}
+{{--                                            <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read" style="margin-bottom: 0 !important">--}}
+{{--                                                <div class="d-flex">--}}
+{{--                                                    <div class="flex-grow-1 p-2">--}}
+{{--                                                        <h6 class="small mb-0">Congratulation Lettie 🎉</h6>--}}
+{{--                                                        <small class="mb-1 d-block text-body">Won the monthly best seller gold badge</small>--}}
+{{--                                                        <small class="text-muted">1h ago</small>--}}
+{{--                                                    </div>--}}
+{{--                                                    <div class="flex-shrink-0 dropdown-notifications-actions">--}}
+{{--                                                        <a href="#" class="dropdown-notifications-read"><span class="badge badge-dot"></span></a>--}}
+{{--                                                        <a href="javascript:void(0)" class="dropdown-notifications-archive"><span class="bi bi-x"></span></a>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                            </li>--}}
+
+{{--                                        </ul>--}}
+
+{{--                                    <li class="border-top">--}}
+{{--                                        <div class="d-grid p-4">--}}
+{{--                                            <a class="btn btn-primary btn-sm d-flex" href="javascript:void(0);">--}}
+{{--                                                <small class="align-middle">View all notifications</small>--}}
+{{--                                            </a>--}}
+{{--                                        </div>--}}
+{{--                                    </li>--}}
+{{--                                </ul>--}}
+{{--                            </li>--}}
+{{--                        </ul>--}}
+
                         <div class="header-top-right text-end">
 
                             <div class="dropdown">
@@ -443,15 +496,22 @@
     </div>
 </div>
 
+<script>
+    window.Laravel = {
+        userId: {{ auth()->user()->id }}
+    };
+</script>
+
 <script src="{{asset('js/all.js')}}"></script>
-<script src="{{asset('js/datatables.js')}}"></script>
+<script src="{{asset('js/datatables.js')}}?v2"></script>
 <script src="{{asset('js/apexcharts.js')}}"></script>
 <script src="{{asset('js/toastify.js')}}"></script>
-<script src="{{asset('js/main.js')}}?v8"></script>
+<script src="{{asset('js/main.js')}}?v30"></script>
 <script src="{{asset('js/calendar.js')}}"></script>
 <script src="{{asset('js/popper.js')}}"></script>
-<script src="{{asset('js/rrule-gui.js')}}"></script>
-<script src="{{asset('js/custom-calendar.js')}}"></script>
+<script src="{{asset('js/rrule-gui.js')}}?v2"></script>
+<script src="{{asset('js/custom-calendar.js')}}?v6"></script>
+<script src="{{asset('js/events-table.js')}}"></script>
 
 
 </body>

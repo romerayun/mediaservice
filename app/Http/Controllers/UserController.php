@@ -29,6 +29,10 @@ class UserController extends Controller
 
     public function login()
     {
+//        dd(DB::table('users')->where('id', '=', '1')->update([
+//            'password' => Hash::make('1111'),
+//            'email' => 'admin@info.ru'
+//        ]));
         return view('users.login');
     }
 
@@ -63,7 +67,7 @@ class UserController extends Controller
     {
 
 
-        $users = UserM::where('isBlocked', 0)->get();
+        $users = UserM::orderBy('isBlocked', 'asc')->get();
         return view('users.index', compact('users'));
     }
 
@@ -115,7 +119,7 @@ class UserController extends Controller
         } catch (\Exception $exception) {
             DB::rollback();
 
-            $request->session()->flash('error', 'При добавлении данных произошла ошибка 😢' . $exception);
+            $request->session()->flash('error', 'При добавлении данных произошла ошибка 😢' );
             return back();
         }
     }
@@ -128,13 +132,16 @@ class UserController extends Controller
      */
     public function show($id, Request $request)
     {
-        if (auth()->user()->role->level > 2 && auth()->user()->id != $id) {
+        if (auth()->user()->role->level != 1 && auth()->user()->role->level != 2 && auth()->user()->id != $id && auth()->user()->role->level != 5 ) {
             abort(403);
         }
         $ajaxMonth = date('Y-m');
         $start = date('Y-m-01') . ' 00:00:00';
         $end = date('Y-m-31') . ' 23:59:59';
         $planMonth = date('Y-m-01');
+
+        session(['previous_url' => url()->current()]);
+        getCountPastDays($planMonth);
 
         if ($request->input('month')) {
             $start = $request->input('month') . '-01 00:00:00';
@@ -163,6 +170,7 @@ class UserController extends Controller
             ->where('notInclude', '=',0)
             ->where('created_at', '>=', $start)
             ->where('created_at', '<=', $end)
+            ->whereNull('deleted_at')
             ->get();
 
         $sumPaid = HistoryPayment::where('created_at', '>=', $start)
@@ -215,7 +223,7 @@ class UserController extends Controller
         $user = UserM::firstWhere('id', $id);
 
 
-        return view('users.show', compact('userClaims', 'user', 'sumPlan', 'sumClaims', 'sumPaid', 'id', 'salesByCategory'));
+        return view('users.show', compact('userClaims', 'user', 'sumPlan', 'sumClaims', 'sumPaid', 'id', 'salesByCategory', 'planMonth'));
     }
 
     /**
@@ -291,12 +299,22 @@ class UserController extends Controller
     public function destroy($id)
     {
         $user = UserM::find($id);
-        $user->isBlocked = 1;
-        $user->save();
 
-        Client::where('user_id', $id)->update(['user_id'=>null]);
-        Claim::where('user_id', $id)->update(['user_id'=>null]);
-        return redirect()->route('users.index')->with('success', 'Пользователь успешно заблокирован 👍');
+        if ($user->isBlocked == 1) {
+            $user->isBlocked = 0;
+            $user->save();
+            return redirect()->route('users.index')->with('success', 'Пользователь успешно разблокирован 👍');
+        } else {
+            $user->isBlocked = 1;
+            $user->save();
+            Client::where('user_id', $id)->update(['user_id' => null]);
+            Claim::where('user_id', $id)->update(['user_id' => null]);
+            return redirect()->route('users.index')->with('success', 'Пользователь успешно заблокирован 👍');
+        }
+
+
+
+
     }
 
 
@@ -535,7 +553,7 @@ class UserController extends Controller
 
         }
 
-
+        $sum = 0;
         $res = '';
         $res .= '<div class="col-12 col-md-12">
             <div class="card">
@@ -552,6 +570,7 @@ class UserController extends Controller
         $res .= '<tr>';
         $res .= '<td class="font-bold">Итого поступлений: </td>';
         foreach ($allData as $item) {
+            $sum += $item['sum'];
             $res .= '<td>' . money($item['sum']) . ' руб.</td>';
         }
         $res .= '</tr>';
@@ -571,6 +590,12 @@ class UserController extends Controller
 
         $res .= '</tr>';
 
+
+        $res .= '<tr>';
+        $res .= '<td class="font-bold text-primary">Итого поступлений: </td>';
+        $res .= '<td colspan="'.count($allData).'">' . money($sum) . ' руб.</td>';
+        $res .= '</tr>';
+
         $res .= '<tr>';
         $res .= '<td class="font-bold text-primary">Общий доход: </td>';
         $res .= '<td colspan="'.count($allData).'">' . money($allSalary) . ' руб.</td>';
@@ -579,7 +604,8 @@ class UserController extends Controller
         if ($allClaimsAmount < 200000) $bonus = 0;
         else if ($allClaimsAmount < 300000) $bonus = $allClaimsAmount * 0.01;
         else if ($allClaimsAmount < 500000) $bonus = $allClaimsAmount * 0.02;
-        else if ($allClaimsAmount < 1000000) $bonus = $allClaimsAmount * 0.03;
+        else if ($allClaimsAmount < 700000) $bonus = $allClaimsAmount * 0.03;
+        else if ($allClaimsAmount < 1000000) $bonus = $allClaimsAmount * 0.04;
         else if ($allClaimsAmount < 3000000) $bonus = $allClaimsAmount * 0.05;
         else $bonus = $allClaimsAmount * 0.06;
 
@@ -617,7 +643,9 @@ class UserController extends Controller
                                 </thead>';
                             foreach($item['users'] as $user) {
 
+
                                 if(count($user) != 0) {
+                                    if($user->first()->claim == null || $user->first()->claim->client == null) continue;
                                     $res .= "<tr>
                                             <td>" . $user->first()->claim->client->name ."</td>";
 

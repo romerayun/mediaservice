@@ -49,6 +49,7 @@ if (document.getElementById('datatables')) {
     var dataTable = new simpleDatatables.DataTable("#datatables", {
         searchable: true,
         fixedHeight: false,
+        perPage: 25,
         labels: {
             placeholder: "Поиск...",
             perPage: "{select} записей на странице",

@@ -19,4 +19,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+//Route::group(['middleware' => ['web']], function () {
+    Route::get('/get-statistics-by-year/{year}', [\App\Http\Controllers\SalesPlanController::class, 'getStatisticsByYear']);
+    Route::get('/get-working-days/{month}', [\App\Http\Controllers\SalesPlanController::class, 'getWorkingDays']);
+//});
+
 //Route::post('/get-users-by-group', [ServiceController::class, 'usersByGroup'])->name('services.usersByGroup');

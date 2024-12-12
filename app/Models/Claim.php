@@ -27,7 +27,9 @@ class Claim extends Model
         'creator',
         'comment',
         'notInclude',
-        'number_invoice'
+        'number_invoice',
+        'created_at',
+        'close_user_id'
     ];
 
     public function getDate() {
@@ -89,6 +91,11 @@ class Claim extends Model
 
     public function getDeadline(): string {
         return Carbon::parse($this->deadline)->format('d.m.Y г.');
+    }
+
+    public function pusherNotofications()
+    {
+        return $this->hasMany(PusherNotification::class);
     }
 
 }

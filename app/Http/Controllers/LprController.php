@@ -102,10 +102,17 @@ class LprController extends Controller
      */
     public function update(Request $request, $id)
     {
+//        dd($request);
         $lpr = LprClient::firstWhere('id', $id);
         if ($request->date_of_birth) {
+
             $date = Carbon::createFromFormat('d.m.Y', $request->date_of_birth)->format('Y-m-d');
             $request->merge(['date_of_birth' => $date]);
+        } else if ($request->date_of_birth == null) {
+
+            $request->merge(['date_of_birth']);
+            $lpr->date_of_birth = null;
+            $lpr->save();
         }
 
         $lpr->update($request->all());

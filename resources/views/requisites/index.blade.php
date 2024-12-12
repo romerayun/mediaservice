@@ -96,6 +96,25 @@
                                 </div>
 
                                 <div class="row mt-3">
+                                    <div class="col-md-12 col-sm-12">
+                                        <div class="form-group">
+                                            <label>КПП организации: </label>
+                                            <input type="text" id="KPP_C" class="form-control @if($errors->has('KPP_C')) is-invalid @endif" name="KPP_C"
+                                                   placeholder="Введите КПП организации..."
+                                                   @if(old('KPP_C')) value="{{old('KPP_C')}}" @else value="{{$requisites->KPP_C}}" @endif>
+                                            @if($errors->has('KPP_C'))
+                                                <div class="invalid-feedback">
+                                                    <i class="bx bx-radio-circle"></i>
+                                                    @foreach($errors->get('KPP_C') as $message)
+                                                        {{$message}}<br>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-3">
                                         <div class="col-md-12 col-sm-12">
                                         <div class="form-group">
                                             <label>Юридический адрес организации: </label>

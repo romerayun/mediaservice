@@ -16,6 +16,8 @@ class HistoryClaim extends Model
         'status_id',
         'comment' ,
         'claim_id',
+        'created_at',
+        'updated_at',
     ];
 
     public function claim()

@@ -119,11 +119,22 @@
                             <ol class="activity-feed">
                                 @foreach($client->histories as $currentStatus)
                                     @if ($loop->index == 2) @break @endif
-                                    <li class="feed-item feed-item-{{$currentStatus->status->color}}">
+                                    @if ($currentStatus->status == null)
+                                       <li class="feed-item feed-item-primary">
+                                    @else
+                                       <li class="feed-item feed-item-{{$currentStatus->status->color}}">
+                                    @endif
+
 
                                         <time class="date" datetime="9-25">{{$currentStatus->getDate()}}</time>
-                                        <p class="fs-6"><b>Статус: </b> {{$currentStatus->status->name}}</p>
-                                        <span class="text"><b>Комментарий: </b> {{$currentStatus->comment}}</span>
+
+                                            @if ($currentStatus->status == null)
+                                               <p class="fs-6"><b>Статус: </b> Неизвестно</p>
+                                            @else
+                                                        <p class="fs-6"><b>Статус: </b> {{$currentStatus->status->name}}</p>
+                                            @endif
+
+                                                    <span class="text"><b>Комментарий: </b> {{$currentStatus->comment}}</span>
                                         <p class="text mt-3">
                                             <b>Ответственный: </b>{{$currentStatus->user->getFullName()}}</p>
                                     </li>
@@ -170,7 +181,7 @@
         @endif
 
     </div>
-
+    Всего записей: {{$clients->total()}}
     {{ $clients->links() }}
 
 

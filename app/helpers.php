@@ -3,6 +3,7 @@
 use App\Models\Claim;
 use App\Models\ClaimUsers;
 use App\Models\HistoryPayment;
+use App\Models\SalesPlanMonth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -100,6 +101,7 @@ if (!function_exists('getCountClaimsResponsibleIsNotRead')) {
     function getCountClaimsResponsibleIsNotRead()
     {
         return \App\Models\Claim::whereNull('user_id')
+            ->where('isClose', 0)
             ->with('service')
             ->whereHas('service', function ($q) {
                 $q->where('user_id', \Illuminate\Support\Facades\Auth::user()->id);
@@ -389,5 +391,238 @@ if (!function_exists('getPaymentsClaim')) {
             ->sum('amount');
 
         return $claim;
+    }
+}
+if (!function_exists('getDebtSum')) {
+    function getDebtSum() {
+
+        $res = '';
+
+        $debtClaims = Claim::with('historiesPayment')
+            ->whereHas('historiesPayment', function ($q)  {
+                $q->with('status')
+                    ->whereHas('status', function ($w) {
+                        $w->where('name', "Долг");
+                    });
+            })
+            ->where('notInclude',0)
+            ->select(DB::raw('id'))
+            ->get();
+
+        $paidClaims = Claim::with('historiesPayment')
+            ->whereHas('historiesPayment', function ($q)  {
+                $q->with('status')
+                    ->whereHas('status', function ($w) {
+                        $w->where('name', "Оплачен");
+                    });
+            })
+            ->where('notInclude',0)
+            ->select(DB::raw('id'))
+            ->get();
+
+        $idPaidClaims = $paidClaims->mapWithKeys(function ($item, $i) {
+            return [$i => $item->id];
+        });
+
+        $idDebtClaims = $debtClaims->mapWithKeys(function ($item, $i) {
+            return [$i => $item->id];
+        });
+
+        $sumDebtClaims = Claim::with('historiesPayment')
+            ->whereHas('historiesPayment', function ($q)  {
+                $q->with('status')
+                    ->whereHas('status', function ($w) {
+                        $w->where('name', "Долг");
+                    });
+            })
+            ->where('notInclude',0)
+            ->whereNotIn('id', $idPaidClaims)
+            ->select(DB::raw('SUM(amount) as total_amount'))
+            ->get();
+
+        $sumPartPaid = HistoryPayment::with('status')
+            ->whereHas('status', function ($w) {
+                $w->where('name', "Частично оплачен");
+            })
+            ->whereNotIn('claim_id', $idPaidClaims)
+            ->whereIn('claim_id', $idDebtClaims)
+            ->select(DB::raw(' SUM(amount) as total_amount'))
+            ->get();
+
+
+        $res .= '<p class="fw-bold mb-0"><b class="text-primary">Долг: </b>';
+        if($sumDebtClaims->first()->total_amount == null)
+            $res .= '0 руб';
+        else {
+            $res .= money($sumDebtClaims->first()->total_amount) . ' руб.';
+            if ($sumPartPaid->first()->total_amount != null) {
+                $res .= ' (из них частично оплачено: '. money($sumPartPaid->first()->total_amount) . ' руб.)';
+                $res .= ' = Итого: '. money($sumDebtClaims->first()->total_amount - $sumPartPaid->first()->total_amount) . ' руб.';
+            }
+        }
+
+
+        $res .= '</p>';
+
+        return $res;
+
+    }
+}
+
+if (!function_exists('getDebtSumByUser')) {
+    function getDebtSumByUser($user_id) {
+
+        $res = '';
+
+        $debtClaims = Claim::with('historiesPayment')
+            ->whereHas('historiesPayment', function ($q)  {
+                $q->with('status')
+                    ->whereHas('status', function ($w) {
+                        $w->where('name', "Долг");
+                    });
+            })
+            ->where('creator', $user_id)
+            ->where('notInclude',0)
+            ->select(DB::raw('id'))
+            ->get();
+
+        $paidClaims = Claim::with('historiesPayment')
+            ->whereHas('historiesPayment', function ($q)  {
+                $q->with('status')
+                    ->whereHas('status', function ($w) {
+                        $w->where('name', "Оплачен");
+                    });
+            })
+            ->where('creator', $user_id)
+            ->where('notInclude',0)
+            ->select(DB::raw('id'))
+            ->get();
+
+        $idDebtClaims = $debtClaims->mapWithKeys(function ($item, $i) {
+            return [$i => $item->id];
+        });
+
+        $idPaidClaims = $paidClaims->mapWithKeys(function ($item, $i) {
+            return [$i => $item->id];
+        });
+
+        $sumDebtClaims = Claim::with('historiesPayment')
+            ->whereHas('historiesPayment', function ($q)  {
+                $q->with('status')
+                    ->whereHas('status', function ($w) {
+                        $w->where('name', "Долг");
+                    });
+            })
+            ->whereNotIn('id', $idPaidClaims)
+            ->where('creator', $user_id)
+            ->where('notInclude',0)
+            ->select(DB::raw('SUM(amount) as total_amount'))
+            ->get();
+
+        $sumPartPaid = HistoryPayment::with('status')
+            ->whereHas('status', function ($w) {
+                $w->where('name', "Частично оплачен");
+            })
+            ->with('claim')
+            ->whereHas('claim', function ($q) use ($user_id) {
+                $q->where('creator', $user_id);
+            })
+            ->whereNotIn('claim_id', $idPaidClaims)
+            ->whereIn('claim_id', $idDebtClaims)
+            ->select(DB::raw(' SUM(amount) as total_amount'))
+            ->get();
+
+
+        $res .= '<p class="fw-bold mb-0"><b class="text-primary">Долг: </b>';
+        if($sumDebtClaims->first()->total_amount == null)
+            $res .= '0 руб';
+        else {
+            $res .= money($sumDebtClaims->first()->total_amount) . ' руб.';
+            if ($sumPartPaid->first()->total_amount != null) {
+                $res .= ' (из них частично оплачено: '. money($sumPartPaid->first()->total_amount) . ' руб.)';
+                $res .= ' = Итого: '. money($sumDebtClaims->first()->total_amount - $sumPartPaid->first()->total_amount) . ' руб.';
+            }
+        }
+
+
+        $res .= '</p>';
+
+        return $res;
+
+    }
+}
+
+if (!function_exists('getWorkingDays')) {
+    function getWorkingDays($month) {
+        $res = [];
+        $days = SalesPlanMonth::where('month', $month)->first();
+        if ($days) {
+            $days = explode('|', $days->selected_days);
+            foreach ($days as $day) {
+                $res[] = trim($day);
+            }
+            return $res;
+        }
+
+        return $res;
+    }
+}
+
+if (!function_exists('getCountPastDays')) {
+    function getCountPastDays($month) {
+        $countPastDays = 0;
+        $today = Carbon::now()->format('Y-m-d');
+        $days = SalesPlanMonth::where('month', $month)->first();
+        if ($days) {
+            $days = explode('|', $days->selected_days);
+            foreach ($days as $day) {
+               if (Carbon::createFromDate($day) <= Carbon::createFromDate($today)) {
+                   $countPastDays++;
+               }
+            }
+        }
+
+        return $countPastDays;
+    }
+}
+
+
+if (!function_exists('checkAnotherUser')) {
+    function checkAnotherUser($claim_id) {
+
+        $claim = Claim::where('id', $claim_id)->first();
+
+
+        if (!$claim) return 0;
+        else {
+            if ($claim->creator == $claim->client->user_id) {
+                return 0;
+            } else {
+                return true;
+            }
+        }
+
+    }
+}
+
+if (!function_exists('createPusherNotification')) {
+    function createPusherNotification($claim_id, $user_id, $text, $url) {
+
+        try {
+            \App\Models\PusherNotification::create([
+                'claim_id' => $claim_id,
+                'user_id' => $user_id,
+                'text' => $text,
+                'url' => $url,
+            ]);
+
+            return true;
+
+        } catch (Exception $exception) {
+
+            return false;
+
+        }
+
     }
 }

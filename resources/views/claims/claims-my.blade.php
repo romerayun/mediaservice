@@ -45,6 +45,7 @@
                                                 @endif"
                                                      alt="Avatar">
                                             </div>
+
                                             {{$claim->creatorUser->getFullName()}}
                                         </div>
                                         <hr>
@@ -52,7 +53,11 @@
                                             <b>Клиент - </b> <a href="{{route('clients.show', ['client' => $claim->client_id])}}">{{$claim->client->name}}</a>
                                         </p>
                                         <p class="mb-1">
+                                            @if(count($claim->histories))
                                             <b>Текущий статус - </b> {{$claim->histories->first()->status->name}}
+                                            @else
+                                                <b>Текущий статус - </b> Неизвестно
+                                            @endif
                                         </p>
                                         <p class="mb-1">
                                             <b>Стоимость - </b> {{money($claim->amount)}} руб.
